@@ -239,8 +239,8 @@ function ExhibitModalBody({
             onClick={toggleNarrate}
             className="absolute right-5 top-5 z-10 inline-flex items-center gap-2 rounded-full border bg-card/85 px-3 py-1.5 text-[0.7rem] font-medium backdrop-blur-md transition hover:bg-card"
             style={{
-              borderColor: narrating ? phase.accent : "rgba(255,255,255,0.15)",
-              color: narrating ? phase.accent : "rgba(255,255,255,0.8)",
+              borderColor: narrating ? phase.accent : "oklch(0.5 0.02 60 / 0.22)",
+              color: narrating ? phase.accent : "oklch(0.5 0.02 60 / 0.88)",
             }}
           >
             {narrLoading ? (
@@ -442,9 +442,9 @@ function IconBtn({
       aria-label={title}
       className="grid h-9 w-9 place-items-center rounded-full border transition"
       style={{
-        borderColor: active ? accent : "rgba(255,255,255,0.12)",
-        background: active ? `${accent}14` : "rgba(255,255,255,0.02)",
-        color: active ? accent : "rgba(255,255,255,0.7)",
+        borderColor: active ? accent : "oklch(0.5 0.02 60 / 0.18)",
+        background: active ? `${accent}14` : "oklch(0.5 0.02 60 / 0.04)",
+        color: active ? accent : "oklch(0.5 0.02 60 / 0.8)",
       }}
     >
       {children}

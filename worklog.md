@@ -368,3 +368,47 @@ Unresolved / next-phase recommendations:
 - Mobile: Tour Player Bar could be more compact on small screens (currently stacks).
 - Accessibility: add keyboard navigation for Featured Tours carousel + Photo Wall grid.
 - Performance: consider lazy-loading 3D models per phase (currently all 32 models bundled).
+
+---
+Task ID: 10
+Agent: main (user request)
+Task: Fix Scene Lab checkbox alignment + add light/dark theme toggle
+
+Work Log:
+- FIXED: Scene Lab component checklist checkbox alignment bug. Root cause: the wrapper `<div className="pt-0.5">` around `<Checkbox>` was shifting the checkbox down slightly relative to the label baseline (VLM confirmed "LẮP RẮP row shows misalignment: checkbox offset downward"). Fix: removed the `pt-0.5` wrapper div, changed the parent button from `items-start` to `items-center`, and added `shrink-0` to the Checkbox. VLM re-verify confirms "checkboxes now properly aligned vertically with label text, no offset or floating".
+- NEW FEATURE: Light/dark theme system.
+  - Updated `src/app/globals.css`: `:root` now defines LIGHT mode (warm cream/paper museum gallery — background oklch(0.965 0.008 75), foreground oklch(0.22 0.018 55), primary oklch(0.55 0.14 55) deeper bronze for contrast, light museum-backdrop gradient). `.dark` retains original warm brown night theme. Added `--on-dark` flag + light atmospheric layers (softer vignette, lighter spotlight-floor). Selection colors adapt per theme.
+  - Created `src/hooks/museum/use-is-dark.ts` — hook that observes `<html class="dark">` via MutationObserver, returns boolean. Used by 3D stages.
+  - Created `src/components/museum/layout/ThemeToggle.tsx` — pill toggle button with Sun/Moon icons (animated via framer-motion), uses `useTheme` from next-themes, `useSyncExternalStore` for mount detection (lint-safe). Shows "Ban đêm/Ban ngày" label on desktop.
+  - Updated `src/app/providers.tsx` — wrapped app in `<ThemeProvider attribute="class" defaultTheme="dark" storageKey="atrium-theme">`.
+  - Updated `src/app/layout.tsx` — removed hardcoded `className="dark"`, added inline `<script>` in `<head>` that reads localStorage `atrium-theme` and sets the html class BEFORE hydration (prevents theme flash). Removed hardcoded Toaster toastOptions (let it use theme vars).
+  - Mounted `<ThemeToggle />` in: LandingPage header, PortalEntry header, MuseumMap header, ExitSummary header, VisitorHud (compact, between AudioToggle and tool cluster).
+- THEME-AWARE 3D STAGES:
+  - `Artifact3DStage.tsx` — uses `useIsDark()` to adapt: canvas background (dark `#1a0f08→#100804` vs light `#f5ebd8→#e8dcc4`), pedestal colors (dark browns vs light sandstones), ambient/spotlight intensities (brighter in light), hemisphereLight ground color, accent ring emissive intensity, ContactShadows opacity/color.
+  - `CinematicHero.tsx` — uses `useIsDark()` to adapt: floor disc color, fog color (added `<fog>` for depth), all light intensities reduced in light mode, fade overlay opacity reduced. Steam engine still renders well in both.
+- BULK THEME FIX: Replaced 24 hardcoded `rgba(255,255,255,X)` references across 11 files with theme-adaptive `oklch(0.5 0.02 60 / X)` equivalents (mid-tone warm gray that works on both light and dark backgrounds). Files: Timeline, PortalEntry, QuizBox, SceneLabModal, ExhibitModal, BookmarksPanel, OnboardingOverlay, TourBuilderModal, AnalyticsDashboard, Guestbook, Achievements.
+- Final lint: clean (0 errors).
+- Console: no errors (only THREE.js deprecation warnings, harmless).
+
+Verification (agent-browser + VLM):
+- Dark mode landing: warm brown, teal/pink headline accents, 3D steam engine visible. ✓
+- Light mode landing: cream paper background, dark text readable, 3D model still visible, headline accents pop. VLM: "balances warmth and legibility effectively". ✓
+- Light mode room: exhibit cards readable (dark text on light), HUD clear, phase accent orange visible. VLM: "No contrast issues, washed-out elements, or unreadable text". ✓
+- Light mode exhibit modal: 3D stage cream background, model visible, narrative readable, section labels visible. VLM: "No contrast issues". ✓
+- Light mode Scene Lab: checkbox alignment FIXED — VLM confirms "properly aligned vertically with label text, no offset or floating". ✓
+- Dark↔Light toggle: works both directions, persists across page reload (localStorage `atrium-theme`), no theme flash (inline script sets class before hydration). ✓
+- Mobile 375px light mode: responsive, toggle accessible, no overflow. ✓
+- All API routes still 200, no console errors.
+
+Stage Summary:
+- Scene Lab checkbox alignment bug FIXED.
+- Light/dark theme system COMPLETE — user can toggle via ThemeToggle pill in header/HUD. Light mode is warm paper/cream museum gallery (not cold white). Dark mode is original warm brown night. Theme persists across reloads. 3D stages adapt to both themes. All 24 hardcoded white rgba refs replaced with theme-adaptive oklch values.
+- Vietnamese UI preserved, warm-brown identity preserved in dark mode, no indigo/blue introduced in either mode.
+- ThemeToggle mounted in all 5 entry points (Landing, Portal, Map, Exit, Room HUD).
+
+Unresolved / next-phase recommendations:
+- Real historical images (image-generation skill) would replace procedural gradients — gradients look OK in both themes but real photos would elevate.
+- Featured Achievements carousel on landing (not yet built).
+- Compare modal could show side-by-side 3D models.
+- Consider a "system" theme option that follows prefers-color-scheme (currently explicit light/dark only).
+- The Guestbook form inputs use `bg-background/60` which adapts, but could add explicit focus ring colors per theme.

@@ -112,17 +112,17 @@ export function Achievements() {
                 transition={{ delay: Math.min(i * 0.04, 0.4) }}
                 className="flex items-start gap-3 rounded-xl border p-3 transition"
                 style={{
-                  borderColor: got ? `${color}44` : "rgba(255,255,255,0.08)",
-                  background: got ? `${color}0d` : "rgba(255,255,255,0.02)",
+                  borderColor: got ? `${color}44` : "oklch(0.5 0.02 60 / 0.12)",
+                  background: got ? `${color}0d` : "oklch(0.5 0.02 60 / 0.04)",
                   opacity: got ? 1 : 0.55,
                 }}
               >
                 <div
                   className="grid h-10 w-10 shrink-0 place-items-center rounded-full border"
                   style={{
-                    borderColor: got ? color : "rgba(255,255,255,0.15)",
+                    borderColor: got ? color : "oklch(0.5 0.02 60 / 0.22)",
                     background: got ? `${color}18` : "transparent",
-                    color: got ? color : "rgba(255,255,255,0.4)",
+                    color: got ? color : "oklch(0.5 0.02 60 / 0.5)",
                   }}
                 >
                   <Icon className="h-5 w-5" />

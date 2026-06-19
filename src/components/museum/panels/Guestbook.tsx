@@ -138,7 +138,7 @@ export function Guestbook() {
                       className="h-5 w-5 transition"
                       style={{
                         fill: s <= rating ? "#e8b53a" : "transparent",
-                        color: s <= rating ? "#e8b53a" : "rgba(255,255,255,0.3)",
+                        color: s <= rating ? "#e8b53a" : "oklch(0.5 0.02 60 / 0.4)",
                       }}
                     />
                   </button>

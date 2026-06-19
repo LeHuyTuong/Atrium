@@ -34,14 +34,14 @@ export function Timeline() {
                 }}
                 className="group relative flex flex-1 flex-col items-center gap-1 rounded-lg border px-2 py-1.5 transition-all"
                 style={{
-                  borderColor: active ? p.accent : "rgba(255,255,255,0.08)",
+                  borderColor: active ? p.accent : "oklch(0.5 0.02 60 / 0.12)",
                   background: active ? `${p.accent}14` : "transparent",
                 }}
               >
                 <div className="flex items-center gap-1.5">
                   <span
                     className="font-serif text-sm font-bold leading-none"
-                    style={{ color: active ? p.accent : "rgba(255,255,255,0.5)" }}
+                    style={{ color: active ? p.accent : "oklch(0.5 0.02 60 / 0.6)" }}
                   >
                     {p.label}
                   </span>

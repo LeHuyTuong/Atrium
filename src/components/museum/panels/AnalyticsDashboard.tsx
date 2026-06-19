@@ -99,7 +99,7 @@ export function AnalyticsDashboard() {
           <div className="mt-6 flex items-center gap-4 rounded-xl border border-foreground/10 bg-foreground/[0.02] p-5">
             <div className="relative grid h-16 w-16 place-items-center">
               <svg className="-rotate-90" width={64} height={64}>
-                <circle cx={32} cy={32} r={28} fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth={5} />
+                <circle cx={32} cy={32} r={28} fill="none" stroke="oklch(0.5 0.02 60 / 0.15)" strokeWidth={5} />
                 <circle
                   cx={32}
                   cy={32}

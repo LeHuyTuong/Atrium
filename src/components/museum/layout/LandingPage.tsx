@@ -6,6 +6,7 @@ import { ArrowRight, Sparkles, Clock, Map as MapIcon } from "lucide-react";
 import { PHASES } from "@/lib/museum-data";
 import { useMuseum } from "@/lib/store";
 import { BrandMark, PhaseNumeral } from "./brand";
+import { ThemeToggle } from "./ThemeToggle";
 
 const CinematicHero = dynamic(() => import("@/components/museum/3d/CinematicHero").then((m) => m.CinematicHero), {
   ssr: false,
@@ -36,12 +37,15 @@ export function LandingPage() {
         {/* header */}
         <header className="flex items-center justify-between px-5 py-5 sm:px-8 sm:py-6">
           <BrandMark size="md" />
-          <div className="hidden items-center gap-4 text-right text-[0.7rem] uppercase tracking-[0.2em] text-foreground/55 sm:flex sm:flex-col">
-            <span className="flex items-center gap-2">
-              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400" />
-              Mở cửa · Luôn mở
-            </span>
-            <span>4 kỷ nguyên · 32 hiện vật</span>
+          <div className="flex items-center gap-4">
+            <div className="hidden items-center gap-4 text-right text-[0.7rem] uppercase tracking-[0.2em] text-foreground/55 sm:flex sm:flex-col">
+              <span className="flex items-center gap-2">
+                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400" />
+                Mở cửa · Luôn mở
+              </span>
+              <span>4 kỷ nguyên · 32 hiện vật</span>
+            </div>
+            <ThemeToggle />
           </div>
         </header>
 

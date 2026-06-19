@@ -184,17 +184,16 @@ function PartRow({
   return (
     <button
       onClick={onToggle}
-      className="group flex w-full items-start gap-3 rounded-lg border border-foreground/8 bg-foreground/[0.02] p-3 text-left transition hover:border-foreground/20 hover:bg-foreground/[0.04]"
+      className="group flex w-full items-center gap-3 rounded-lg border border-foreground/8 bg-foreground/[0.02] p-3 text-left transition hover:border-foreground/20 hover:bg-foreground/[0.04]"
       style={checked ? { borderColor: `${ACCENT}66`, background: `${ACCENT}12` } : undefined}
     >
-      <div className="pt-0.5">
-        <Checkbox
-          checked={checked}
-          onCheckedChange={() => onToggle()}
-          onClick={(e) => e.stopPropagation()}
-          style={checked ? { backgroundColor: ACCENT, borderColor: ACCENT } : undefined}
-        />
-      </div>
+      <Checkbox
+        checked={checked}
+        onCheckedChange={() => onToggle()}
+        onClick={(e) => e.stopPropagation()}
+        className="shrink-0"
+        style={checked ? { backgroundColor: ACCENT, borderColor: ACCENT } : undefined}
+      />
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
           <span
@@ -203,7 +202,7 @@ function PartRow({
           />
           <span
             className="truncate text-sm font-medium"
-            style={{ color: checked ? ACCENT : "rgba(255,255,255,0.85)" }}
+            style={{ color: checked ? ACCENT : "oklch(0.5 0.02 60 / 0.9)" }}
           >
             {part.label}
           </span>

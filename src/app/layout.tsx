@@ -50,23 +50,22 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="vi" suppressHydrationWarning className="dark">
+    <html lang="vi" suppressHydrationWarning>
+      <head>
+        {/* Set initial theme before hydration to avoid flash */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem('atrium-theme');var m=t?JSON.parse(t):{};var v=m&&m.state&&m.state.theme||'dark';if(v==='light'){document.documentElement.classList.remove('dark');}else{document.documentElement.classList.add('dark');}}catch(e){document.documentElement.classList.add('dark');}})();`,
+          }}
+        />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${playfair.variable} antialiased bg-background text-foreground min-h-screen`}
       >
         <Providers>
           {children}
         </Providers>
-        <Toaster
-          position="bottom-center"
-          toastOptions={{
-            style: {
-              background: "oklch(0.205 0.014 60)",
-              color: "oklch(0.96 0.008 70)",
-              border: "1px solid oklch(0.32 0.014 60 / 60%)",
-            },
-          }}
-        />
+        <Toaster position="bottom-center" />
       </body>
     </html>
   );

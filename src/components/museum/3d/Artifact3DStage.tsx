@@ -7,6 +7,7 @@ import * as THREE from "three";
 import { ArtifactModel } from "./ArtifactModels";
 import { Motif } from "@/lib/museum-data";
 import { usePrefersReducedMotion } from "@/hooks/museum/use-prefers-reduced-motion";
+import { useIsDark } from "@/hooks/museum/use-is-dark";
 
 interface StageProps {
   motif: Motif;
@@ -16,32 +17,35 @@ interface StageProps {
   interactive?: boolean;
 }
 
-function Pedestal({ accent }: { accent: string }) {
+function Pedestal({ accent, dark }: { accent: string; dark: boolean }) {
+  const top = dark ? "#2a1c10" : "#c9b896";
+  const mid = dark ? "#1f1408" : "#b8a684";
+  const base = dark ? "#170e06" : "#a8957a";
   return (
     <group position={[0, -1.05, 0]}>
       {/* top tier */}
       <mesh receiveShadow>
         <cylinderGeometry args={[1.1, 1.1, 0.08, 48]} />
-        <meshStandardMaterial color="#2a1c10" metalness={0.4} roughness={0.6} />
+        <meshStandardMaterial color={top} metalness={0.4} roughness={0.6} />
       </mesh>
       {/* mid tier */}
       <mesh position={[0, -0.12, 0]}>
         <cylinderGeometry args={[1.25, 1.35, 0.18, 48]} />
-        <meshStandardMaterial color="#1f1408" metalness={0.3} roughness={0.7} />
+        <meshStandardMaterial color={mid} metalness={0.3} roughness={0.7} />
       </mesh>
       {/* base */}
       <mesh position={[0, -0.28, 0]}>
         <cylinderGeometry args={[1.4, 1.45, 0.16, 48]} />
-        <meshStandardMaterial color="#170e06" metalness={0.2} roughness={0.8} />
+        <meshStandardMaterial color={base} metalness={0.2} roughness={0.8} />
       </mesh>
       {/* glowing accent ring */}
       <mesh position={[0, 0.05, 0]} rotation={[Math.PI / 2, 0, 0]}>
         <ringGeometry args={[1.0, 1.12, 64]} />
-        <meshStandardMaterial color={accent} emissive={accent} emissiveIntensity={1.2} side={THREE.DoubleSide} transparent opacity={0.8} />
+        <meshStandardMaterial color={accent} emissive={accent} emissiveIntensity={dark ? 1.2 : 0.7} side={THREE.DoubleSide} transparent opacity={dark ? 0.8 : 0.5} />
       </mesh>
       <mesh position={[0, 0.05, 0]} rotation={[Math.PI / 2, 0, 0]}>
         <ringGeometry args={[1.18, 1.24, 64]} />
-        <meshStandardMaterial color={accent} emissive={accent} emissiveIntensity={0.6} side={THREE.DoubleSide} transparent opacity={0.4} />
+        <meshStandardMaterial color={accent} emissive={accent} emissiveIntensity={dark ? 0.6 : 0.35} side={THREE.DoubleSide} transparent opacity={dark ? 0.4 : 0.25} />
       </mesh>
     </group>
   );
@@ -68,6 +72,9 @@ function SpinningWrapper({ children, spin }: { children: React.ReactNode; spin: 
 
 export function Artifact3DStage({ motif, accent, hero, height = 320, interactive = true }: StageProps) {
   const reduced = usePrefersReducedMotion();
+  const dark = useIsDark();
+  const bgTop = dark ? "#1a0f08" : "#f5ebd8";
+  const bgBot = dark ? "#100804" : "#e8dcc4";
   return (
     <div
       className="relative w-full overflow-hidden rounded-xl"
@@ -80,7 +87,12 @@ export function Artifact3DStage({ motif, accent, hero, height = 320, interactive
           background:
             "radial-gradient(ellipse 90% 60% at 50% 28%, " +
             accent +
-            "22 0%, transparent 55%), linear-gradient(180deg, #1a0f08 0%, #100804 100%)",
+            (dark ? "22" : "18") +
+            " 0%, transparent 55%), linear-gradient(180deg, " +
+            bgTop +
+            " 0%, " +
+            bgBot +
+            " 100%)",
         }}
       />
       <Canvas
@@ -90,21 +102,21 @@ export function Artifact3DStage({ motif, accent, hero, height = 320, interactive
         gl={{ antialias: true, alpha: true }}
       >
         <Suspense fallback={null}>
-          <ambientLight intensity={0.55} />
-          <hemisphereLight args={["#fff5d8", "#3a2410", 0.4]} />
+          <ambientLight intensity={dark ? 0.55 : 0.85} />
+          <hemisphereLight args={["#fff5d8", dark ? "#3a2410" : "#8a6a3e", dark ? 0.4 : 0.6]} />
           <spotLight
             position={[0, 6, 2]}
             angle={0.5}
             penumbra={0.8}
-            intensity={5}
+            intensity={dark ? 5 : 3}
             color="#fff5d8"
             castShadow
             shadow-mapSize={[1024, 1024]}
           />
-          <pointLight position={[-3, 1.5, -2]} intensity={1.2} color={accent} />
-          <pointLight position={[3, -0.5, 2]} intensity={0.8} color="#ffcf80" />
-          <pointLight position={[0, 1, 4]} intensity={0.6} color="#fff5e0" />
-          <directionalLight position={[2, 4, 3]} intensity={0.6} color="#ffe9c0" />
+          <pointLight position={[-3, 1.5, -2]} intensity={dark ? 1.2 : 0.6} color={accent} />
+          <pointLight position={[3, -0.5, 2]} intensity={dark ? 0.8 : 0.4} color="#ffcf80" />
+          <pointLight position={[0, 1, 4]} intensity={dark ? 0.6 : 0.3} color="#fff5e0" />
+          <directionalLight position={[2, 4, 3]} intensity={dark ? 0.6 : 0.9} color="#ffe9c0" />
 
           <SpotlightCone accent={accent} />
 
@@ -121,15 +133,15 @@ export function Artifact3DStage({ motif, accent, hero, height = 320, interactive
             </SpinningWrapper>
           </Float>
 
-          <Pedestal accent={accent} />
+          <Pedestal accent={accent} dark={dark} />
 
           <ContactShadows
             position={[0, -1.06, 0]}
-            opacity={0.55}
+            opacity={dark ? 0.55 : 0.25}
             scale={6}
             blur={2.4}
             far={4}
-            color="#000"
+            color={dark ? "#000" : "#5a4222"}
           />
 
           {!reduced && (

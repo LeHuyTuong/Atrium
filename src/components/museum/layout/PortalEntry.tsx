@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Compass, Map as MapIcon, ArrowLeft, Route, Infinity as Inf } from "lucide-react";
 import { useMuseum, JourneyMode } from "@/lib/store";
 import { BrandMark } from "./brand";
+import { ThemeToggle } from "./ThemeToggle";
 
 export function PortalEntry() {
   const setStage = useMuseum((s) => s.setStage);
@@ -23,12 +24,15 @@ export function PortalEntry() {
       <div className="relative z-10 flex min-h-screen flex-col">
         <header className="flex items-center justify-between px-5 py-5 sm:px-8 sm:py-6">
           <BrandMark />
-          <button
-            onClick={() => setStage("landing")}
-            className="inline-flex items-center gap-1.5 rounded-full border border-foreground/15 px-3.5 py-1.5 text-xs text-foreground/65 transition hover:border-foreground/30 hover:text-foreground"
-          >
-            <ArrowLeft className="h-3.5 w-3.5" /> Quay lại
-          </button>
+          <div className="flex items-center gap-2">
+            <ThemeToggle compact />
+            <button
+              onClick={() => setStage("landing")}
+              className="inline-flex items-center gap-1.5 rounded-full border border-foreground/15 px-3.5 py-1.5 text-xs text-foreground/65 transition hover:border-foreground/30 hover:text-foreground"
+            >
+              <ArrowLeft className="h-3.5 w-3.5" /> Quay lại
+            </button>
+          </div>
         </header>
 
         <main className="flex flex-1 flex-col items-center justify-center px-5 py-10">
@@ -115,7 +119,7 @@ function ModeCard({
       onClick={onClick}
       className="group relative overflow-hidden rounded-2xl border bg-foreground/[0.025] p-6 text-left transition-all hover:bg-foreground/[0.05]"
       style={{
-        borderColor: active ? accent : "rgba(255,255,255,0.12)",
+        borderColor: active ? accent : "oklch(0.5 0.02 60 / 0.18)",
         boxShadow: active ? `0 0 40px -12px ${accent}66` : "none",
       }}
     >

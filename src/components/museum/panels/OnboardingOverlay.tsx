@@ -355,7 +355,7 @@ export function OnboardingOverlay() {
                 style={{
                   width: i === step ? 20 : 6,
                   background:
-                    i === step ? HIGHLIGHT : "rgba(255,255,255,0.22)",
+                    i === step ? HIGHLIGHT : "oklch(0.5 0.02 60 / 0.3)",
                 }}
               />
             ))}

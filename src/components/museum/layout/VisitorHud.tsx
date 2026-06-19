@@ -15,6 +15,7 @@ import {
 import { PHASES } from "@/lib/museum-data";
 import { useMuseum } from "@/lib/store";
 import { BrandMark, ProgressRing } from "./brand";
+import { ThemeToggle } from "./ThemeToggle";
 import { AudioToggle } from "./AudioToggle";
 
 function ToolButton({
@@ -121,6 +122,9 @@ export function VisitorHud() {
 
         {/* audio controls (mute + ambient) */}
         <AudioToggle />
+
+        {/* theme toggle */}
+        <ThemeToggle compact />
 
         {/* tool cluster */}
         <div data-onboarding="tools" className="flex items-center gap-1.5">

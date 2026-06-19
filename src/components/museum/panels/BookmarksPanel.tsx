@@ -82,9 +82,9 @@ export function BookmarksPanel() {
                       title="Thêm vào so sánh"
                       className="grid h-8 w-8 place-items-center rounded-full border transition"
                       style={{
-                        borderColor: inCompare ? phase.accent : "rgba(255,255,255,0.12)",
+                        borderColor: inCompare ? phase.accent : "oklch(0.5 0.02 60 / 0.18)",
                         background: inCompare ? `${phase.accent}14` : "transparent",
-                        color: inCompare ? phase.accent : "rgba(255,255,255,0.55)",
+                        color: inCompare ? phase.accent : "oklch(0.5 0.02 60 / 0.65)",
                       }}
                     >
                       <Columns2 className="h-3.5 w-3.5" />

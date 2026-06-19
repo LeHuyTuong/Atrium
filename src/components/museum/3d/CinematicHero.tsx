@@ -6,6 +6,7 @@ import { Sparkles, Environment } from "@react-three/drei";
 import * as THREE from "three";
 import { ArtifactModel } from "./ArtifactModels";
 import { usePrefersReducedMotion } from "@/hooks/museum/use-prefers-reduced-motion";
+import { useIsDark } from "@/hooks/museum/use-is-dark";
 
 const SETTLE_EPS = 0.0015;
 
@@ -64,7 +65,10 @@ function DustMotes({ accent }: { accent: string }) {
 
 export function CinematicHero({ accent = "#e89446" }: { accent?: string }) {
   const reduced = usePrefersReducedMotion();
+  const dark = useIsDark();
   const [settled, setSettled] = useState(false);
+  const floorColor = dark ? "#1a0f08" : "#e8dcc4";
+  const fogColor = dark ? "#100804" : "#f5ebd8";
 
   return (
     <div className="absolute inset-0">
@@ -75,17 +79,19 @@ export function CinematicHero({ accent = "#e89446" }: { accent?: string }) {
         gl={{ antialias: true, alpha: true }}
       >
         <Suspense fallback={null}>
-          <ambientLight intensity={0.3} />
+          <fog attach="fog" args={[fogColor, 8, 22]} />
+          <ambientLight intensity={dark ? 0.3 : 0.7} />
           <spotLight
             position={[2, 7, 3]}
             angle={0.6}
             penumbra={0.9}
-            intensity={4}
+            intensity={dark ? 4 : 2.5}
             color="#fff2d0"
             castShadow
           />
-          <pointLight position={[-4, 1, -3]} intensity={1.2} color={accent} />
-          <pointLight position={[4, -1, 3]} intensity={0.6} color="#ffcf80" />
+          <pointLight position={[-4, 1, -3]} intensity={dark ? 1.2 : 0.5} color={accent} />
+          <pointLight position={[4, -1, 3]} intensity={dark ? 0.6 : 0.3} color="#ffcf80" />
+          <hemisphereLight args={["#fff5d8", dark ? "#3a2410" : "#c9b896", dark ? 0.3 : 0.5]} />
 
           {/* Hero: Watt steam engine */}
           <group position={[0, 0, 0]} scale={1.1}>
@@ -95,16 +101,16 @@ export function CinematicHero({ accent = "#e89446" }: { accent?: string }) {
           {/* floor disc */}
           <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.4, 0]} receiveShadow>
             <circleGeometry args={[7, 64]} />
-            <meshStandardMaterial color="#1a0f08" metalness={0.2} roughness={0.9} />
+            <meshStandardMaterial color={floorColor} metalness={0.2} roughness={0.9} />
           </mesh>
           <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.39, 0]}>
             <ringGeometry args={[2.2, 2.35, 64]} />
-            <meshStandardMaterial color={accent} emissive={accent} emissiveIntensity={0.8} side={THREE.DoubleSide} transparent opacity={0.6} />
+            <meshStandardMaterial color={accent} emissive={accent} emissiveIntensity={dark ? 0.8 : 0.4} side={THREE.DoubleSide} transparent opacity={dark ? 0.6 : 0.35} />
           </mesh>
 
           {!reduced && <DustMotes accent={accent} />}
           {!reduced && (
-            <Sparkles count={60} scale={[12, 6, 12]} size={2.5} speed={0.25} opacity={0.5} color={accent} />
+            <Sparkles count={60} scale={[12, 6, 12]} size={2.5} speed={0.25} opacity={dark ? 0.5 : 0.25} color={accent} />
           )}
 
           <Environment preset="sunset" environmentIntensity={0.3} />
@@ -117,8 +123,8 @@ export function CinematicHero({ accent = "#e89446" }: { accent?: string }) {
       <div
         className="pointer-events-none absolute inset-0 transition-opacity duration-1000"
         style={{
-          background: "radial-gradient(ellipse at center, transparent 30%, #100804 90%)",
-          opacity: settled ? 0.5 : 0.9,
+          background: `radial-gradient(ellipse at center, transparent 30%, ${fogColor} 90%)`,
+          opacity: settled ? (dark ? 0.5 : 0.15) : (dark ? 0.9 : 0.4),
         }}
       />
     </div>

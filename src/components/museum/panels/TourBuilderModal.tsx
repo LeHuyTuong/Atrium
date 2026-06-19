@@ -129,7 +129,7 @@ export function TourBuilderModal() {
                       onClick={() => toggle(e.id)}
                       className="flex items-center gap-2 rounded-lg border px-2.5 py-2 text-left transition"
                       style={{
-                        borderColor: sel ? phase.accent : "rgba(255,255,255,0.08)",
+                        borderColor: sel ? phase.accent : "oklch(0.5 0.02 60 / 0.12)",
                         background: sel ? `${phase.accent}12` : "transparent",
                       }}
                     >

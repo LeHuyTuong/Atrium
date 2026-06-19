@@ -139,16 +139,16 @@ export function QuizModal({ open, onClose }: { open: boolean; onClose: () => voi
                         onClick={() => setSelected(i)}
                         className="flex w-full items-center gap-3 rounded-lg border px-4 py-3 text-left text-sm transition"
                         style={{
-                          borderColor: isSel ? phase.accent : "rgba(255,255,255,0.1)",
-                          background: isSel ? `${phase.accent}12` : "rgba(255,255,255,0.02)",
-                          color: isSel ? "#fff" : "rgba(255,255,255,0.8)",
+                          borderColor: isSel ? phase.accent : "oklch(0.5 0.02 60 / 0.15)",
+                          background: isSel ? `${phase.accent}12` : "oklch(0.5 0.02 60 / 0.04)",
+                          color: isSel ? "#fff" : "oklch(0.5 0.02 60 / 0.88)",
                         }}
                       >
                         <span
                           className="grid h-6 w-6 shrink-0 place-items-center rounded-full border text-[0.65rem] font-bold"
                           style={{
-                            borderColor: isSel ? phase.accent : "rgba(255,255,255,0.2)",
-                            color: isSel ? phase.accent : "rgba(255,255,255,0.5)",
+                            borderColor: isSel ? phase.accent : "oklch(0.5 0.02 60 / 0.28)",
+                            color: isSel ? phase.accent : "oklch(0.5 0.02 60 / 0.6)",
                           }}
                         >
                           {String.fromCharCode(65 + i)}

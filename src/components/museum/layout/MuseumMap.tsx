@@ -5,6 +5,7 @@ import { ArrowLeft, ArrowRight, Check, Images } from "lucide-react";
 import { PHASES } from "@/lib/museum-data";
 import { useMuseum } from "@/lib/store";
 import { BrandMark, PhaseNumeral, ProgressRing } from "./brand";
+import { ThemeToggle } from "./ThemeToggle";
 import { FeaturedTours } from "@/components/museum/panels/FeaturedTours";
 
 export function MuseumMap() {
@@ -24,12 +25,15 @@ export function MuseumMap() {
       <div className="relative z-10 flex min-h-screen flex-col">
         <header className="flex items-center justify-between px-5 py-5 sm:px-8 sm:py-6">
           <BrandMark />
-          <button
-            onClick={() => setStage("portal")}
-            className="inline-flex items-center gap-1.5 rounded-full border border-foreground/15 px-3.5 py-1.5 text-xs text-foreground/65 transition hover:border-foreground/30 hover:text-foreground"
-          >
-            <ArrowLeft className="h-3.5 w-3.5" /> Cái Ngưỡng
-          </button>
+          <div className="flex items-center gap-2">
+            <ThemeToggle compact />
+            <button
+              onClick={() => setStage("portal")}
+              className="inline-flex items-center gap-1.5 rounded-full border border-foreground/15 px-3.5 py-1.5 text-xs text-foreground/65 transition hover:border-foreground/30 hover:text-foreground"
+            >
+              <ArrowLeft className="h-3.5 w-3.5" /> Cái Ngưỡng
+            </button>
+          </div>
         </header>
 
         <main className="flex flex-1 flex-col items-center px-5 py-6 sm:px-8">

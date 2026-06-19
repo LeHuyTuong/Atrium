@@ -5,6 +5,7 @@ import { ArrowRight, RotateCcw, BookOpen, Award, Share2, Sparkles } from "lucide
 import { useMuseum } from "@/lib/store";
 import { EXHIBITS, PHASES } from "@/lib/museum-data";
 import { BrandMark, ProgressRing } from "./brand";
+import { ThemeToggle } from "./ThemeToggle";
 
 export function ExitSummary() {
   const setStage = useMuseum((s) => s.setStage);
@@ -38,8 +39,9 @@ export function ExitSummary() {
       <div className="pointer-events-none absolute inset-0 vignette-overlay" />
 
       <div className="relative z-10 flex min-h-screen flex-col">
-        <header className="px-5 py-5 sm:px-8 sm:py-6">
+        <header className="flex items-center justify-between px-5 py-5 sm:px-8 sm:py-6">
           <BrandMark />
+          <ThemeToggle compact />
         </header>
 
         <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col items-center justify-center px-5 py-8 text-center">
