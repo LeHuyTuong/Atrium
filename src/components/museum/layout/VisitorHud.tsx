@@ -15,6 +15,7 @@ import {
 import { PHASES } from "@/lib/museum-data";
 import { useMuseum } from "@/lib/store";
 import { BrandMark, ProgressRing } from "./brand";
+import { AudioToggle } from "./AudioToggle";
 
 function ToolButton({
   onClick,
@@ -100,7 +101,7 @@ export function VisitorHud() {
         <div className="flex-1" />
 
         {/* progress */}
-        <div className="flex items-center gap-2 rounded-full border border-foreground/12 bg-foreground/[0.03] px-2.5 py-1.5">
+        <div data-onboarding="progress" className="flex items-center gap-2 rounded-full border border-foreground/12 bg-foreground/[0.03] px-2.5 py-1.5">
           <ProgressRing value={seenExhibits.length} max={32} accent="#e89446" size={22} />
           <span className="text-xs font-medium text-foreground/75">
             <span className="font-bold text-foreground">{seenExhibits.length}</span>
@@ -118,8 +119,11 @@ export function VisitorHud() {
           {mm}:{ss}
         </div>
 
+        {/* audio controls (mute + ambient) */}
+        <AudioToggle />
+
         {/* tool cluster */}
-        <div className="flex items-center gap-1.5">
+        <div data-onboarding="tools" className="flex items-center gap-1.5">
           <ToolButton onClick={() => setSearchOpen(true)} icon={<Search className="h-3.5 w-3.5" />} label="Tìm" />
           <ToolButton onClick={() => setBookmarksPanelOpen(true)} icon={<Bookmark className="h-3.5 w-3.5" />} label="Yêu thích" badge={bookmarks.length} />
           <ToolButton onClick={() => setConnectionsOpen(true)} icon={<Network className="h-3.5 w-3.5" />} label="Mạch" />

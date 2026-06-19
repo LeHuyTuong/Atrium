@@ -1,15 +1,17 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ArrowLeft, ArrowRight, Check } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, Images } from "lucide-react";
 import { PHASES } from "@/lib/museum-data";
 import { useMuseum } from "@/lib/store";
 import { BrandMark, PhaseNumeral, ProgressRing } from "./brand";
+import { FeaturedTours } from "@/components/museum/panels/FeaturedTours";
 
 export function MuseumMap() {
   const setStage = useMuseum((s) => s.setStage);
   const enterPhase = useMuseum((s) => s.enterPhase);
   const setCurrentPhase = useMuseum((s) => s.setCurrentPhase);
+  const setPhotoWallPhase = useMuseum((s) => s.setPhotoWallPhase);
   const seenExhibits = useMuseum((s) => s.seenExhibits);
   const phasesEntered = useMuseum((s) => s.phasesEntered);
 
@@ -55,18 +57,19 @@ export function MuseumMap() {
               const realSeen = seenExhibits.filter((id) =>
                 EXHIBIT_IDS_BY_PHASE[p.id].includes(id)
               ).length;
+              const enterRoom = () => {
+                enterPhase(p.id);
+                setCurrentPhase(p.id);
+                setStage("room");
+              };
               return (
-                <motion.button
+                <motion.article
                   key={p.id}
                   initial={{ opacity: 0, y: 16 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.1 + i * 0.08, duration: 0.5 }}
-                  onClick={() => {
-                    enterPhase(p.id);
-                    setCurrentPhase(p.id);
-                    setStage("room");
-                  }}
-                  className="group relative overflow-hidden rounded-2xl border border-foreground/12 bg-foreground/[0.025] p-6 text-left transition-all hover:border-foreground/30 hover:bg-foreground/[0.05] sm:p-7"
+                  onClick={enterRoom}
+                  className="group relative cursor-pointer overflow-hidden rounded-2xl border border-foreground/12 bg-foreground/[0.025] p-6 text-left transition-all hover:border-foreground/30 hover:bg-foreground/[0.05] sm:p-7"
                   style={{ ["--phase-color" as string]: p.accent }}
                 >
                   <div className="absolute inset-x-0 top-0 h-px" style={{ background: `linear-gradient(90deg, transparent, ${p.accent}, transparent)` }} />
@@ -102,27 +105,50 @@ export function MuseumMap() {
                     <ProgressRing value={realSeen} max={phaseExhibits} accent={p.accent} size={48} />
                   </div>
 
-                  <div className="relative mt-5 flex items-center justify-between">
+                  <div className="relative mt-5 flex items-center justify-between gap-2">
                     <span className="text-xs text-foreground/55">
                       <span className="font-semibold text-foreground/80">{realSeen}</span> / {phaseExhibits} hiện vật
                       {entered && <span className="ml-2 text-foreground/40">· đã vào</span>}
                     </span>
-                    <span
-                      className="inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all group-hover:gap-2.5"
-                      style={{
-                        background: `${p.accent}1a`,
-                        color: p.accent,
-                        border: `1px solid ${p.accent}44`,
-                      }}
-                    >
-                      {entered ? "Tiếp tục" : "Vào phòng"}
-                      <ArrowRight className="h-3.5 w-3.5" />
-                    </span>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setPhotoWallPhase(p.id);
+                        }}
+                        className="inline-flex items-center gap-1.5 rounded-full border border-foreground/15 px-3 py-1.5 text-xs text-foreground/70 transition hover:border-foreground/35 hover:text-foreground"
+                        aria-label={`Phòng ảnh kỷ nguyên ${p.label}`}
+                      >
+                        <Images className="h-3.5 w-3.5" /> Phòng ảnh
+                      </button>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          enterRoom();
+                        }}
+                        className="inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all group-hover:gap-2.5"
+                        style={{
+                          background: `${p.accent}1a`,
+                          color: p.accent,
+                          border: `1px solid ${p.accent}44`,
+                        }}
+                      >
+                        {entered ? "Tiếp tục" : "Vào phòng"}
+                        <ArrowRight className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
                   </div>
-                </motion.button>
+                </motion.article>
               );
             })}
           </div>
+
+          {/* Featured community tours carousel */}
+          <section className="mt-12 w-full max-w-6xl">
+            <FeaturedTours />
+          </section>
 
           <div className="mt-10 flex items-center gap-3 text-xs text-foreground/45">
             <span className="inline-flex items-center gap-1.5">

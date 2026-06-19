@@ -1,10 +1,11 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, ArrowRight, Map as MapIcon, LayoutGrid, Clock, Sparkles, Layers3 } from "lucide-react";
+import { ArrowLeft, ArrowRight, Map as MapIcon, LayoutGrid, Clock, Sparkles, Layers3, Images, FlaskConical } from "lucide-react";
 import { useState } from "react";
 import { PHASES, exhibitsByPhase, PhaseId } from "@/lib/museum-data";
 import { useMuseum } from "@/lib/store";
+import { audio } from "@/lib/audio";
 import { BrandMark, PhaseNumeral, ProgressRing } from "./brand";
 import { ExhibitCard } from "@/components/museum/cards/ExhibitCard";
 import { VisitorHud } from "@/components/museum/layout/VisitorHud";
@@ -16,6 +17,8 @@ export function PhaseRoom() {
   const setCurrentPhase = useMuseum((s) => s.setCurrentPhase);
   const enterPhase = useMuseum((s) => s.enterPhase);
   const seenExhibits = useMuseum((s) => s.seenExhibits);
+  const setPhotoWallPhase = useMuseum((s) => s.setPhotoWallPhase);
+  const setSceneLabOpen = useMuseum((s) => s.setSceneLabOpen);
 
   const [dismissedPhases, setDismissedPhases] = useState<Set<string>>(new Set());
 
@@ -41,6 +44,7 @@ export function PhaseRoom() {
   const prevPhase = PHASES[phaseIdx - 1];
 
   const goPhase = (p: PhaseId) => {
+    if (!audio.muted) audio.playNavigate();
     enterPhase(p);
     setCurrentPhase(p);
   };
@@ -89,12 +93,38 @@ export function PhaseRoom() {
                         « {phase.curatorQuote} »
                       </p>
                     </div>
-                    <button
-                      onClick={dismissIntro}
-                      className="shrink-0 rounded-full border border-foreground/15 px-2.5 py-1 text-[0.65rem] text-foreground/55 transition hover:border-foreground/30 hover:text-foreground"
-                    >
-                      Ẩn
-                    </button>
+                    <div className="flex shrink-0 items-center gap-2">
+                      <button
+                        onClick={() => setPhotoWallPhase(currentPhase)}
+                        className="inline-flex items-center gap-1.5 rounded-full border border-foreground/15 px-2.5 py-1 text-[0.65rem] text-foreground/65 transition hover:border-foreground/30 hover:text-foreground"
+                        aria-label="Mở phòng ảnh kỷ nguyên"
+                      >
+                        <Images className="h-3 w-3" /> Phòng ảnh
+                      </button>
+                      {currentPhase === "industry-1" && (
+                        <button
+                          onClick={() => {
+                            if (!audio.muted) audio.playOpen();
+                            setSceneLabOpen(true);
+                          }}
+                          className="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[0.65rem] font-medium transition"
+                          style={{
+                            borderColor: `${phase.accent}66`,
+                            color: phase.accent,
+                            background: `${phase.accent}12`,
+                          }}
+                          aria-label="Mở Scene Lab động cơ hơi nước Watt"
+                        >
+                          <FlaskConical className="h-3 w-3" /> Scene Lab
+                        </button>
+                      )}
+                      <button
+                        onClick={dismissIntro}
+                        className="rounded-full border border-foreground/15 px-2.5 py-1 text-[0.65rem] text-foreground/55 transition hover:border-foreground/30 hover:text-foreground"
+                      >
+                        Ẩn
+                      </button>
+                    </div>
                   </div>
                 </motion.div>
               )}
@@ -113,9 +143,15 @@ export function PhaseRoom() {
 
           {/* exhibit grid */}
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4">
-            {exhibits.map((e, i) => (
-              <ExhibitCard key={e.id} exhibit={e} index={i} />
-            ))}
+            {exhibits.map((e, i) =>
+              i === 0 ? (
+                <div key={e.id} data-onboarding="first-card">
+                  <ExhibitCard exhibit={e} index={i} />
+                </div>
+              ) : (
+                <ExhibitCard key={e.id} exhibit={e} index={i} />
+              )
+            )}
           </div>
 
           {/* room navigation */}

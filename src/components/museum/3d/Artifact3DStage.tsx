@@ -90,18 +90,21 @@ export function Artifact3DStage({ motif, accent, hero, height = 320, interactive
         gl={{ antialias: true, alpha: true }}
       >
         <Suspense fallback={null}>
-          <ambientLight intensity={0.35} />
+          <ambientLight intensity={0.55} />
+          <hemisphereLight args={["#fff5d8", "#3a2410", 0.4]} />
           <spotLight
             position={[0, 6, 2]}
             angle={0.5}
             penumbra={0.8}
-            intensity={3.5}
+            intensity={5}
             color="#fff5d8"
             castShadow
             shadow-mapSize={[1024, 1024]}
           />
-          <pointLight position={[-3, 1, -2]} intensity={0.8} color={accent} />
-          <pointLight position={[3, -1, 2]} intensity={0.5} color="#ffcf80" />
+          <pointLight position={[-3, 1.5, -2]} intensity={1.2} color={accent} />
+          <pointLight position={[3, -0.5, 2]} intensity={0.8} color="#ffcf80" />
+          <pointLight position={[0, 1, 4]} intensity={0.6} color="#fff5e0" />
+          <directionalLight position={[2, 4, 3]} intensity={0.6} color="#ffe9c0" />
 
           <SpotlightCone accent={accent} />
 

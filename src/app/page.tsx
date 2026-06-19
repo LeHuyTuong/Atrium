@@ -1,7 +1,9 @@
 "use client";
 
-import { useEffect, useState, Suspense } from "react";
+import { useEffect, useRef, useState, Suspense } from "react";
+import { toast } from "sonner";
 import { useMuseum } from "@/lib/store";
+import { exhibitById } from "@/lib/museum-data";
 import { LandingPage } from "@/components/museum/layout/LandingPage";
 import { PortalEntry } from "@/components/museum/layout/PortalEntry";
 import { MuseumMap } from "@/components/museum/layout/MuseumMap";
@@ -21,6 +23,11 @@ import { HistoricalTimeline } from "@/components/museum/panels/HistoricalTimelin
 import { QuizModal } from "@/components/museum/panels/QuizBox";
 import { DailySpotlight } from "@/components/museum/panels/DailySpotlight";
 import { TimelineFab } from "@/components/museum/layout/TimelineFab";
+import { OnboardingOverlay } from "@/components/museum/panels/OnboardingOverlay";
+import { TourPlayerBar } from "@/components/museum/panels/TourPlayerBar";
+import { SceneLabModal } from "@/components/museum/panels/SceneLabModal";
+import { PhotoWall } from "@/components/museum/panels/PhotoWall";
+import { Lightbox } from "@/components/museum/panels/Lightbox";
 
 export default function Home() {
   const stage = useMuseum((s) => s.stage);
@@ -28,6 +35,49 @@ export default function Home() {
   const setBookmarksPanelOpen = useMuseum((s) => s.setBookmarksPanelOpen);
   const setTimelineOpen = useMuseum((s) => s.setTimelineOpen);
   const [quizOpen, setQuizOpen] = useState(false);
+
+  // tour playback actions
+  const setActiveTour = useMuseum((s) => s.setActiveTour);
+  const enterPhase = useMuseum((s) => s.enterPhase);
+  const setCurrentPhase = useMuseum((s) => s.setCurrentPhase);
+  const setStage = useMuseum((s) => s.setStage);
+  const openExhibit = useMuseum((s) => s.openExhibit);
+
+  // On mount: if ?tour=<slug> is in the URL, fetch the tour, activate it,
+  // jump to the room of its first exhibit and auto-open that exhibit.
+  const tourBootstrapped = useRef(false);
+  useEffect(() => {
+    if (tourBootstrapped.current) return;
+    tourBootstrapped.current = true;
+    const params = new URLSearchParams(window.location.search);
+    const slug = params.get("tour");
+    if (!slug) return;
+    fetch(`/api/tours/${slug}`)
+      .then((r) => r.json())
+      .then((data) => {
+        if (!data?.tour) return;
+        setActiveTour({
+          slug: data.tour.slug,
+          title: data.tour.title,
+          author: data.tour.author,
+          exhibitIds: data.tour.exhibitIds,
+          currentStep: 0,
+        });
+        const firstId = data.tour.exhibitIds?.[0];
+        if (firstId) {
+          const firstExhibit = exhibitById(firstId);
+          if (firstExhibit) {
+            enterPhase(firstExhibit.phase);
+            setCurrentPhase(firstExhibit.phase);
+            setStage("room");
+            window.setTimeout(() => openExhibit(firstExhibit.id), 500);
+          }
+        }
+      })
+      .catch(() => {
+        toast.error("Không tải được tour này. Có thể liên kết đã hết hạn.");
+      });
+  }, [setActiveTour, enterPhase, setCurrentPhase, setStage, openExhibit]);
 
   // keyboard shortcuts
   useEffect(() => {
@@ -89,6 +139,19 @@ export default function Home() {
       {/* Floating helpers */}
       <DailySpotlight />
       <TimelineFab onQuiz={() => setQuizOpen(true)} />
+
+      {/* First-visit onboarding (auto-shows on the room stage) */}
+      <OnboardingOverlay />
+
+      {/* Tour playback bar (renders only when a tour is active) */}
+      <TourPlayerBar />
+
+      {/* Photo wall + lightbox (open via store) */}
+      <PhotoWall />
+      <Lightbox />
+
+      {/* Scene Lab — exploded 3D view of the Watt steam engine */}
+      <SceneLabModal />
     </div>
   );
 }

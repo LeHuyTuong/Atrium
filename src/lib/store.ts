@@ -6,6 +6,14 @@ import { PhaseId } from "./museum-data";
 
 export type JourneyMode = "guided" | "free";
 
+export interface ActiveTour {
+  slug: string;
+  title: string;
+  author: string;
+  exhibitIds: string[];
+  currentStep: number;
+}
+
 export type Stage =
   | "landing"
   | "portal"
@@ -50,6 +58,19 @@ export interface MuseumState {
   timelineOpen: boolean;
   minimapOpen: boolean;
   onboardingOpen: boolean;
+  onboardingCompleted: boolean;
+  sceneLabOpen: boolean;
+
+  // tour playback
+  activeTour: ActiveTour | null;
+
+  // audio preferences
+  audioMuted: boolean;
+  ambientOn: boolean;
+
+  // ephemeral UI overlays
+  photoWallPhase: PhaseId | null;
+  lightboxImageId: string | null;
 
   // ephemeral
   lastAchievement: string | null;
@@ -79,7 +100,23 @@ export interface MuseumState {
   setTimelineOpen: (v: boolean) => void;
   setMinimapOpen: (v: boolean) => void;
   setOnboardingOpen: (v: boolean) => void;
+  completeOnboarding: () => void;
+  setSceneLabOpen: (v: boolean) => void;
   setLastAchievement: (id: string | null) => void;
+  setAudioMuted: (v: boolean) => void;
+  setAmbientOn: (v: boolean) => void;
+  setActiveTour: (tour: {
+    slug: string;
+    title: string;
+    author: string;
+    exhibitIds: string[];
+    currentStep?: number;
+  }) => void;
+  advanceTourStep: () => void;
+  retreatTourStep: () => void;
+  clearActiveTour: () => void;
+  setPhotoWallPhase: (p: PhaseId | null) => void;
+  setLightboxImageId: (id: string | null) => void;
   reset: () => void;
 }
 
@@ -115,6 +152,19 @@ export const useMuseum = create<MuseumState>()(
       timelineOpen: false,
       minimapOpen: false,
       onboardingOpen: false,
+      onboardingCompleted: false,
+      sceneLabOpen: false,
+
+      // tour playback
+      activeTour: null,
+
+      // audio preferences — start muted to avoid surprise audio
+      audioMuted: true,
+      ambientOn: false,
+
+      // ephemeral UI overlays
+      photoWallPhase: null,
+      lightboxImageId: null,
 
       lastAchievement: null,
 
@@ -178,7 +228,38 @@ export const useMuseum = create<MuseumState>()(
       setTimelineOpen: (v) => set({ timelineOpen: v }),
       setMinimapOpen: (v) => set({ minimapOpen: v }),
       setOnboardingOpen: (v) => set({ onboardingOpen: v }),
+      completeOnboarding: () => set({ onboardingCompleted: true, onboardingOpen: false }),
+      setSceneLabOpen: (v) => set({ sceneLabOpen: v }),
       setLastAchievement: (id) => set({ lastAchievement: id }),
+      setAudioMuted: (v) => set({ audioMuted: v }),
+      setAmbientOn: (v) => set({ ambientOn: v }),
+
+      setActiveTour: (tour) =>
+        set({
+          activeTour: {
+            slug: tour.slug,
+            title: tour.title,
+            author: tour.author,
+            exhibitIds: tour.exhibitIds,
+            currentStep: tour.currentStep ?? 0,
+          },
+        }),
+      advanceTourStep: () =>
+        set((s) => {
+          if (!s.activeTour) return {};
+          const max = Math.max(0, s.activeTour.exhibitIds.length - 1);
+          const next = Math.min(max, s.activeTour.currentStep + 1);
+          return { activeTour: { ...s.activeTour, currentStep: next } };
+        }),
+      retreatTourStep: () =>
+        set((s) => {
+          if (!s.activeTour) return {};
+          const prev = Math.max(0, s.activeTour.currentStep - 1);
+          return { activeTour: { ...s.activeTour, currentStep: prev } };
+        }),
+      clearActiveTour: () => set({ activeTour: null }),
+      setPhotoWallPhase: (p) => set({ photoWallPhase: p }),
+      setLightboxImageId: (id) => set({ lightboxImageId: id }),
 
       reset: () =>
         set({
@@ -193,6 +274,8 @@ export const useMuseum = create<MuseumState>()(
           quizzesPassed: 0,
           openExhibitId: null,
           compareIds: [],
+          activeTour: null,
+          ambientOn: false,
         } as Partial<MuseumState>),
     }),
     {
@@ -205,6 +288,10 @@ export const useMuseum = create<MuseumState>()(
         phasesEntered: s.phasesEntered,
         quizzesPassed: s.quizzesPassed,
         mode: s.mode,
+        onboardingCompleted: s.onboardingCompleted,
+        activeTour: s.activeTour,
+        audioMuted: s.audioMuted,
+        ambientOn: s.ambientOn,
       }),
     }
   )

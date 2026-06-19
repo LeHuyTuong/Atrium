@@ -13,8 +13,13 @@ import {
   Network,
   ArrowRight,
   Quote,
+  Volume2,
+  Square,
+  Loader2,
+  FlaskConical,
 } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import {
   Dialog,
   DialogContent,
@@ -28,6 +33,7 @@ import {
   connectionsForExhibit,
 } from "@/lib/museum-data";
 import { useMuseum } from "@/lib/store";
+import { audio as audioEngine } from "@/lib/audio";
 import { MotifIcon } from "@/components/museum/cards/MotifIcon";
 import { imageForExhibit, gradientForExhibit } from "@/lib/historical-images";
 import { PhasePill } from "@/components/museum/layout/brand";
@@ -57,6 +63,14 @@ export function ExhibitModal() {
   const exhibit = openExhibitId ? exhibitById(openExhibitId) : undefined;
   const open = !!exhibit;
 
+  // Soft chime whenever a new exhibit opens (mount of ExhibitModalBody,
+  // which is keyed by exhibit.id so it remounts on prev/next navigation).
+  // Also plays the close thunk when the modal closes.
+  const handleClose = () => {
+    if (!audioEngine.muted) audioEngine.playClose();
+    closeExhibit();
+  };
+
   // keyboard nav
   useEffect(() => {
     if (!open) return;
@@ -68,7 +82,7 @@ export function ExhibitModal() {
         const p = openExhibitId ? prevExhibit(openExhibitId) : undefined;
         if (p) openExhibit(p.id);
       } else if (e.key === "Escape") {
-        closeExhibit();
+        handleClose();
       }
     };
     window.addEventListener("keydown", handler);
@@ -76,7 +90,7 @@ export function ExhibitModal() {
   }, [open, openExhibitId, openExhibit, closeExhibit]);
 
   return (
-    <Dialog open={open} onOpenChange={(o) => !o && closeExhibit()}>
+    <Dialog open={open} onOpenChange={(o) => !o && handleClose()}>
       <DialogContent className="!max-w-5xl gap-0 overflow-hidden rounded-2xl border-foreground/15 bg-card p-0 sm:max-w-5xl">
         <DialogTitle className="sr-only">
           {exhibit ? exhibit.name : "Hiện vật"}
@@ -86,7 +100,7 @@ export function ExhibitModal() {
             <ExhibitModalBody
               key={exhibit.id}
               exhibitId={exhibit.id}
-              onClose={closeExhibit}
+              onClose={handleClose}
               onPrev={() => {
                 const p = prevExhibit(exhibit.id);
                 if (p) openExhibit(p.id);
@@ -96,11 +110,14 @@ export function ExhibitModal() {
                 if (n) openExhibit(n.id);
               }}
               bookmarked={bookmarks.includes(exhibit.id)}
-              onBookmark={() => toggleBookmark(exhibit.id)}
+              onBookmark={() => {
+                if (!audioEngine.muted) audioEngine.playBookmark();
+                toggleBookmark(exhibit.id);
+              }}
               inCompare={compareIds.includes(exhibit.id)}
               onCompare={() => addCompare(exhibit.id)}
               onExploreConnections={() => {
-                closeExhibit();
+                handleClose();
                 setConnectionsOpen(true);
               }}
             />
@@ -137,6 +154,74 @@ function ExhibitModalBody({
   const img = imageForExhibit(exhibit.id);
   const connections = connectionsForExhibit(exhibit.id);
 
+  const setSceneLabOpen = useMuseum((s) => s.setSceneLabOpen);
+  const openSceneLab = () => {
+    onClose();
+    setSceneLabOpen(true);
+  };
+
+  const [narrating, setNarrating] = useState(false);
+  const [narrLoading, setNarrLoading] = useState(false);
+  const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
+
+  // Soft chime when this exhibit body mounts (i.e. when an exhibit opens or
+  // the visitor navigates to a different one via prev/next).
+  useEffect(() => {
+    if (!audioEngine.muted) audioEngine.playOpen();
+  }, []);
+
+  // Stop narration when exhibit changes
+  useEffect(() => {
+    if (audio) {
+      audio.pause();
+      audio.currentTime = 0;
+    }
+    setAudio(null);
+    setNarrating(false);
+  }, [exhibitId, audio]);
+
+  const toggleNarrate = async () => {
+    if (narrating && audio) {
+      audio.pause();
+      setNarrating(false);
+      return;
+    }
+    if (audio) {
+      audio.play();
+      setNarrating(true);
+      return;
+    }
+    setNarrLoading(true);
+    try {
+      const text = `${exhibit.name}. ${exhibit.tagline}. ${exhibit.story} ${exhibit.whyItMatters} Bạn có biết: ${exhibit.didYouKnow}`;
+      const res = await fetch("/api/narrate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text, phase: exhibit.phase }),
+      });
+      if (!res.ok) throw new Error("narrate failed");
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const el = new Audio(url);
+      el.onended = () => {
+        setNarrating(false);
+        URL.revokeObjectURL(url);
+      };
+      el.onerror = () => {
+        setNarrating(false);
+        URL.revokeObjectURL(url);
+        toast.error("Không thể phát âm thanh.");
+      };
+      setAudio(el);
+      await el.play();
+      setNarrating(true);
+    } catch {
+      toast.error("Giọng đọc tạm thời không sẵn sàng.");
+    } finally {
+      setNarrLoading(false);
+    }
+  };
+
   return (
     <div className="grid max-h-[92vh] grid-cols-1 overflow-y-auto elegant-scroll md:grid-cols-2 md:overflow-hidden">
       {/* LEFT: visual */}
@@ -149,6 +234,24 @@ function ExhibitModalBody({
             hero={exhibit.hero}
             height={320}
           />
+          {/* narrator pill */}
+          <button
+            onClick={toggleNarrate}
+            className="absolute right-5 top-5 z-10 inline-flex items-center gap-2 rounded-full border bg-card/85 px-3 py-1.5 text-[0.7rem] font-medium backdrop-blur-md transition hover:bg-card"
+            style={{
+              borderColor: narrating ? phase.accent : "rgba(255,255,255,0.15)",
+              color: narrating ? phase.accent : "rgba(255,255,255,0.8)",
+            }}
+          >
+            {narrLoading ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            ) : narrating ? (
+              <Square className="h-3.5 w-3.5" style={{ fill: phase.accent }} />
+            ) : (
+              <Volume2 className="h-3.5 w-3.5" />
+            )}
+            {narrating ? "Đang đọc" : narrLoading ? "Đang tải" : "Người dẫn tuyến"}
+          </button>
         </div>
 
         {/* metrics */}
@@ -272,6 +375,25 @@ function ExhibitModalBody({
               Khám phá mạng lưới <ArrowRight className="h-3 w-3" />
             </button>
           </div>
+        )}
+
+        {/* Scene Lab entry (watt-steam only) */}
+        {exhibitId === "watt-steam" && (
+          <button
+            onClick={openSceneLab}
+            className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-full border px-4 py-2.5 text-xs font-medium transition hover:gap-2.5"
+            style={{
+              borderColor: `${phase.accent}55`,
+              color: phase.accent,
+              background: `${phase.accent}10`,
+            }}
+          >
+            <FlaskConical className="h-3.5 w-3.5" />
+            Mở trong Scene Lab
+            <span className="ml-1 text-[0.6rem] uppercase tracking-[0.15em] opacity-70">
+              3D · Tháo rời bộ phận
+            </span>
+          </button>
         )}
 
         {/* nav footer */}

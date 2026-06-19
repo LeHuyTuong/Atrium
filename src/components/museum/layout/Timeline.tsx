@@ -13,7 +13,7 @@ export function Timeline() {
   const seenExhibits = useMuseum((s) => s.seenExhibits);
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-30 border-t border-foreground/10 bg-background/85 backdrop-blur-md">
+    <nav data-onboarding="timeline" className="fixed bottom-0 left-0 right-0 z-30 border-t border-foreground/10 bg-background/85 backdrop-blur-md">
       <div className="mx-auto flex max-w-7xl items-center gap-1 px-3 py-2 sm:gap-2 sm:px-6 sm:py-2.5">
         <button
           onClick={() => setStage("map")}

@@ -1,0 +1,938 @@
+     1→"use client";
+     2→
+     3→import { useMemo } from "react";
+     4→import * as THREE from "three";
+     5→import { Motif } from "@/lib/museum-data";
+     6→
+     7→/**
+     8→ * Procedural 3D models cho 32 motif hiện vật.
+     9→ * Mỗi model là một nhóm mesh dùng primitive THREE — không load file ngoài.
+    10→ * Tông màu: kim loại vàng/đồng + phát sáng theo phase accent.
+    11→ */
+    12→
+    13→interface ModelProps {
+    14→  accent: string;
+    15→  spinning?: boolean;
+    16→}
+    17→
+    18→const metal = (color: string, emissive = "#000", ei = 0) => ({
+    19→  color,
+    20→  metalness: 0.85,
+    21→  roughness: 0.28,
+    22→  emissive,
+    23→  emissiveIntensity: ei,
+    24→});
+    25→
+    26→const matte = (color: string) => ({
+    27→  color,
+    28→  metalness: 0.1,
+    29→  roughness: 0.8,
+    30→});
+    31→
+    32→function Gear({ accent }: ModelProps) {
+    33→  const teeth = useMemo(() => {
+    34→    const arr: THREE.Vector3[] = [];
+    35→    const n = 12;
+    36→    for (let i = 0; i < n; i++) {
+    37→      const a = (i / n) * Math.PI * 2;
+    38→      arr.push(new THREE.Vector3(Math.cos(a) * 1.05, Math.sin(a) * 1.05, 0));
+    39→    }
+    40→    return arr;
+    41→  }, []);
+    42→  return (
+    43→    <group>
+    44→      <mesh rotation={[0, 0, 0]}>
+    45→        <cylinderGeometry args={[0.8, 0.8, 0.18, 32]} />
+    46→        <meshStandardMaterial {...metal("#c9a05a")} />
+    47→      </mesh>
+    48→      <group rotation={[Math.PI / 2, 0, 0]}>
+    49→        {teeth.map((p, i) => (
+    50→          <mesh key={i} position={[p.x, p.y, 0.09]}>
+    51→            <boxGeometry args={[0.18, 0.32, 0.18]} />
+    52→            <meshStandardMaterial {...metal("#b8893f")} />
+    53→          </mesh>
+    54→        ))}
+    55→        <mesh>
+    56→          <torusGeometry args={[0.35, 0.1, 16, 32]} />
+    57→          <meshStandardMaterial {...metal("#8a6a2e")} />
+    58→        </mesh>
+    59→      </group>
+    60→      <mesh rotation={[Math.PI / 2, 0, 0]}>
+    61→        <torusGeometry args={[0.85, 0.04, 12, 48]} />
+    62→        <meshStandardMaterial {...metal(accent, accent, 0.4)} />
+    63→      </mesh>
+    64→    </group>
+    65→  );
+    66→}
+    67→
+    68→function SteamEngine({ accent, spinning }: ModelProps) {
+    69→  return (
+    70→    <group>
+    71→      <mesh position={[0, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
+    72→        <cylinderGeometry args={[0.7, 0.7, 1.8, 32]} />
+    73→        <meshStandardMaterial {...metal("#7a5a2e")} />
+    74→      </mesh>
+    75→      <mesh position={[-0.9, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
+    76→        <cylinderGeometry args={[0.72, 0.72, 0.08, 32]} />
+    77→        <meshStandardMaterial {...metal("#9a7a3e")} />
+    78→      </mesh>
+    79→      <mesh position={[0.9, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
+    80→        <cylinderGeometry args={[0.72, 0.72, 0.08, 32]} />
+    81→        <meshStandardMaterial {...metal("#9a7a3e")} />
+    82→      </mesh>
+    83→      <mesh position={[-0.85, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
+    84→        <torusGeometry args={[0.7, 0.04, 8, 32]} />
+    85→        <meshStandardMaterial {...metal("#caa05a")} />
+    86→      </mesh>
+    87→      <mesh position={[1.4, 0.3, 0]}>
+    88→        <boxGeometry args={[0.8, 0.18, 0.18]} />
+    89→        <meshStandardMaterial {...metal("#d4b06a")} />
+    90→      </mesh>
+    91→      <mesh position={[1.85, 0.3, 0]}>
+    92→        <cylinderGeometry args={[0.22, 0.22, 0.4, 24]} />
+    93→        <meshStandardMaterial {...metal("#b89050")} />
+    94→      </mesh>
+    95→      <group position={[1.85, 0.3, 0]} rotation={[0, 0, Math.PI / 2]}>
+    96→        <mesh rotation={spinning ? [0, 0, Date.now() * 0.001] : [0, 0, 0]}>
+    97→          <torusGeometry args={[0.5, 0.08, 16, 48]} />
+    98→          <meshStandardMaterial {...metal(accent, accent, 0.3)} />
+    99→        </mesh>
+   100→        <mesh>
+   101→          <cylinderGeometry args={[0.08, 0.08, 0.5, 16]} />
+   102→          <meshStandardMaterial {...metal("#8a6a2e")} />
+   103→        </mesh>
+   104→      </group>
+   105→      <mesh position={[-1.2, 0.5, 0]}>
+   106→        <sphereGeometry args={[0.15, 12, 12]} />
+   107→        <meshStandardMaterial color="#ddd" emissive="#fff" emissiveIntensity={0.5} transparent opacity={0.4} />
+   108→      </mesh>
+   109→    </group>
+   110→  );
+   111→}
+   112→
+   113→function Loom({ accent }: ModelProps) {
+   114→  return (
+   115→    <group>
+   116→      <mesh position={[-0.9, 0, 0]}>
+   117→        <boxGeometry args={[0.18, 1.6, 0.9]} />
+   118→        <meshStandardMaterial {...matte("#3a2410")} />
+   119→      </mesh>
+   120→      <mesh position={[0.9, 0, 0]}>
+   121→        <boxGeometry args={[0.18, 1.6, 0.9]} />
+   122→        <meshStandardMaterial {...matte("#3a2410")} />
+   123→      </mesh>
+   124→      {[-0.4, 0, 0.4].map((y, i) => (
+   125→        <mesh key={i} position={[0, y, 0]}>
+   126→          <cylinderGeometry args={[0.06, 0.06, 1.9, 12]} />
+   127→          <meshStandardMaterial {...metal(accent, accent, 0.2)} />
+   128→        </mesh>
+   129→      ))}
+   130→      {Array.from({ length: 9 }).map((_, i) => (
+   131→        <mesh key={i} position={[0, 0, -0.35 + i * 0.0875]}>
+   132→          <boxGeometry args={[1.9, 0.02, 0.02]} />
+   133→          <meshStandardMaterial color="#d4b888" metalness={0.2} roughness={0.6} />
+   134→        </mesh>
+   135→      ))}
+   136→    </group>
+   137→  );
+   138→}
+   139→
+   140→function Locomotive({ accent }: ModelProps) {
+   141→  return (
+   142→    <group>
+   143→      <mesh position={[0, 0.3, 0]}>
+   144→        <boxGeometry args={[1.8, 0.7, 0.7]} />
+   145→        <meshStandardMaterial {...metal("#6a4a22")} />
+   146→      </mesh>
+   147→      <mesh position={[-0.7, 0.7, 0]}>
+   148→        <boxGeometry args={[0.5, 0.6, 0.66]} />
+   149→        <meshStandardMaterial {...matte("#4a2f14")} />
+   150→      </mesh>
+   151→      <mesh position={[0.95, 0.35, 0]} rotation={[0, 0, Math.PI / 2]}>
+   152→        <cylinderGeometry args={[0.32, 0.32, 0.4, 24]} />
+   153→        <meshStandardMaterial {...metal("#8a6a2e")} />
+   154→      </mesh>
+   155→      <mesh position={[0.5, 0.95, 0]}>
+   156→        <cylinderGeometry args={[0.1, 0.13, 0.4, 16]} />
+   157→        <meshStandardMaterial {...matte("#3a2410")} />
+   158→      </mesh>
+   159→      {[0.6, 0, -0.6].map((x, i) => (
+   160→        <group key={i} position={[x, -0.25, 0]} rotation={[0, 0, Math.PI / 2]}>
+   161→          <mesh>
+   162→            <cylinderGeometry args={[0.3, 0.3, 0.12, 24]} />
+   163→            <meshStandardMaterial {...metal("#b8893f")} />
+   164→          </mesh>
+   165→          <mesh>
+   166→            <torusGeometry args={[0.18, 0.04, 8, 24]} />
+   167→            <meshStandardMaterial {...metal(accent, accent, 0.4)} />
+   168→          </mesh>
+   169→        </group>
+   170→      ))}
+   171→    </group>
+   172→  );
+   173→}
+   174→
+   175→function CottonGin({ accent }: ModelProps) {
+   176→  return (
+   177→    <group>
+   178→      <mesh position={[0, -0.3, 0]}>
+   179→        <boxGeometry args={[1.6, 0.4, 0.8]} />
+   180→        <meshStandardMaterial {...matte("#4a2f14")} />
+   181→      </mesh>
+   182→      {[-0.3, 0.3].map((x, i) => (
+   183→        <group key={i} position={[x, 0.2, 0]} rotation={[0, 0, Math.PI / 2]}>
+   184→          <mesh>
+   185→            <cylinderGeometry args={[0.35, 0.35, 1.2, 24]} />
+   186→            <meshStandardMaterial {...metal("#b8893f")} />
+   187→          </mesh>
+   188→          {Array.from({ length: 8 }).map((_, j) => {
+   189→            const a = (j / 8) * Math.PI * 2;
+   190→            return (
+   191→              <mesh key={j} position={[Math.cos(a) * 0.35, Math.sin(a) * 0.35, 0]}>
+   192→                <boxGeometry args={[0.04, 0.04, 1.25]} />
+   193→                <meshStandardMaterial {...metal(accent, accent, 0.3)} />
+   194→              </mesh>
+   195→            );
+   196→          })}
+   197→        </group>
+   198→      ))}
+   199→    </group>
+   200→  );
+   201→}
+   202→
+   203→function PuddlingFurnace({ accent }: ModelProps) {
+   204→  return (
+   205→    <group>
+   206→      <mesh position={[0, -0.3, 0]}>
+   207→        <boxGeometry args={[1.4, 0.6, 1.0]} />
+   208→        <meshStandardMaterial {...matte("#2a1810")} />
+   209→      </mesh>
+   210→      <mesh position={[0, 0.2, 0]}>
+   211→        <sphereGeometry args={[0.6, 24, 24, 0, Math.PI * 2, 0, Math.PI / 2]} />
+   212→        <meshStandardMaterial {...metal("#5a2a10", accent, 0.6)} />
+   213→      </mesh>
+   214→      <mesh position={[0, 0.55, 0]}>
+   215→        <cylinderGeometry args={[0.12, 0.16, 0.8, 16]} />
+   216→        <meshStandardMaterial {...matte("#3a2410")} />
+   217→      </mesh>
+   218→      <mesh position={[0, -0.1, 0]}>
+   219→        <sphereGeometry args={[0.4, 16, 16]} />
+   220→        <meshStandardMaterial color="#ff7a2a" emissive="#ff5a1a" emissiveIntensity={1.2} />
+   221→      </mesh>
+   222→    </group>
+   223→  );
+   224→}
+   225→
+   226→function GasLamp({ accent }: ModelProps) {
+   227→  return (
+   228→    <group>
+   229→      <mesh position={[0, -0.6, 0]}>
+   230→        <cylinderGeometry args={[0.06, 0.08, 1.6, 16]} />
+   231→        <meshStandardMaterial {...matte("#3a2410")} />
+   232→      </mesh>
+   233→      <mesh position={[0, 0.3, 0]}>
+   234→        <cylinderGeometry args={[0.04, 0.06, 0.3, 16]} />
+   235→        <meshStandardMaterial {...metal("#b8893f")} />
+   236→      </mesh>
+   237→      <mesh position={[0, 0.6, 0]}>
+   238→        <sphereGeometry args={[0.28, 24, 24]} />
+   239→        <meshStandardMaterial
+   240→          color="#fff4c0"
+   241→          emissive={accent}
+   242→          emissiveIntensity={1.4}
+   243→          transparent
+   244→          opacity={0.85}
+   245→        />
+   246→      </mesh>
+   247→      <mesh position={[0, 0.85, 0]}>
+   248→        <coneGeometry args={[0.2, 0.18, 16]} />
+   249→        <meshStandardMaterial {...matte("#3a2410")} />
+   250→      </mesh>
+   251→      <pointLight position={[0, 0.6, 0]} color={accent} intensity={2} distance={4} />
+   252→    </group>
+   253→  );
+   254→}
+   255→
+   256→function ThamesShield({ accent }: ModelProps) {
+   257→  return (
+   258→    <group>
+   259→      <mesh position={[0, 0, 0]} rotation={[0, 0, 0]}>
+   260→        <torusGeometry args={[0.8, 0.12, 16, 32, Math.PI]} />
+   261→        <meshStandardMaterial {...metal("#6a4a22")} />
+   262→      </mesh>
+   263→      <mesh position={[0, 0, -0.3]}>
+   264→        <boxGeometry args={[1.6, 0.1, 0.4]} />
+   265→        <meshStandardMaterial {...matte("#3a2410")} />
+   266→      </mesh>
+   267→      {[-0.5, -0.16, 0.16, 0.5].map((x, i) => (
+   268→        <mesh key={i} position={[x, 0, 0.1]} rotation={[Math.PI / 2, 0, 0]}>
+   269→          <cylinderGeometry args={[0.04, 0.04, 0.6, 12]} />
+   270→          <meshStandardMaterial {...metal(accent, accent, 0.3)} />
+   271→        </mesh>
+   272→      ))}
+   273→    </group>
+   274→  );
+   275→}
+   276→
+   277→function Bolt({ accent }: ModelProps) {
+   278→  return (
+   279→    <group>
+   280→      <mesh>
+   281→        <cylinderGeometry args={[0.18, 0.18, 1.6, 24]} />
+   282→        <meshStandardMaterial {...metal("#c9a05a")} />
+   283→      </mesh>
+   284→      <mesh>
+   285→        <icosahedronGeometry args={[0.5, 1]} />
+   286→        <meshStandardMaterial color={accent} emissive={accent} emissiveIntensity={1.2} wireframe />
+   287→      </mesh>
+   288→      <pointLight color={accent} intensity={1.5} distance={3} />
+   289→    </group>
+   290→  );
+   291→}
+   292→
+   293→function Assembly({ accent }: ModelProps) {
+   294→  return (
+   295→    <group>
+   296→      <mesh position={[0, -0.5, 0]}>
+   297→        <boxGeometry args={[2.2, 0.1, 0.5]} />
+   298→        <meshStandardMaterial {...metal("#5a4222")} />
+   299→      </mesh>
+   300→      {[-0.7, -0.2, 0.3, 0.8].map((x, i) => (
+   301→        <mesh key={i} position={[x, -0.3, 0]}>
+   302→          <boxGeometry args={[0.25, 0.25, 0.35]} />
+   303→          <meshStandardMaterial {...metal(i % 2 ? accent : "#b8893f")} />
+   304→        </mesh>
+   305→      ))}
+   306→      <mesh position={[0, 0.1, 0]}>
+   307→        <boxGeometry args={[0.3, 0.6, 0.3]} />
+   308→        <meshStandardMaterial {...metal("#8a6a2e")} />
+   309→      </mesh>
+   310→      <mesh position={[0, 0.5, 0]}>
+   311→        <boxGeometry args={[0.6, 0.1, 0.6]} />
+   312→        <meshStandardMaterial {...metal(accent, accent, 0.3)} />
+   313→      </mesh>
+   314→    </group>
+   315→  );
+   316→}
+   317→
+   318→function Dynamo({ accent }: ModelProps) {
+   319→  return (
+   320→    <group>
+   321→      <mesh position={[0, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
+   322→        <cylinderGeometry args={[0.6, 0.6, 1.2, 32]} />
+   323→        <meshStandardMaterial {...metal("#6a4a22")} />
+   324→      </mesh>
+   325→      {[-0.4, -0.2, 0, 0.2, 0.4].map((y, i) => (
+   326→        <mesh key={i} position={[0, y, 0]} rotation={[0, 0, Math.PI / 2]}>
+   327→          <torusGeometry args={[0.62, 0.04, 8, 32]} />
+   328→          <meshStandardMaterial {...metal("#caa05a")} />
+   329→        </mesh>
+   330→      ))}
+   331→      <mesh position={[0, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
+   332→        <cylinderGeometry args={[0.3, 0.3, 1.3, 16]} />
+   333→        <meshStandardMaterial {...metal(accent, accent, 0.5)} />
+   334→      </mesh>
+   335→      <pointLight color={accent} intensity={1.2} distance={3} />
+   336→    </group>
+   337→  );
+   338→}
+   339→
+   340→function OttoEngine({ accent }: ModelProps) {
+   341→  return (
+   342→    <group>
+   343→      <mesh position={[0, -0.2, 0]}>
+   344→        <boxGeometry args={[1.2, 0.7, 0.7]} />
+   345→        <meshStandardMaterial {...matte("#2a1810")} />
+   346→      </mesh>
+   347→      {[0.35, 0, -0.35].map((z, i) => (
+   348→        <group key={i} position={[0, 0.35, z]}>
+   349→          <mesh>
+   350→            <cylinderGeometry args={[0.14, 0.14, 0.5, 16]} />
+   351→            <meshStandardMaterial {...metal("#b8893f")} />
+   352→          </mesh>
+   353→          <mesh position={[0.4, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
+   354→            <cylinderGeometry args={[0.05, 0.05, 0.4, 12]} />
+   355→            <meshStandardMaterial {...metal(accent, accent, 0.3)} />
+   356→          </mesh>
+   357→        </group>
+   358→      ))}
+   359→      <mesh position={[0.85, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
+   360→        <torusGeometry args={[0.35, 0.06, 12, 32]} />
+   361→        <meshStandardMaterial {...metal("#c9a05a")} />
+   362→      </mesh>
+   363→    </group>
+   364→  );
+   365→}
+   366→
+   367→function Marconi({ accent }: ModelProps) {
+   368→  return (
+   369→    <group>
+   370→      <mesh position={[0, -0.5, 0]}>
+   371→        <boxGeometry args={[0.6, 0.3, 0.4]} />
+   372→        <meshStandardMaterial {...matte("#3a2410")} />
+   373→      </mesh>
+   374→      <mesh position={[0, -0.2, 0]}>
+   375→        <cylinderGeometry args={[0.18, 0.18, 0.4, 16]} />
+   376→        <meshStandardMaterial {...metal("#b8893f")} />
+   377→      </mesh>
+   378→      {[-0.5, 0, 0.5].map((y, i) => (
+   379→        <mesh key={i} position={[0, 0.1 + y, 0]}>
+   380→          <cylinderGeometry args={[0.02, 0.02, 1, 12]} />
+   381→          <meshStandardMaterial {...metal(accent, accent, 0.4)} />
+   382→        </mesh>
+   383→      ))}
+   384→      <mesh position={[0, 0.5, 0]}>
+   385→        <torusGeometry args={[0.6, 0.01, 8, 32]} />
+   386→        <meshStandardMaterial color={accent} emissive={accent} emissiveIntensity={1} transparent opacity={0.5} />
+   387→      </mesh>
+   388→      <mesh position={[0, 0.5, 0]}>
+   389→        <torusGeometry args={[0.9, 0.01, 8, 32]} />
+   390→        <meshStandardMaterial color={accent} emissive={accent} emissiveIntensity={0.8} transparent opacity={0.3} />
+   391→      </mesh>
+   392→      <pointLight color={accent} intensity={1} distance={4} />
+   393→    </group>
+   394→  );
+   395→}
+   396→
+   397→function EdisonMeter({ accent }: ModelProps) {
+   398→  return (
+   399→    <group>
+   400→      <mesh position={[0, 0, 0]}>
+   401→        <boxGeometry args={[1.0, 1.2, 0.4]} />
+   402→        <meshStandardMaterial {...matte("#3a2410")} />
+   403→      </mesh>
+   404→      <mesh position={[0, 0.2, 0.22]}>
+   405→        <cylinderGeometry args={[0.35, 0.35, 0.08, 32]} />
+   406→        <meshStandardMaterial {...metal("#caa05a")} />
+   407→      </mesh>
+   408→      {[-0.18, 0, 0.18].map((x, i) => (
+   409→        <mesh key={i} position={[x, 0.2, 0.27]}>
+   410→          <boxGeometry args={[0.02, 0.02, 0.06]} />
+   411→          <meshStandardMaterial {...metal(accent, accent, 0.5)} />
+   412→        </mesh>
+   413→      ))}
+   414→      <mesh position={[0, -0.4, 0.22]}>
+   415→        <boxGeometry args={[0.5, 0.3, 0.06]} />
+   416→        <meshStandardMaterial {...matte("#1a0f08")} />
+   417→      </mesh>
+   418→    </group>
+   419→  );
+   420→}
+   421→
+   422→function LightBulb({ accent }: ModelProps) {
+   423→  return (
+   424→    <group>
+   425→      <mesh position={[0, 0.25, 0]}>
+   426→        <sphereGeometry args={[0.5, 32, 32]} />
+   427→        <meshStandardMaterial
+   428→          color="#fff8d0"
+   429→          emissive={accent}
+   430→          emissiveIntensity={0.9}
+   431→          transparent
+   432→          opacity={0.35}
+   433→          roughness={0.05}
+   434→          metalness={0}
+   435→        />
+   436→      </mesh>
+   437→      <group position={[0, 0.25, 0]}>
+   438→        {Array.from({ length: 6 }).map((_, i) => {
+   439→          const a = (i / 6) * Math.PI * 2;
+   440→          return (
+   441→            <mesh key={i} position={[Math.cos(a) * 0.12, Math.sin(a) * 0.12, 0]}>
+   442→              <torusGeometry args={[0.12, 0.012, 8, 16]} />
+   443→              <meshStandardMaterial color="#fff" emissive="#fff5c0" emissiveIntensity={2} />
+   444→            </mesh>
+   445→          );
+   446→        })}
+   447→      </group>
+   448→      <mesh position={[0, -0.25, 0]}>
+   449→        <cylinderGeometry args={[0.22, 0.18, 0.3, 24]} />
+   450→        <meshStandardMaterial {...metal("#9a7a3e")} />
+   451→      </mesh>
+   452→      <mesh position={[0, -0.45, 0]}>
+   453→        <cylinderGeometry args={[0.16, 0.12, 0.18, 16]} />
+   454→        <meshStandardMaterial {...matte("#3a2410")} />
+   455→      </mesh>
+   456→      <pointLight position={[0, 0.25, 0]} color={accent} intensity={3} distance={5} />
+   457→    </group>
+   458→  );
+   459→}
+   460→
+   461→function Bulb({ accent }: ModelProps) {
+   462→  return <LightBulb accent={accent} />;
+   463→}
+   464→
+   465→function Network({ accent }: ModelProps) {
+   466→  const nodes = useMemo(() => {
+   467→    const arr: THREE.Vector3[] = [];
+   468→    const n = 8;
+   469→    for (let i = 0; i < n; i++) {
+   470→      const phi = Math.acos(-1 + (2 * i) / n);
+   471→      const theta = Math.sqrt(n * Math.PI) * phi;
+   472→      arr.push(
+   473→        new THREE.Vector3(
+   474→          Math.cos(theta) * Math.sin(phi) * 0.8,
+   475→          Math.sin(theta) * Math.sin(phi) * 0.8,
+   476→          Math.cos(phi) * 0.8
+   477→        )
+   478→      );
+   479→    }
+   480→    return arr;
+   481→  }, []);
+   482→  return (
+   483→    <group>
+   484→      {nodes.map((p, i) => (
+   485→        <mesh key={i} position={p}>
+   486→          <sphereGeometry args={[0.08, 16, 16]} />
+   487→          <meshStandardMaterial color={accent} emissive={accent} emissiveIntensity={0.8} />
+   488→        </mesh>
+   489→      ))}
+   490→    </group>
+   491→  );
+   492→}
+   493→
+   494→function Chip({ accent }: ModelProps) {
+   495→  return (
+   496→    <group>
+   497→      <mesh>
+   498→        <boxGeometry args={[1.0, 0.12, 1.0]} />
+   499→        <meshStandardMaterial {...metal("#1a1a1a")} roughness={0.4} />
+   500→      </mesh>
+   501→      <mesh position={[0, 0.07, 0]}>
+   502→        <boxGeometry args={[0.5, 0.02, 0.5]} />
+   503→        <meshStandardMaterial color={accent} emissive={accent} emissiveIntensity={0.5} metalness={0.3} />
+   504→      </mesh>
+   505→      {Array.from({ length: 14 }).map((_, i) => {
+   506→        const side = Math.floor(i / 4);
+   507→        const t = (i % 4) - 1.5;
+   508→        const pos =
+   509→          side === 0 ? [0.55, 0, t * 0.22] : side === 1 ? [-0.55, 0, t * 0.22] : side === 2 ? [t * 0.22, 0, 0.55] : [t * 0.22, 0, -0.55];
+   510→        return (
+   511→          <mesh key={i} position={pos as [number, number, number]}>
+   512→            <boxGeometry args={[0.04, 0.04, 0.18]} />
+   513→            <meshStandardMaterial {...metal("#caa05a")} />
+   514→          </mesh>
+   515→        );
+   516→      })}
+   517→    </group>
+   518→  );
+   519→}
+   520→
+   521→function Monitor({ accent }: ModelProps) {
+   522→  return (
+   523→    <group>
+   524→      <mesh position={[0, 0.1, 0]}>
+   525→        <boxGeometry args={[1.4, 1.0, 0.12]} />
+   526→        <meshStandardMaterial {...matte("#1a0f08")} />
+   527→      </mesh>
+   528→      <mesh position={[0, 0.1, 0.07]}>
+   529→        <boxGeometry args={[1.25, 0.85, 0.02]} />
+   530→        <meshStandardMaterial color={accent} emissive={accent} emissiveIntensity={0.5} />
+   531→      </mesh>
+   532→      <mesh position={[0, -0.6, 0]}>
+   533→        <cylinderGeometry args={[0.05, 0.05, 0.3, 12]} />
+   534→        <meshStandardMaterial {...metal("#3a2410")} />
+   535→      </mesh>
+   536→      <mesh position={[0, -0.78, 0]}>
+   537→        <boxGeometry args={[0.5, 0.06, 0.3]} />
+   538→        <meshStandardMaterial {...metal("#3a2410")} />
+   539→      </mesh>
+   540→    </group>
+   541→  );
+   542→}
+   543→
+   544→function Upc({ accent }: ModelProps) {
+   545→  const widths = [0.04, 0.02, 0.06, 0.03, 0.04, 0.02, 0.05, 0.03, 0.04, 0.06, 0.02, 0.03];
+   546→  return (
+   547→    <group>
+   548→      <mesh position={[0, 0, -0.02]}>
+   549→        <boxGeometry args={[1.4, 0.9, 0.02]} />
+   550→        <meshStandardMaterial {...matte("#f0ead0")} />
+   551→      </mesh>
+   552→      {widths.map((w, i) => {
+   553→        const x = -0.6 + i * 0.09;
+   554→        return (
+   555→          <mesh key={i} position={[x, 0, 0.01]}>
+   556→            <boxGeometry args={[w, 0.7, 0.01]} />
+   557→            <meshStandardMaterial color="#1a0f08" />
+   558→          </mesh>
+   559→        );
+   560→      })}
+   561→      <mesh position={[0, -0.55, 0.01]}>
+   562→        <boxGeometry args={[0.3, 0.1, 0.01]} />
+   563→        <meshStandardMaterial color={accent} emissive={accent} emissiveIntensity={0.6} />
+   564→      </mesh>
+   565→    </group>
+   566→  );
+   567→}
+   568→
+   569→function Www({ accent }: ModelProps) {
+   570→  return (
+   571→    <group>
+   572→      <mesh>
+   573→        <sphereGeometry args={[0.7, 32, 32]} />
+   574→        <meshStandardMaterial color="#0a1a2a" emissive={accent} emissiveIntensity={0.3} wireframe />
+   575→      </mesh>
+   576→      <mesh>
+   577→        <sphereGeometry args={[0.68, 32, 32]} />
+   578→        <meshStandardMaterial color="#0a1422" transparent opacity={0.6} />
+   579→      </mesh>
+   580→      <mesh rotation={[Math.PI / 2, 0, 0]}>
+   581→        <torusGeometry args={[0.7, 0.005, 8, 48]} />
+   582→        <meshStandardMaterial color={accent} emissive={accent} emissiveIntensity={0.8} />
+   583→      </mesh>
+   584→      <mesh>
+   585→        <torusGeometry args={[0.7, 0.005, 8, 48]} />
+   586→        <meshStandardMaterial color={accent} emissive={accent} emissiveIntensity={0.8} />
+   587→      </mesh>
+   588→      <pointLight color={accent} intensity={1.2} distance={3} />
+   589→    </group>
+   590→  );
+   591→}
+   592→
+   593→function Phone({ accent }: ModelProps) {
+   594→  return (
+   595→    <group rotation={[0, 0, Math.PI / 6]}>
+   596→      <mesh>
+   597→        <boxGeometry args={[1.4, 0.35, 0.28]} />
+   598→        <meshStandardMaterial {...matte("#2a1810")} />
+   599→      </mesh>
+   600→      <mesh position={[-0.55, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
+   601→        <cylinderGeometry args={[0.22, 0.22, 0.3, 24]} />
+   602→        <meshStandardMaterial {...metal("#3a2410")} />
+   603→      </mesh>
+   604→      <mesh position={[0.55, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
+   605→        <cylinderGeometry args={[0.22, 0.22, 0.3, 24]} />
+   606→        <meshStandardMaterial {...metal("#3a2410")} />
+   607→      </mesh>
+   608→      <mesh position={[0, 0, 0.15]}>
+   609→        <boxGeometry args={[0.8, 0.04, 0.02]} />
+   610→        <meshStandardMaterial color={accent} emissive={accent} emissiveIntensity={0.6} />
+   611→      </mesh>
+   612→    </group>
+   613→  );
+   614→}
+   615→
+   616→function Gps({ accent }: ModelProps) {
+   617→  return (
+   618→    <group>
+   619→      <mesh>
+   620→        <boxGeometry args={[0.5, 0.5, 0.5]} />
+   621→        <meshStandardMaterial {...metal("#c9a05a")} />
+   622→      </mesh>
+   623→      <mesh position={[-0.55, 0, 0]}>
+   624→        <boxGeometry args={[0.5, 0.3, 0.04]} />
+   625→        <meshStandardMaterial color="#1a3a5a" emissive={accent} emissiveIntensity={0.4} metalness={0.3} />
+   626→      </mesh>
+   627→      <mesh position={[0.55, 0, 0]}>
+   628→        <boxGeometry args={[0.5, 0.3, 0.04]} />
+   629→        <meshStandardMaterial color="#1a3a5a" emissive={accent} emissiveIntensity={0.4} metalness={0.3} />
+   630→      </mesh>
+   631→      <mesh position={[0, 0.4, 0]}>
+   632→        <cylinderGeometry args={[0.05, 0.05, 0.3, 12]} />
+   633→        <meshStandardMaterial {...metal("#3a2410")} />
+   634→      </mesh>
+   635→      <pointLight color={accent} intensity={1} distance={3} />
+   636→    </group>
+   637→  );
+   638→}
+   639→
+   640→function Brain({ accent }: ModelProps) {
+   641→  return (
+   642→    <group>
+   643→      <mesh>
+   644→        <icosahedronGeometry args={[0.8, 2]} />
+   645→        <meshStandardMaterial color="#d8b890" roughness={0.6} metalness={0.1} />
+   646→      </mesh>
+   647→      {Array.from({ length: 14 }).map((_, i) => {
+   648→        const a = (i / 14) * Math.PI * 2;
+   649→        const r = 0.85;
+   650→        return (
+   651→          <mesh key={i} position={[Math.cos(a) * r, Math.sin(a) * r * 0.7, Math.sin(a * 2) * 0.3]}>
+   652→            <sphereGeometry args={[0.1, 12, 12]} />
+   653→            <meshStandardMaterial color={accent} emissive={accent} emissiveIntensity={0.8} />
+   654→          </mesh>
+   655→        );
+   656→      })}
+   657→      <pointLight color={accent} intensity={1} distance={4} />
+   658→    </group>
+   659→  );
+   660→}
+   661→
+   662→function Cloud({ accent }: ModelProps) {
+   663→  return (
+   664→    <group>
+   665→      {[
+   666→        [0, 0, 0, 0.5],
+   667→        [0.5, -0.1, 0, 0.4],
+   668→        [-0.5, -0.05, 0, 0.42],
+   669→        [0.2, 0.25, 0, 0.35],
+   670→        [-0.2, 0.22, 0, 0.32],
+   671→      ].map(([x, y, z, r], i) => (
+   672→        <mesh key={i} position={[x, y, z]}>
+   673→          <sphereGeometry args={[r, 24, 24]} />
+   674→          <meshStandardMaterial color="#e8e0d0" emissive={accent} emissiveIntensity={0.15} roughness={0.8} />
+   675→        </mesh>
+   676→      ))}
+   677→      {[-0.4, 0, 0.4].map((x, i) => (
+   678→        <mesh key={i} position={[x, -0.7, 0]}>
+   679→          <boxGeometry args={[0.02, 0.5, 0.02]} />
+   680→          <meshStandardMaterial color={accent} emissive={accent} emissiveIntensity={1} />
+   681→        </mesh>
+   682→      ))}
+   683→    </group>
+   684→  );
+   685→}
+   686→
+   687→function Printer({ accent }: ModelProps) {
+   688→  return (
+   689→    <group>
+   690→      <mesh position={[0, 0, 0]}>
+   691→        <boxGeometry args={[1.2, 0.7, 0.9]} />
+   692→        <meshStandardMaterial {...matte("#2a1810")} />
+   693→      </mesh>
+   694→      <mesh position={[0, 0.5, 0]}>
+   695→        <boxGeometry args={[0.9, 0.2, 0.7]} />
+   696→        <meshStandardMaterial {...metal("#3a2410")} />
+   697→      </mesh>
+   698→      <mesh position={[0, 0.15, 0.5]} rotation={[Math.PI / 8, 0, 0]}>
+   699→        <cylinderGeometry args={[0.05, 0.05, 0.6, 12]} />
+   700→        <meshStandardMaterial {...metal("#b8893f")} />
+   701→      </mesh>
+   702→      <mesh position={[0, -0.32, 0.2]}>
+   703→        <boxGeometry args={[0.4, 0.06, 0.4]} />
+   704→        <meshStandardMaterial color={accent} emissive={accent} emissiveIntensity={0.7} />
+   705→      </mesh>
+   706→      <pointLight position={[0, 0.2, 0.5]} color={accent} intensity={1} distance={3} />
+   707→    </group>
+   708→  );
+   709→}
+   710→
+   711→function Car({ accent }: ModelProps) {
+   712→  return (
+   713→    <group>
+   714→      <mesh position={[0, 0, 0]}>
+   715→        <boxGeometry args={[1.6, 0.4, 0.7]} />
+   716→        <meshStandardMaterial {...metal("#3a2410")} />
+   717→      </mesh>
+   718→      <mesh position={[-0.1, 0.35, 0]}>
+   719→        <boxGeometry args={[0.9, 0.3, 0.65]} />
+   720→        <meshStandardMaterial {...metal("#5a3a1a")} />
+   721→      </mesh>
+   722→      <mesh position={[-0.1, 0.35, 0.33]}>
+   723→        <boxGeometry args={[0.7, 0.2, 0.02]} />
+   724→        <meshStandardMaterial color={accent} emissive={accent} emissiveIntensity={0.5} transparent opacity={0.6} />
+   725→      </mesh>
+   726→      {[-0.5, 0.5].map((x, i) => (
+   727→        <group key={i}>
+   728→          <mesh position={[x, -0.3, 0.35]} rotation={[Math.PI / 2, 0, 0]}>
+   729→            <cylinderGeometry args={[0.22, 0.22, 0.15, 24]} />
+   730→            <meshStandardMaterial {...metal("#1a0f08")} />
+   731→          </mesh>
+   732→          <mesh position={[x, -0.3, -0.35]} rotation={[Math.PI / 2, 0, 0]}>
+   733→            <cylinderGeometry args={[0.22, 0.22, 0.15, 24]} />
+   734→            <meshStandardMaterial {...metal("#1a0f08")} />
+   735→          </mesh>
+   736→        </group>
+   737→      ))}
+   738→      <mesh position={[0.2, 0.6, 0]}>
+   739→        <cylinderGeometry args={[0.08, 0.08, 0.1, 16]} />
+   740→        <meshStandardMaterial color={accent} emissive={accent} emissiveIntensity={1} />
+   741→      </mesh>
+   742→    </group>
+   743→  );
+   744→}
+   745→
+   746→function Smartphone({ accent }: ModelProps) {
+   747→  return (
+   748→    <group rotation={[0.1, 0, 0]}>
+   749→      <mesh>
+   750→        <boxGeometry args={[0.7, 1.4, 0.08]} />
+   751→        <meshStandardMaterial {...metal("#1a0f08")} roughness={0.3} />
+   752→      </mesh>
+   753→      <mesh position={[0, 0, 0.04]}>
+   754→        <boxGeometry args={[0.62, 1.3, 0.01]} />
+   755→        <meshStandardMaterial color={accent} emissive={accent} emissiveIntensity={0.5} />
+   756→      </mesh>
+   757→      <mesh position={[0, 0.6, 0.045]}>
+   758→        <boxGeometry args={[0.15, 0.04, 0.01]} />
+   759→        <meshStandardMaterial color="#1a0f08" />
+   760→      </mesh>
+   761→      <pointLight color={accent} intensity={0.8} distance={2} />
+   762→    </group>
+   763→  );
+   764→}
+   765→
+   766→function Transformer({ accent }: ModelProps) {
+   767→  return (
+   768→    <group>
+   769→      <mesh position={[0, -0.3, 0]}>
+   770→        <boxGeometry args={[0.8, 0.3, 0.5]} />
+   771→        <meshStandardMaterial {...matte("#2a1810")} />
+   772→      </mesh>
+   773→      <mesh position={[0, 0.1, 0]}>
+   774→        <boxGeometry args={[0.6, 0.6, 0.3]} />
+   775→        <meshStandardMaterial {...metal("#5a4222")} />
+   776→      </mesh>
+   777→      {[-0.18, 0, 0.18].map((y, i) => (
+   778→        <mesh key={i} position={[0, y, 0]} rotation={[0, 0, Math.PI / 2]}>
+   779→          <torusGeometry args={[0.25, 0.04, 8, 32]} />
+   780→          <meshStandardMaterial {...metal("#caa05a", accent, 0.3)} />
+   781→        </mesh>
+   782→      ))}
+   783→      <pointLight color={accent} intensity={0.8} distance={3} />
+   784→    </group>
+   785→  );
+   786→}
+   787→
+   788→function Rocket({ accent }: ModelProps) {
+   789→  return (
+   790→    <group>
+   791→      <mesh position={[0, 0.2, 0]}>
+   792→        <cylinderGeometry args={[0.2, 0.2, 1.2, 24]} />
+   793→        <meshStandardMaterial {...metal("#e0e0e0")} metalness={0.9} roughness={0.2} />
+   794→      </mesh>
+   795→      <mesh position={[0, 1.0, 0]}>
+   796→        <coneGeometry args={[0.2, 0.4, 24]} />
+   797→        <meshStandardMaterial {...metal("#b8893f")} />
+   798→      </mesh>
+   799→      {[0, Math.PI / 2, Math.PI, (3 * Math.PI) / 2].map((a, i) => (
+   800→        <mesh key={i} position={[Math.cos(a) * 0.2, -0.35, Math.sin(a) * 0.2]} rotation={[0, -a, 0]}>
+   801→          <boxGeometry args={[0.02, 0.3, 0.18]} />
+   802→          <meshStandardMaterial {...metal("#3a2410")} />
+   803→        </mesh>
+   804→      ))}
+   805→      <mesh position={[0, -0.6, 0]}>
+   806→        <coneGeometry args={[0.18, 0.5, 16]} />
+   807→        <meshStandardMaterial color={accent} emissive={accent} emissiveIntensity={1.5} transparent opacity={0.8} />
+   808→      </mesh>
+   809→      <pointLight position={[0, -0.7, 0]} color={accent} intensity={2} distance={4} />
+   810→    </group>
+   811→  );
+   812→}
+   813→
+   814→function Robot({ accent }: ModelProps) {
+   815→  return (
+   816→    <group>
+   817→      <mesh position={[0, 0.55, 0]}>
+   818→        <boxGeometry args={[0.45, 0.4, 0.4]} />
+   819→        <meshStandardMaterial {...metal("#c9a05a")} />
+   820→      </mesh>
+   821→      <mesh position={[-0.1, 0.6, 0.2]}>
+   822→        <sphereGeometry args={[0.06, 12, 12]} />
+   823→        <meshStandardMaterial color={accent} emissive={accent} emissiveIntensity={1.2} />
+   824→      </mesh>
+   825→      <mesh position={[0.1, 0.6, 0.2]}>
+   826→        <sphereGeometry args={[0.06, 12, 12]} />
+   827→        <meshStandardMaterial color={accent} emissive={accent} emissiveIntensity={1.2} />
+   828→      </mesh>
+   829→      <mesh position={[0, 0, 0]}>
+   830→        <boxGeometry args={[0.6, 0.7, 0.35]} />
+   831→        <meshStandardMaterial {...metal("#8a6a2e")} />
+   832→      </mesh>
+   833→      {[-0.4, 0.4].map((x, i) => (
+   834→        <mesh key={i} position={[x, 0.05, 0]} rotation={[0, 0, i ? -0.1 : 0.1]}>
+   835→          <cylinderGeometry args={[0.08, 0.08, 0.7, 16]} />
+   836→          <meshStandardMaterial {...metal("#b8893f")} />
+   837→        </mesh>
+   838→      ))}
+   839→      {[-0.15, 0.15].map((x, i) => (
+   840→        <mesh key={i} position={[x, -0.6, 0]}>
+   841→          <cylinderGeometry args={[0.1, 0.1, 0.5, 16]} />
+   842→          <meshStandardMaterial {...metal("#5a4222")} />
+   843→        </mesh>
+   844→      ))}
+   845→    </group>
+   846→  );
+   847→}
+   848→
+   849→function NeuralNet({ accent }: ModelProps) {
+   850→  const layers = [4, 6, 6, 3];
+   851→  const nodes = useMemo(() => {
+   852→    const arr: { pos: THREE.Vector3; layer: number }[] = [];
+   853→    layers.forEach((count, li) => {
+   854→      for (let i = 0; i < count; i++) {
+   855→        const y = (i - (count - 1) / 2) * 0.25;
+   856→        arr.push({ pos: new THREE.Vector3((li - 1.5) * 0.6, y, 0), layer: li });
+   857→      }
+   858→    });
+   859→    return arr;
+   860→  }, []);
+   861→  return (
+   862→    <group>
+   863→      {nodes.map((n, i) => (
+   864→        <mesh key={i} position={n.pos}>
+   865→          <sphereGeometry args={[0.08, 16, 16]} />
+   866→          <meshStandardMaterial color={accent} emissive={accent} emissiveIntensity={0.9} />
+   867→        </mesh>
+   868→      ))}
+   869→      {nodes.map((n, i) =>
+   870→        nodes
+   871→          .filter((m) => m.layer === n.layer + 1)
+   872→          .map((m, j) => (
+   873→            <ConnectionLine key={`${i}-${j}`} from={n.pos} to={m.pos} accent={accent} />
+   874→          ))
+   875→      )}
+   876→      <pointLight color={accent} intensity={1.2} distance={4} />
+   877→    </group>
+   878→  );
+   879→}
+   880→
+   881→function ConnectionLine({ from, to, accent }: { from: THREE.Vector3; to: THREE.Vector3; accent: string }) {
+   882→  const { mid, len } = useMemo(() => {
+   883→    const mid = from.clone().lerp(to, 0.5);
+   884→    const len = from.distanceTo(to);
+   885→    return { mid, len };
+   886→  }, [from, to]);
+   887→  return (
+   888→    <mesh position={mid}>
+   889→      <boxGeometry args={[0.01, 0.01, len]} />
+   890→      <meshStandardMaterial color={accent} emissive={accent} emissiveIntensity={0.3} transparent opacity={0.4} />
+   891→    </mesh>
+   892→  );
+   893→}
+   894→
+   895→const MODEL_MAP: Record<Motif, React.FC<ModelProps>> = {
+   896→  steam: SteamEngine,
+   897→  loom: Loom,
+   898→  gear: Gear,
+   899→  locomotive: Locomotive,
+   900→  "cotton-gin": CottonGin,
+   901→  puddling: PuddlingFurnace,
+   902→  "gas-lamp": GasLamp,
+   903→  "thames-shield": ThamesShield,
+   904→  bolt: Bolt,
+   905→  assembly: Assembly,
+   906→  dynamo: Dynamo,
+   907→  otto: OttoEngine,
+   908→  marconi: Marconi,
+   909→  "edison-meter": EdisonMeter,
+   910→  "light-bulb": LightBulb,
+   911→  bulb: Bulb,
+   912→  network: Network,
+   913→  chip: Chip,
+   914→  monitor: Monitor,
+   915→  upc: Upc,
+   916→  www: Www,
+   917→  phone: Phone,
+   918→  gps: Gps,
+   919→  brain: Brain,
+   920→  cloud: Cloud,
+   921→  printer: Printer,
+   922→  car: Car,
+   923→  smartphone: Smartphone,
+   924→  transformer: Transformer,
+   925→  rocket: Rocket,
+   926→  robot: Robot,
+   927→  "neural-net": NeuralNet,
+   928→};
+   929→
+   930→export function ArtifactModel({ motif, accent, spinning }: { motif: Motif; accent: string; spinning?: boolean }) {
+   931→  const Cmp = MODEL_MAP[motif] ?? Gear;
+   932→  return <Cmp accent={accent} spinning={spinning} />;
+   933→}
+   934→
+   935→export function motifHasModel(motif: Motif): boolean {
+   936→  return motif in MODEL_MAP;
+   937→}
+   938→

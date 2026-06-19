@@ -41,7 +41,7 @@ export function TimelineFab({ onQuiz }: { onQuiz: () => void }) {
   }
 
   return (
-    <div className="fixed bottom-20 left-4 z-20 flex flex-col gap-2 sm:bottom-24 sm:left-6">
+    <div data-onboarding="fab" className="fixed bottom-20 left-4 z-20 flex flex-col gap-2 sm:bottom-24 sm:left-6">
       {actions.map((a) => (
         <button
           key={a.label}

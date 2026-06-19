@@ -79,3 +79,292 @@ Unresolved / next-phase recommendations:
 - Featured tours / featured achievements carousels on landing — not yet built.
 - The warm-brown theme is currently single-mode (always dark). If user wants light mode, add a toggle.
 - Consider regenerating real historical images via image-generation skill to replace the procedural gradient placeholders in historical-images.ts.
+
+---
+Task ID: 5
+Agent: featured-tours-builder
+Task: Build featured tours carousel on MuseumMap
+
+Work Log:
+- Đọc worklog.md + các file hiện có (MuseumMap.tsx, tours/route.ts, museum-data.ts, TourBuilderModal.tsx, MotifIcon.tsx, layout.tsx, store.ts) để hiểu context và data shape.
+- Tạo `/src/app/api/tours/seed/route.ts` (POST, idempotent): 3 tour curated theo slug (hanh-trinh-hoi-nuoc, anh-sang-va-dien, tu-silicon-den-ai) — check `findUnique({where:{slug}})`, nếu chưa có thì create với featured=true, nếu có rồi nhưng featured=false thì update. Trả về `{seeded: N}`.
+- Phát hiện project chưa có QueryClientProvider — tạo `/src/app/providers.tsx` (client) bọc `QueryClientProvider` với QueryClient singleton (staleTime 60s, retry 1, no refetchOnWindowFocus). Wrap `<Providers>` quanh children trong `src/app/layout.tsx` (Toaster vẫn ở ngoài Provider để giữ tách bạch).
+- Tạo `/src/components/museum/panels/FeaturedTours.tsx` ("use client"):
+  - `useQuery<Tour[]>({queryKey:['featured-tours'], queryFn: fetch('/api/tours?featured=1') → d.tours})`.
+  - Auto-seed: `useEffect` theo dõi `isLoading/isError/tours`; nếu `tours.length===0` gọi `seedOnce()` (POST /api/tours/seed, sau đó `queryClient.invalidateQueries(['featured-tours'])`). Dùng `seededRef` để tránh race khi StrictMode double-mount.
+  - Card 280px, snap-start, rounded-2xl, border warm-brown (border-foreground/12, hover:border-foreground/30), header gradient dùng accent màu phase của exhibit đầu tiên + MotifIcon + phase label pill + số phase lớn mờ nền.
+  - Body: title font-serif truncate, author (Users icon) + step count ("N hiện vật"), description 2-line clamp, nút "Bắt đầu tour" (Sparkles icon, bg = phase accent).
+  - Navigate: `window.location.href = \`/?tour=${slug}\`` (full reload để TourPlayerBar pickup).
+  - EmptyState: prompt "Chưa có tour nổi bật. Tạo tour đầu tiên của bạn!" + nút "Tải tour mẫu" (gọi seedOnce) + nút "Tạo tour của bạn" (mở TourBuilderModal qua `useMuseum.setTourBuilderOpen`).
+  - Carousel: `snap-x snap-mandatory gap-4 overflow-x-auto elegant-scroll`. Hai bộ arrow: 1 bộ cố định top-right (desktop, md+), 1 bộ overlay left/right xuất hiện khi hover group/carousel (desktop). Mỗi scroll advance 1 card (296px = 280+16 gap).
+  - Loading state: spinner + text Việt. Error state tự rơi vào EmptyState (tours=undefined → []).
+- Mount `<FeaturedTours />` trong MuseumMap.tsx, wrap bằng `<section className="mt-12 w-full max-w-6xl">` ngay dưới grid 4 era cards, trên footer note "Tự do đi lại".
+- Lint: `bun run lint` → 0 errors (1 warning pre-existing trong ExhibitModal.tsx, không thuộc scope). Ban đầu có 1 warning "Unused eslint-disable directive" cho `react-hooks/exhaustive-deps` trong FeaturedTours — đã remove comment vì rule không fire (seedOnce dùng ref, an toàn).
+- Test runtime qua curl + agent-browser:
+  - `GET /api/tours?featured=1` → 200, `{tours:[]}` lần đầu.
+  - `POST /api/tours/seed` → 200, `{seeded:3}` (3 INSERT trong dev.log).
+  - `POST /api/tours/seed` lần 2 → 200, `{seeded:0}` (chỉ 3 SELECT, idempotent OK).
+  - `GET /api/tours?featured=1` sau seed → 200, trả 3 tour đúng slug/title/exhibitIds.
+  - agent-browser: `/` → "Bắt đầu hành trình" → portal → "Vào bảo tàng" → MuseumMap render 4 era cards + section "Hành trình được dẫn tuyến" với 3 card tour ("Từ silicon đến AI", "Ánh sáng & điện", "Hành trình hơi nước") + 3 nút "Bắt đầu tour" + scroll arrows.
+  - Click "Bắt đầu tour" trên card "Hành trình hơi nước" → URL = `/?tour=hanh-trinh-hoi-nuoc` (full reload, TourPlayerBar sẽ pickup).
+- Console: 1 error pre-existing về nested <button> trong PhaseRoom (không thuộc scope Task 5). Còn lại chỉ warning THREE.js deprecated,无害.
+
+Stage Summary:
+- FeaturedTours carousel đã sống trên MuseumMap, ngay dưới 4 era cards. 3 tour mẫu tự-seed idempotent qua `/api/tours/seed` (POST). React Query quản lý cache + auto-seed khi list rỗng.
+- Card design warm-brown đồng bộ với theme: header gradient theo phase accent của exhibit đầu tiên, motif icon, phase label pill, body font-serif + 2-line clamp + nút "Bắt đầu tour" accent. Click → full reload `/?tour=<slug>` cho TourPlayerBar pickup.
+- Empty state có 2 CTA: "Tải tour mẫu" (re-seed) + "Tạo tour của bạn" (mở TourBuilderModal).
+- Provider setup: thêm `src/app/providers.tsx` (QueryClient) + wrap layout. Tất cả component dùng useQuery sẽ work sau này.
+- Lint pass (0 errors), dev server chạy port 3000, không có error mới từ code Task 5.
+
+Files added:
+- `src/app/api/tours/seed/route.ts` — POST idempotent seed 3 featured tours.
+- `src/app/providers.tsx` — QueryClientProvider client wrapper.
+- `src/components/museum/panels/FeaturedTours.tsx` — carousel component.
+
+Files modified:
+- `src/app/layout.tsx` — wrap children trong <Providers>.
+- `src/components/museum/layout/MuseumMap.tsx` — import + mount <FeaturedTours /> trong <section mt-12 max-w-6xl>.
+
+---
+Task ID: 3
+Agent: onboarding-builder
+Task: Build onboarding coachmark overlay
+
+Work Log:
+- Read prior worklog (Tasks 1 + 2) to understand the Atrium museum foundation: Zustand persist store, 32 exhibits, VisitorHud/PhaseRoom/Timeline/TimelineFab layouts, dark warm-brown theme (oklch 0.16 0.012 60), gold accent #e89446, Vietnamese UI.
+- Extended `src/lib/store.ts`: added `onboardingCompleted: boolean` field (default false) + `completeOnboarding()` action (sets the flag true and closes onboardingOpen). Added `onboardingCompleted` to the persist `partialize` array so dismissal survives reloads.
+- Added `data-onboarding` anchor attributes to the right containers in 4 layout files: VisitorHud (`tools` on the tool cluster + `progress` on the progress ring container), PhaseRoom (`first-card` on a wrapper div around only the first ExhibitCard — others render directly to keep grid layout identical), Timeline (`timeline` on the bottom `<nav>`), TimelineFab (`fab` on the floating FAB cluster).
+- Built `src/components/museum/panels/OnboardingOverlay.tsx`: 7-state coachmark sequence (6 numbered steps pointing to tools/progress/first-card/timeline/fab, + a final centered completion card "Bạn đã sẵn sàng. Bắt đầu hành trình của bạn!"). Spotlight effect via 4 dark `bg-black/60` overlays around the target rect + a gold `#e89446` highlight border box (boxShadow 2px ring + soft glow). Card placement: below target when space allows, else above; left edge clamped to viewport. Welcome + final cards centered. Card uses dark warm-brown `oklch(0.205 0.014 60)` with gold border, `max-w-xs` (320px), rounded-2xl, step badge (`1/6`..`6/6` with Sparkles icon, "Hoàn tất" with Check icon for final), progress dots, and Skip/Next buttons. Framer-motion entrance/exit animations.
+- Visibility gate: overlay only renders when `stage === "room" && !onboardingCompleted`. Hydration-safe via `useSyncExternalStore` (avoids SSR mismatch).
+- Recomputes target rect on `resize` and `scroll` (capture phase). If the target element isn't mounted yet, retries via `requestAnimationFrame` (max 30 tries) then bumps a `tick` counter to trigger recompute. `rect`/`vp` derived from the DOM via `useMemo` driven by the tick counter — setState only happens inside event-listener callbacks (allowed by `react-hooks/set-state-in-effect`).
+- Wired `<OnboardingOverlay />` into `src/app/page.tsx` next to the other global panels.
+- Ran `bun run lint`: initial pass surfaced 2 `react-hooks/set-state-in-effect` errors from a `setMounted(true)` tick and a synchronous `setRect(null)` in the effect body. Refactored: replaced `setMounted` with `useHydrated()` based on `useSyncExternalStore`, and converted `rect`/`vp` from state to `useMemo`-derived DOM reads driven by a `tick` counter (only bumped from event listeners and rAF callbacks). Final lint: 0 errors (only a pre-existing unused-disable warning in ExhibitModal.tsx remains, out of scope).
+- Verified dev server log: GET / 200 with healthy compile/render times, no errors after edits.
+
+Stage Summary:
+- First-visit onboarding coachmark overlay fully wired. 6 numbered steps walk the visitor through HUD tools (Cmd+K search etc.), progress ring (32 exhibits), first exhibit card (3D + story), bottom timeline (era switching), and the FAB cluster (timeline/connections/map/quiz), then a centered "Bạn đã sẵn sàng. Bắt đầu hành trình của bạn!" completion card.
+- Dark warm-brown themed card with gold (#e89446) accent border + CTA, spotlight dim with gold highlight border around the active target, framer-motion transitions, responsive below/above placement, repositions on resize/scroll.
+- "Bỏ qua" (X icon or footer button) and final-step "Bắt đầu hành trình" both call `completeOnboarding()` which persists dismissal to localStorage; "Tiếp" advances.
+- Store change: `onboardingCompleted: boolean` + `completeOnboarding()` action, persisted via `partialize`.
+- All 4 layout files updated with the right `data-onboarding` anchors; OnboardingOverlay mounted in `page.tsx`.
+- Lint: 0 errors. Acceptance criteria all satisfied.
+
+---
+Task ID: 4
+Agent: tour-player-builder
+Task: Build tour player bar with URL param handling
+
+Work Log:
+- Read prior worklog (Task 1 + 2 + 3). Confirmed `hanh-trinh-hoi-nuoc-8xuu` tour exists in SQLite (exhibitIds: watt-steam, spinning-jenny, cotton-gin, author "Người dẫn tuyến").
+- Extended `src/lib/store.ts`: added `ActiveTour` interface + `activeTour: ActiveTour | null` state field, plus four actions — `setActiveTour(tour)` (sets currentStep 0), `advanceTourStep()` (increment, cap at exhibitIds.length-1), `retreatTourStep()` (decrement, min 0), `clearActiveTour()` (set null). Added `activeTour` to `partialize` so it survives reloads, and reset it in `reset()`. (Note: store had evolved since worklog — onboardingCompleted/completeOnboarding present; preserved those.)
+- Created `src/app/api/tours/[slug]/route.ts`: GET handler using `params: Promise<{slug}>` (Next.js 16 async params). Returns 404 `{error:"not_found"}` if missing, else JSON.parse(exhibitIds) → array, increments `visits` (non-blocking catch), returns full tour object with parsed exhibitIds + visits+1.
+- Created `src/components/museum/panels/TourPlayerBar.tsx`: fixed `top-16 z-20 max-w-3xl` floating bar (below VisitorHud at top-0), rounded-2xl, border-foreground/15, bg-card/90 backdrop-blur-md. Left = Route icon (phase-accented) + tour title (truncate) + author (hidden on mobile). Right = phase-colored progress bar (motion-animated width) + Prev (ChevronLeft, disabled on first) + "Bước X/Y" label + Next (ChevronRight / "Hoàn thành" on last) + Exit (X). framer-motion slide-down entrance via AnimatePresence. Responsive: flex-col on mobile (title row + controls row), flex-row on sm+. Next on last step → toast "Hoàn thành tour!..." + closeExhibit + clearActiveTour after 2s (finishing guard prevents double-fire). Exit → closeExhibit + clearActiveTour + setStage("map"). Progress bar fill accent derived from current exhibit's phase.
+- Wired `src/app/page.tsx`: imported TourPlayerBar + exhibitById + toast + useRef. Added useEffect (guarded by `tourBootstrapped` ref to survive React StrictMode double-invoke) that reads `?tour=<slug>` from window.location.search on mount, fetches `/api/tours/<slug>`, calls setActiveTour, then enterPhase + setCurrentPhase + setStage("room") + setTimeout(openExhibit(firstExhibit.id), 500). Mounted `<TourPlayerBar />` at end of render tree (auto-renders only when activeTour set).
+- Verified: `curl /api/tours/hanh-trinh-hoi-nuoc-8xuu` → 200 with parsed exhibitIds array + visits incremented; `curl /api/tours/nonexistent` → 404; `curl "/?tour=hanh-trinh-hoi-nuoc-8xuu"` → 200. Dev log shows Prisma SELECT + UPDATE(visits) running, no errors, "✓ Compiled" after edits.
+- Lint: `bun run lint` → 0 errors (1 pre-existing unrelated warning in ExhibitModal.tsx about a stale eslint-disable comment).
+
+Stage Summary:
+- Tour playback fully wired end-to-end. Loading `/?tour=<slug>` auto-fetches the tour, activates it, jumps to the first exhibit's room, and opens that exhibit's modal; the TourPlayerBar slides in below the VisitorHud.
+- Next/Prev buttons advance through `exhibitIds`, opening each exhibit modal in turn; progress bar + "Bước X/Y" indicator update live; phase accent colors the bar to match the current exhibit's era.
+- Completing the last step fires a "Hoàn thành tour!" toast and clears the tour after 2s. Exit (X) returns the visitor to the museum map.
+- `activeTour` is persisted to localStorage, so an in-progress tour survives page reloads.
+- API route `/api/tours/[slug]` returns a single tour by slug with parsed exhibitIds and increments visit counter on each load.
+- All acceptance criteria met: TourPlayerBar.tsx exists & mounted in page.tsx; `/api/tours/[slug]/route.ts` exists; store has activeTour + 4 actions; lint clean.
+
+---
+Task ID: 6
+Agent: photo-wall-builder
+Task: Build Photo Wall + Lightbox feature
+
+Work Log:
+- Đọc worklog.md (Task 1–5) + các file hiện có (historical-images.ts, store.ts, museum-data.ts, MotifIcon.tsx, MuseumMap.tsx, PhaseRoom.tsx, page.tsx, dialog.tsx, OnboardingOverlay.tsx, BookmarksPanel.tsx) để hiểu context + patterns (Radix Dialog qua shadcn, MotifIcon map, framer-motion stagger, useMuseum selector).
+- Mở rộng `src/lib/store.ts`: thêm 2 ephemeral UI fields `photoWallPhase: PhaseId | null` + `lightboxImageId: string | null` (mặc định null), và 2 actions `setPhotoWallPhase(p)` + `setLightboxImageId(id)`. Theo spec, KHÔNG thêm vào `partialize` (overlay state tạm thời, không persist).
+- Tạo `src/components/museum/panels/PhotoWall.tsx` ("use client"):
+  - Dialog mở khi `photoWallPhase !== null`. DialogContent `max-w-6xl max-h-[92vh] overflow-y-auto elegant-scroll bg-card border-foreground/15 p-0`, `showCloseButton={false}` (dùng X custom).
+  - Header sticky (`sticky top-0 z-10 bg-card/95 backdrop-blur-md`): kicker "Kỷ nguyên X trên 4 · {period}" tô màu accent + `{phase.name}` (serif bold) + `{phase.era}` (italic) + nút X đóng.
+  - Body: paragraph intro (`phase.intro`), curator quote với border-left accent + icon `Quote` (italic serif), grid 7 ảnh.
+  - Grid `grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4`. Mỗi card là `motion.button` với stagger entrance (`delay: 0.05 + i*0.06`). Card có `background: img.gradient, minHeight: 140`, lớp `grain opacity-[0.08] mix-blend-overlay`, `MotifIcon` top-right faded, featured có `★` vàng (amber-300) top-left, caption overlay ở bottom (year kicker + caption 2-line clamp + source italic). Featured image dùng `sm:col-span-2 xl:col-span-2` để chiếm 2 ô rộng.
+  - Click card → `setLightboxImageId(img.id)` (mở Lightbox).
+  - Footer: paragraph gợi ý + nút "Bước vào phòng" (ArrowRight, bg = phase.accent, text-background). Click → `setPhotoWallPhase(null)` + `enterPhase(phaseId)` + `setCurrentPhase(phaseId)` + `setStage("room")`.
+  - `DialogTitle` sr-only để Radix Dialog không complain về missing title.
+- Tạo `src/components/museum/panels/Lightbox.tsx` ("use client"):
+  - Dialog mở khi `lightboxImageId !== null`. DialogContent `max-w-5xl max-h-[92vh] bg-card p-0 border-foreground/15`.
+  - Tìm current image qua `HISTORICAL_IMAGES.find(id)`. Lấy `phaseId` từ current image (fallback `photoWallPhase`). Lấy siblings qua `imagesByPhase(phaseId)`. Tính `currentIndex`.
+  - Vùng ảnh lớn: `h-[60vh] max-h-[28rem]` với `background: current.gradient`, lớp grain, `MotifIcon` phóng to `h-24 w-24`. Counter "X/N" top-left. Nút X top-right. Hai nút arrow (ChevronLeft/ChevronRight) left/right edge, vertical-center.
+  - Caption block dưới ảnh: year kicker + caption (serif large) + "Nguồn: {source}" italic.
+  - Navigation: `go(delta)` tính `next = (currentIndex + delta + n) % n` (wrap-around). Gọi `setLightboxImageId(target.id)`.
+  - Keyboard: ArrowLeft/ArrowRight ← → qua `window.addEventListener("keydown")` (ESC do Radix Dialog tự xử lý). `useEffect` cleanup.
+  - AnimatePresence `mode="wait"` với `key={current.id}` để fade giữa các ảnh.
+- Sửa `src/components/museum/layout/MuseumMap.tsx`:
+  - Đổi era card outer từ `<motion.button>` → `<motion.article onClick={enterRoom}>` (cursor-pointer) để tránh nested-button invalid HTML khi thêm nút "Phòng ảnh".
+  - Thêm 2 button ở footer card: "Phòng ảnh" (Images icon, border-foreground/15, `e.stopPropagation()` → `setPhotoWallPhase(p.id)`) và "Vào phòng"/"Tiếp tục" (ArrowRight, accent fill, `e.stopPropagation()` → `enterRoom()`). Cả hai dùng `type="button"` + `aria-label`.
+- Sửa `src/components/museum/layout/PhaseRoom.tsx`:
+  - Thêm `setPhotoWallPhase` selector + import `Images` icon.
+  - Trong hộp intro dismissible, gộp "Ẩn" và "Phòng ảnh" vào cùng `<div className="flex shrink-0 items-center gap-2">`. Nút "Phòng ảnh" (Images icon) → `setPhotoWallPhase(currentPhase)`.
+- Mount trong `src/app/page.tsx`: import `PhotoWall` + `Lightbox`, render 2 component cuối render tree (sau TourPlayerBar) với comment "Photo wall + lightbox (open via store)".
+- Lint: `bun run lint` → 0 errors (3 warnings pre-existing trong ExhibitModal.tsx về unused eslint-disable directives, không thuộc scope).
+- Dev server: `curl http://localhost:3000/` → 200. dev.log cho thấy nhiều `✓ Compiled in XXXms` + `GET / 200` liên tục, không có error/warning mới sau các edit.
+
+Stage Summary:
+- Photo Wall + Lightbox hoàn thành end-to-end. Click "Phòng ảnh" trên era card ở MuseumMap hoặc trong PhaseRoom intro → mở PhotoWall overlay cho phase đó với 7 ảnh lịch sử (gradient + motif icon + caption + source). Click ảnh → mở Lightbox fullscreen với prev/next arrows + counter + arrow-key navigation + ESC đóng. "Bước vào phòng" → đóng PhotoWall + vào phase room.
+- Store: `photoWallPhase` + `lightboxImageId` là ephemeral UI state, KHÔNG persist (theo spec).
+- PhotoWall: header sticky với phase accent, era intro paragraph, curator quote với border-left accent, grid 7 ảnh (xl:grid-cols-4, featured chiếm 2 ô), nút "Bước vào phòng" accent.
+- Lightbox: ảnh lớn h-[60vh], caption serif, source italic, prev/next arrows + counter "X/N", keyboard ← → navigate, ESC đóng, AnimatePresence fade.
+- Entry points: "Phòng ảnh" button trong MuseumMap era cards (next to "Vào phòng") và trong PhaseRoom intro (next to "Ẩn").
+- Lint clean (0 errors), dev server OK.
+
+Files added:
+- `src/components/museum/panels/PhotoWall.tsx` — full-screen Photo Wall overlay.
+- `src/components/museum/panels/Lightbox.tsx` — fullscreen lightbox với prev/next.
+
+Files modified:
+- `src/lib/store.ts` — thêm `photoWallPhase`, `lightboxImageId`, `setPhotoWallPhase`, `setLightboxImageId` (ephemeral, not in partialize).
+- `src/components/museum/layout/MuseumMap.tsx` — era card refactor motion.button → motion.article + thêm 2 button "Phòng ảnh" + "Vào phòng".
+- `src/components/museum/layout/PhaseRoom.tsx` — thêm nút "Phòng ảnh" cạnh "Ẩn" trong intro.
+- `src/app/page.tsx` — mount `<PhotoWall />` + `<Lightbox />` cuối render tree.
+
+---
+Task ID: 8
+Agent: audio-builder
+Task: Build ambient audio + sound effects system
+
+Work Log:
+- Đọc worklog + các file hiện có (store.ts, VisitorHud.tsx, ExhibitModal.tsx, PhaseRoom.tsx, QuizBox.tsx, page.tsx) để hiểu context và data shape. Phát hiện store đã evolve (có sceneLabOpen, photoWallPhase, lightboxImageId) và ExhibitModalBody có local state tên `audio` (HTMLAudioElement cho narrator) — sẽ shadow import nếu không alias.
+- Tạo `src/lib/audio.ts` (plain TS, không `'use client'`): class `AudioEngine` + singleton `audio`. Lazy-create `AudioContext` trong `init()` (gọi từ click unmute và từ `setAmbient(true)` để tuân autoplay policy). `init()` cũng resume context nếu suspended. `masterGain` ramp 0↔0.4 trong 60ms (tránh click). Hàm `prefersReducedMotion()` đọc `window.matchMedia("(prefers-reduced-motion: reduce)")`.
+- Ambient hum: 2 brown-noise buffer (4s loop, leaky integrator `(last + 0.02*white)/1.02`, scale ×3.5) playbackRate 1.0 & 1.003 (detune) → lowpass 200Hz Q=0.5 → gain 0.04 → `ambientGain` → `masterGain` → destination. Cộng 1 sine 60Hz gain 0.02 (sub-bass rumble). `stopAmbient()` gọi `.stop()` trên oscillator/buffer sources và `.disconnect()` tất cả nodes + `ambientGain`. `startAmbient()` idempotent (skip nếu `ambientNodes.length > 0`).
+- 5 sound effects, mỗi cái check `shouldPlayEffect()` (return false nếu muted HOẶC prefers-reduced-motion):
+  - `playOpen()`: 2 sine C5(523.25)+E5(659.25) → lowpass 2kHz → gain env 0→0.15→0.0001 trong 0.4s.
+  - `playNavigate()`: 0.3s white-noise buffer → bandpass Q=1 sweep 400→2000Hz (exponential) → gain env 0→0.08→0.0001.
+  - `playBookmark()`: sine 880Hz, gain 0→0.1→0.0001 trong 0.1s.
+  - `playSuccess()`: arpeggio C5(0s)→E5(0.1s)→G5(0.2s), mỗi note sine gain 0.12 decay 0.4s.
+  - `playClose()`: sine 200Hz, gain 0→0.1→0.0001 trong 0.15s.
+- Update `src/lib/store.ts`: thêm `audioMuted: boolean` (default true — start muted để tránh surprise audio), `ambientOn: boolean` (default false), `setAudioMuted(v)`, `setAmbientOn(v)`. Thêm cả 2 vào `partialize` (persist qua reloads). Reset `ambientOn: false` trong `reset()` (không reset `audioMuted` để tôn trọng preference).
+- Tạo `src/components/museum/layout/AudioToggle.tsx` (`'use client'`): pill `role="group"` 2 button. Mute button (Volume2/VolumeX) — click → `audio.init()` nếu unmuting, `audio.setMuted(!muted)`, `setAudioMuted(!muted)`. Nếu mute khi ambientOn=true → `audio.setAmbient(false)` + `setAmbientOn(false)`. Ambient button (Music) — `disabled={muted}`, click → `audio.setAmbient(!ambientOn)`, `setAmbientOn(!ambientOn)`. Khi ambient on, icon màu accent `#e89446`. Style: rounded-full border-foreground/12 bg-foreground/[0.03] p-0.5, mỗi button h-8 w-8 grid place-items-center.
+- Mount `<AudioToggle />` trong VisitorHud.tsx giữa timer block và tool cluster (sau `</div>` của timer, trước `{/* tool cluster */}`).
+- Wire SFX:
+  - `ExhibitModal.tsx`: import `{ audio as audioEngine }` (alias tránh shadow local `audio` state). Thêm `handleClose = () => { if (!audioEngine.muted) audioEngine.playClose(); closeExhibit(); }` — dùng cho Dialog onOpenChange, nút Đóng, Escape key, và onExploreConnections. Wrap `onBookmark` để gọi `audioEngine.playBookmark()` trước `toggleBookmark`. Thêm mount-only `useEffect(() => { if (!audioEngine.muted) audioEngine.playOpen(); }, [])` trong ExhibitModalBody (keyed bởi exhibit.id nên re-mount khi prev/next — chime chơi mỗi lần mở/đổi exhibit).
+  - `PhaseRoom.tsx`: thêm `if (!audio.muted) audio.playNavigate();` đầu tiên trong `goPhase(p)`.
+  - `QuizBox.tsx`: trong `submit()`, khi `correct >= 2` thì `recordQuizPass()` + `if (!audio.muted) audio.playSuccess()`.
+- Lint: `bun run lint` ban đầu có 3 warning "Unused eslint-disable directive" trong ExhibitModal (1 pre-existing ở keyboard handler + 2 từ effect mới). Đã remove 3 disable comments + thêm `audio` vào dep array của exhibitId effect → lint sạch hoàn toàn (0 errors, 0 warnings).
+- Verification bằng agent-browser: navigate landing → portal → map → era 2.0 room. "Điều khiển âm thanh" group render đúng với 2 button. Test cycle: muted+ambient-disabled → unmute (button đổi "Tắt âm thanh", ambient enable) → ambient on ("Tắt nhạc nền") → ambient off → mute (ambient button disabled, "Bật âm thanh"). Mở Intel 4004 exhibit → click Yêu thích (playBookmark) → click Đóng (playClose) → không console error. Dev log chỉ có 200 responses + `✓ Compiled`, không error.
+
+Stage Summary:
+- Hệ thống ambient audio + SFX hoàn toàn procedural (Web Audio API, zero audio files) đã sống trong Atrium. Singleton `audio` engine với 5 effects (open/navigate/bookmark/success/close) + ambient hum (brown noise + sub-bass sine). Mặc định muted để tránh surprise; user toggle trong VisitorHud.
+- Zustand persist `audioMuted` + `ambientOn` qua reloads. prefers-reduced-motion tắt SFX nhưng vẫn cho phép ambient nếu user explicitly bật.
+- AudioToggle pill (mute + ambient) mount giữa timer và tool cluster trong VisitorHud. Ambient button disabled khi muted; mute cũng auto-stop ambient.
+- SFX wired vào 4 interaction points: ExhibitModal (open/close/bookmark), PhaseRoom (navigate), QuizBox (success). Tất cả call sites đều có defensive `if (!audio.muted)` guard.
+- Lint: 0 errors 0 warnings. Dev server chạy port 3000, không error sau edits.
+
+Files added:
+- `src/lib/audio.ts` — AudioEngine class + `audio` singleton.
+- `src/components/museum/layout/AudioToggle.tsx` — pill toggle component.
+- `agent-ctx/8-audio-builder.md` — work record.
+
+Files modified:
+- `src/lib/store.ts` — audioMuted/ambientOn state + setters + partialize + reset.
+- `src/components/museum/layout/VisitorHud.tsx` — import + mount `<AudioToggle />`.
+- `src/components/museum/panels/ExhibitModal.tsx` — playOpen (mount), playClose (handleClose), playBookmark (onBookmark wrap). Alias import as `audioEngine`.
+- `src/components/museum/layout/PhaseRoom.tsx` — playNavigate trong goPhase.
+- `src/components/museum/panels/QuizBox.tsx` — playSuccess khi correct >= 2.
+
+---
+Task ID: 7
+Agent: scene-lab-builder
+Task: Build Scene Lab exploded 3D view for Watt steam engine
+
+Work Log:
+- Đọc worklog.md (Task 1–5) để hiểu foundation: Zustand store (persist + partialize), 32 exhibits, Artifact3DStage pattern (Canvas + 3-tier Pedestal + SpotlightCone + Float + Sparkles + ContactShadows + OrbitControls + Environment), Vietnamese UI, dark warm-brown theme (#e89446 accent cho Industry 1.0).
+- Mở `ArtifactModels.tsx` để xem SteamEngine component gốc (8 mesh trong 1 group: boiler cylinder, 2 end caps, rivet ring, piston rod, piston cylinder, flywheel torus+axle, steam puff sphere). Lấy các vị trí/rotation gốc làm base position cho từng part.
+- Tạo `/src/components/museum/3d/SceneLabModels.tsx`:
+  - Export `SteamPartId` union type (8 id) + `SteamPart` interface + `STEAM_PARTS` array (label + desc tiếng Việt) để SceneLabModal render checklist.
+  - Export `ExplodedSteamEngine({ explode, highlightedPart })` component — wrap 8 `Part` trong một group ở (0, 0.1, 0).
+  - Mỗi `Part` là một wrapper có `useFrame` lerp `group.position` về `offset × explode` (reduced motion → copy thay vì lerp). `offset` per part: boiler (0,0,0) stays, endcap-left (-1.5,0,0), endcap-right (+1.0,0,0), rivet-ring (-0.7,0,0), piston-rod (+1.5,0,0), piston-cylinder (+2.5,0,0), flywheel (+3.5,0,0), steam-puff (0,+1.4,0).
+  - Mỗi part có một mesh component riêng (BoilerPart, EndCapLeftPart, …) nhận `{ dimmed, highlighted }` props → áp `transparent={dimmed} opacity={dimmed?0.3:1}` + `emissive={ACCENT}` + `emissiveIntensity={highlighted?0.5–1.1:0}` cho material. Steam puff giữ opacity gốc 0.4 (chỉ mờ hơn khi dimmed → 0.15). Cùng tông kim loại vàng/đồng như gốc (#7a5a2e, #9a7a3e, #caa05a, #d4b06a, #b89050, ACCENT).
+  - Khi `explode > 0.3 && !dimmed`, render `<Html center distanceFactor={8} occlude position={labelPosition}>` với pill đen/amber border + chấm tròn accent + label tiếng Việt ("Lò hơi", "Nắp đầu", "Vòng đinh tán", "Thanh piston", "Xi-lanh", "Bánh đà", "Hơi nước").
+  - `usePrefersReducedMotion` hook dùng cho freeze lerp (copy thay vì lerp) — `reduced` snapshot đọc mỗi frame.
+- Tạo `/src/components/museum/panels/SceneLabModal.tsx`:
+  - Dialog `max-w-7xl`, grid `lg:grid-cols-[1.4fr_1fr]`.
+  - Left: Canvas `h-[55vh] lg:h-[88vh]` với cùng light rig như Artifact3DStage (ambient + hemisphere + spotLight castShadow + 3 pointLight + directionalLight) nhưng camera `position={[0,0.8,6.2]}` xa hơn, OrbitControls minDistance 3.2 / maxDistance 9, autoRotate 0.4. Pedestal + SpotlightCone + ContactShadows scale=7 + Sparkles count=48 + Environment sunset. Wrap `ExplodedSteamEngine` trong `<Float>` (reduced-aware). Badge "Scene Lab" top-left, hint "Kéo để xoay · Cuộn để phóng to" bottom-center.
+  - Right: panel scrollable với header (eyebrow "3D SCENE LAB · Industry 1.0", h2 "Động cơ hơi nước Watt", subtitle đổi theo explode — "Nhấp vào mô hình 3D để xem câu chuyện đầy đủ" khi < 0.3, "Kéo thanh trượt để tháo rời các bộ phận" khi > 0.3) + nút "Đặt lại" (RotateCcw).
+  - Slider `<Slider value={[explode*100]} onValueChange={(v)=>setExplode(v[0]/100)} min={0} max={100} step={1} />` với % hiển thị (font-serif bold accent) + 2 label "Lắp ráp" / "Tháo rời" 2 đầu.
+  - Hint callout (border accent, icon Info): giải thích tích chọn để highlight + kéo > 30% để hiện nhãn.
+  - Checklist 8 part rows (sm:grid-cols-2, max-h-[42vh] scroll): mỗi row là `<button>` với `<Checkbox>` + dot accent + label (đổi màu accent khi checked) + desc. Click toggle `highlightedPart` (single-select, click lại để bỏ).
+  - Footer 2 nút: "Mở hiện vật đầy đủ" (ExternalLink, bg accent, flex-1) → đóng SceneLab + `openExhibit("watt-steam")` sau 200ms; "Quay về phòng" (ArrowLeft, border) → đóng SceneLab + `setStage("room")`. Cả 2 reset explode + highlightedPart.
+- Store: thêm `sceneLabOpen: boolean` (default false) + `setSceneLabOpen: (v) => set({ sceneLabOpen: v })` vào interface + initial state + actions. KHÔNG thêm vào persist `partialize` (theo spec).
+- PhaseRoom: thêm import `FlaskConical` + `setSceneLabOpen`. Trong era intro header (cùng row với "Phòng ảnh"), render button "Scene Lab" (icon FlaskConical, border accent + bg accent/10) chỉ khi `currentPhase === "industry-1"`. onClick → `audio.playOpen()` (nếu !muted) + `setSceneLabOpen(true)`.
+- ExhibitModal: thêm import `FlaskConical`. Trong `ExhibitModalBody`, lấy `setSceneLabOpen` từ store + định nghĩa `openSceneLab = () => { onClose(); setSceneLabOpen(true); }`. Trước nav footer, render button "Mở trong Scene Lab" (FlaskConical + text + chip "3D · THÁO RỜI BỘ PHẬN") chỉ khi `exhibitId === "watt-steam"`.
+- page.tsx: import + mount `<SceneLabModal />` ở cuối global panels (sau PhotoWall + Lightbox).
+- Lint: `bun run lint` → 0 errors, 0 warnings (chỉ THREE.js deprecation warnings pre-existing trong console, harmless).
+- Verification (agent-browser + VLM):
+  - `/` → "Bắt đầu hành trình" → portal → "Vào bảo tàng" → map → Industry 1.0 card "Vào phòng" → PhaseRoom render, era intro header có 2 nút "Phòng ảnh" + "Scene Lab" cạnh nhau.
+  - Skip onboarding overlay → click "Scene Lab" → modal mở với heading "3D SCENE LAB · Động cơ hơi nước Watt", slider 0%, 8 checkbox part rows, 2 footer buttons.
+  - Drag slider 0→50% (verified `aria-valuenow=50`): 3D canvas update, Html labels "Lò hơi", "Nắp đầu", "Vòng đinh tán", "Bánh đà", "Xi-lanh", "Thanh piston", "Hơi nước" xuất hiện (verified DOM scan).
+  - Click "Bánh đà" checkbox → `aria-checked=true` (single-select), VLM xác nhận "Bánh đà glowing, các part khác dimmed, labels visible".
+  - Click "Mở hiện vật đầy đủ" → SceneLab đóng, ExhibitModal "Động cơ hơi nước Watt" mở với nút "Mở trong Scene Lab" ở footer (verified).
+  - Click "Mở trong Scene Lab" từ ExhibitModal → ExhibitModal đóng, SceneLab mở lại, slider reset về 0 (state reset đúng).
+  - Click "Quay về phòng" → SceneLab đóng, PhaseRoom Industry 1.0 hiện lại.
+  - Mở exhibit khác (spinning-jenny "Cái ghé quay sợi") → footer KHÔNG có nút "Mở trong Scene Lab" (gating đúng, chỉ watt-steam).
+  - VLM mô tả screenshot 50%: "golden, exploded-view engine on dark base" + labels "Lò hơi", "Nắp đầu (trái)".
+  - VLM mô tả screenshot highlighted: "Bánh đà glowing/highlighted, others dimmed, labels visible".
+  - Console: chỉ THREE.js deprecation warnings (Clock, WebGLShadowMap) + pre-existing `Missing Description` Dialog warning — không có error mới.
+
+Stage Summary:
+- Scene Lab đã sống: 3D exploded view của Watt steam engine với 8 part tách dọc theo trục X (và steam puff trôi lên +Y) khi kéo slider 0→100%. Html labels tiếng Việt ("Lò hơi", "Nắp đầu", "Vòng đinh tán", "Thanh piston", "Xi-lanh", "Bánh đà", "Hơi nước") xuất hiện khi explode > 0.3. Checklist 8 part cho phép single-select highlight (part được chọn phát sáng accent, các part khác mờ opacity 0.3).
+- 2 entry point: (1) button "Scene Lab" (FlaskConical icon, accent border) trong PhaseRoom era intro header — chỉ hiện ở Industry 1.0, cạnh "Phòng ảnh"; (2) button "Mở trong Scene Lab" trong ExhibitModal footer — chỉ hiện cho watt-steam.
+- SceneLabModal (Dialog max-w-7xl) layout 2 cột: left = Canvas 3D lớn (h-[55vh] mobile / h-[88vh] desktop) với pedestal + lights + Sparkles + autoRotate + OrbitControls; right = panel control với slider % + checklist + 2 nút ("Mở hiện vật đầy đủ" accent fill + "Quay về phòng" outline) + reset button.
+- Store: `sceneLabOpen: boolean` + `setSceneLabOpen` (KHÔNG persist — modal luôn đóng khi reload).
+- Reuse pattern từ Artifact3DStage: Pedestal (3-tier cylinder + 2 accent rings), SpotlightCone, light rig (ambient/hemisphere/spot/3 point/directional), ContactShadows, Sparkles, Environment sunset, Float (reduced-aware), OrbitControls (reduced-aware autoRotate). Camera kéo xa hơn (z=6.2) + minDistance 3.2 / maxDistance 9 để accommodate exploded parts.
+- `usePrefersReducedMotion` hook dùng cho: freeze Float speed/rotation/float, tắt autoRotate, snap position (copy thay vì lerp) khi reduced.
+- Lint pass (0 errors), dev server chạy port 3000 không có error mới.
+
+Files added:
+- `src/components/museum/3d/SceneLabModels.tsx` — ExplodedSteamEngine + 8 part mesh components + STEAM_PARTS metadata.
+- `src/components/museum/panels/SceneLabModal.tsx` — full-screen Dialog with 3D canvas + slider + checklist + actions.
+
+Files modified:
+- `src/lib/store.ts` — added `sceneLabOpen: boolean` + `setSceneLabOpen` action (not in persist partialize).
+- `src/components/museum/layout/PhaseRoom.tsx` — added FlaskConical import + Scene Lab button (industry-1 only) in era intro header.
+- `src/components/museum/panels/ExhibitModal.tsx` — added FlaskConical import + `openSceneLab` handler + "Mở trong Scene Lab" button in footer (watt-steam only).
+- `src/app/page.tsx` — mounted `<SceneLabModal />`.
+
+---
+Task ID: 9
+Agent: main (cron webDevReview round 1)
+Task: QA assessment + polish + 6 new features (Narrator TTS, Onboarding, Tour Player, Featured Tours, Photo Wall+Lightbox, Scene Lab, Ambient Audio). Verify end-to-end.
+
+Work Log:
+- QA pass via agent-browser: landing → portal → map → room → exhibit modal → connections → quiz → guestbook → analytics → achievements → timeline → exit. All 200 OK, no console errors (only THREE.js deprecation warnings, harmless). VLM confirms visual quality across screens.
+- Polish: Artifact3DStage lighting improved (added hemisphereLight + directionalLight + extra pointLight, raised ambient 0.35→0.55, spotlight 3.5→5) — 3D models now more visible/readable per VLM feedback.
+- NEW: Narrator TTS — `/api/narrate` route using z-ai-web-dev-sdk TTS (tongtong voice, WAV, multi-chunk concatenation for >1000 char text). "Người dẫn tuyến" pill button on ExhibitModal 3D stage. Fetches blob, creates object URL, plays via HTMLAudioElement. Verified: API returns 200 + ~494KB WAV, narration plays, state transitions (idle → loading → playing → idle).
+- NEW: Onboarding Overlay (Task 3 by subagent) — 6-step coachmark walkthrough on first room visit. Spotlight effect (4 dark overlays around target + gold ring). Targets via data-onboarding attributes on VisitorHud/PhaseRoom/Timeline/TimelineFab. Skipped/completed persists in localStorage. Verified: triggers on fresh localStorage, walks 1/6 → 6/6, "Bắt đầu hành trình" completes.
+- NEW: Tour Player Bar (Task 4 by subagent) — reads ?tour=slug from URL, fetches /api/tours/[slug], floating bar below HUD with title + step counter + prev/next + progress bar. Auto-opens first exhibit. Verified: navigating to /?tour=hanh-trinh-hoi-nuoc activates tour, opens Watt steam modal, "Sau" advances to "Cái ghé quay sợi".
+- NEW: Featured Tours carousel (Task 5 by subagent) — on MuseumMap below era cards. Uses react-query, auto-seeds 3 curated tours via /api/tours/seed if empty. Each card has phase-accent gradient header + motif icon + "Bắt đầu tour" button → navigates to /?tour=slug. Verified: 3 tour cards visible after scroll, "Từ silicon đến AI", "Ánh sáng & điện", "Hành trình hơi nước".
+- NEW: Photo Wall + Lightbox (Task 6 by subagent) — full-screen overlay showing 7 historical image cards per phase in grid (featured col-span-2 with ★). "Phòng ảnh" button on era cards + PhaseRoom intro. Lightbox fullscreen with prev/next arrows. "Bước vào phòng" enters room. Verified: opens for Phase 1, 7 cards visible, lightbox opens on click, prev/next cycle.
+- NEW: Scene Lab (Task 7 by subagent) — exploded 3D view for Watt steam engine. Slider 0-100% separates 8 parts (Lò hơi, Nắp đầu trái/phải, Vòng đinh tán, Thanh piston, Xi-lanh, Bánh đà, Hơi nước) with Html labels appearing at explode>0.3. Component checklist highlights individual parts. Entry: "Scene Lab" button in PhaseRoom (industry-1 only) + "Mở trong Scene Lab" in ExhibitModal (watt-steam only). Verified: slider explodes parts, labels visible, highlight works.
+- NEW: Ambient Audio + SFX (Task 8 by subagent) — Web Audio API engine (no external files). AudioToggle pill in VisitorHud (mute/unmute + ambient on/off). 5 SFX: playOpen (C5+E5 chime), playNavigate (noise sweep), playBookmark (880Hz click), playSuccess (C-E-G arpeggio), playClose (200Hz thunk). Ambient hum = 2 detuned brown noise + 60Hz sine. Respects prefers-reduced-motion. Mute persists. Verified: toggle works, SFX fire on interactions.
+- Final verification: lint clean (0 errors), all API routes 200, mobile 375px responsive, no console errors. VLM confirms all new features render correctly.
+
+Stage Summary:
+- Atrium museum now has 8 NEW feature areas beyond initial build:
+  1. Narrator TTS (Vietnamese voice via z-ai-web-dev-sdk)
+  2. Onboarding coachmark overlay (6 steps, first-visit)
+  3. Tour Player Bar (URL ?tour=slug playback)
+  4. Featured Tours carousel (3 curated tours, auto-seed)
+  5. Photo Wall + Lightbox (28 historical images, fullscreen viewer)
+  6. Scene Lab (exploded 3D Watt steam engine with labels)
+  7. Ambient Audio + 5 Sound Effects (Web Audio API, procedural)
+  8. Improved 3D lighting (brighter, more readable models)
+- Total file count: ~40 components, 8 API routes, 4 lib modules.
+- All features verified end-to-end via agent-browser + VLM.
+- Vietnamese UI preserved throughout, warm-brown theme intact, no indigo/blue.
+- Cron job webDevReview (216082) running every 15 min for ongoing QA.
+
+Unresolved / next-phase recommendations:
+- Real historical images: replace procedural gradients in historical-images.ts with actual generated images (image-generation skill) for higher fidelity.
+- Featured Achievements carousel on landing (similar to Featured Tours) — not yet built.
+- Compare modal could show side-by-side 3D models (currently shows metrics only).
+- Connections web could animate paths when a thread is selected.
+- Guestbook moderation UI (admin route to approve/reject pending entries) — currently auto-approve for short clean messages.
+- Mobile: Tour Player Bar could be more compact on small screens (currently stacks).
+- Accessibility: add keyboard navigation for Featured Tours carousel + Photo Wall grid.
+- Performance: consider lazy-loading 3D models per phase (currently all 32 models bundled).
