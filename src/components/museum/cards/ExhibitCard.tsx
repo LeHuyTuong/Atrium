@@ -14,12 +14,15 @@ export function ExhibitCard({ exhibit, index }: { exhibit: Exhibit; index: numbe
   const toggleBookmark = useMuseum((s) => s.toggleBookmark);
 
   return (
-    <motion.button
+    <motion.div
       layoutId={`exhibit-${exhibit.id}`}
       initial={{ opacity: 0, y: 18 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: Math.min(index * 0.05, 0.5), duration: 0.5 }}
       onClick={() => openExhibit(exhibit.id)}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openExhibit(exhibit.id); } }}
       className="group relative flex flex-col overflow-hidden rounded-xl border border-foreground/12 bg-foreground/[0.025] text-left transition-all hover:border-foreground/30 hover:bg-foreground/[0.05]"
       style={{ ["--phase-color" as string]: phase.accent }}
     >
@@ -100,6 +103,6 @@ export function ExhibitCard({ exhibit, index }: { exhibit: Exhibit; index: numbe
       >
         <Bookmark className="h-3.5 w-3.5" style={{ color: bookmarked ? phase.accent : "currentColor", fill: bookmarked ? phase.accent : "transparent" }} />
       </button>
-    </motion.button>
+    </motion.div>
   );
 }

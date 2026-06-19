@@ -12,9 +12,8 @@ import { LOOM_PARTS, type LoomPartId } from "@/lib/loom-types";
  */
 export function LoomStageDemo({ height = 320 }: { height?: number }) {
   // Pause when reduced motion — lazy init to avoid setState-in-effect
-  const [reducedMotion] = useState(() =>
-    typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches
-  );
+  const reducedMotion =
+    typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const [playing, setPlaying] = useState(!reducedMotion);
   const [speed, setSpeed] = useState(1);
   const [selectedPart, setSelectedPart] = useState<LoomPartId | null>(null);

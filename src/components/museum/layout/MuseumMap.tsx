@@ -67,12 +67,15 @@ export function MuseumMap() {
                 setStage("room");
               };
               return (
-                <motion.article
+                <motion.div
                   key={p.id}
                   initial={{ opacity: 0, y: 16 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.1 + i * 0.08, duration: 0.5 }}
                   onClick={enterRoom}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); enterRoom(); } }}
                   className="group relative cursor-pointer overflow-hidden rounded-2xl border border-foreground/12 bg-foreground/[0.025] p-6 text-left transition-all hover:border-foreground/30 hover:bg-foreground/[0.05] sm:p-7"
                   style={{ ["--phase-color" as string]: p.accent }}
                 >
@@ -144,7 +147,7 @@ export function MuseumMap() {
                       </button>
                     </div>
                   </div>
-                </motion.article>
+                </motion.div>
               );
             })}
           </div>
