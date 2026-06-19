@@ -412,3 +412,46 @@ Unresolved / next-phase recommendations:
 - Compare modal could show side-by-side 3D models.
 - Consider a "system" theme option that follows prefers-color-scheme (currently explicit light/dark only).
 - The Guestbook form inputs use `bg-background/60` which adapts, but could add explicit focus ring colors per theme.
+
+---
+Task ID: 11
+Agent: main (user request)
+Task: Rebuild Watt steam engine 3D model to be more recognizable + fix landing background/text contrast issue
+
+Work Log:
+- ROOT CAUSE ANALYSIS: User reported (a) the background steam engine looks too simple/abstract and (b) text blends with background. VLM confirmed: old SteamEngine model was "too simple and schematic — not readable as a steam engine". Built a detailed animated Watt steam engine with proper mechanical parts.
+- REBUILT `SteamEngine` in `src/components/museum/3d/ArtifactModels.tsx`:
+  - Cast-iron basebed (heavy foundation box + 4 feet + top trim) — gives the engine a proper industrial base
+  - Horizontal riveted boiler (left side): main cylinder shell + 2 domed end caps + 3 rivet rings + 48 individual rivet bumps + steam dome (copper) + chimney with cap + pressure gauge (brass dial with glowing face) + steam pipe to cylinder
+  - Vertical steam cylinder + piston assembly (right of boiler): cylinder block + top cap + valve chest with front plate + piston rod (steel) + crosshead block + 2 crosshead guide rails
+  - Connecting rod (animated): box mesh that tracks the crank pin position, scales/rotates to span from crosshead to crank pin
+  - Flywheel (far right, animated rotation): A-frame bearing support + brass bearing + crank shaft + outer rim (torus) + hub + 6 spokes + offset crank pin
+  - Watt centrifugal governor (top right, iconic): central post + pivot ball + 2 ball arms + bevel gear base
+  - Animated steam puffs (40 particles drifting up from chimney, recycled)
+  - useFrame animation: flywheel spins at 1.8 rad/s, piston oscillates via cos(angle), connecting rod tracks crank pin, steam particles drift up with sine sway
+  - Materials: brass, dark brass, copper, cast iron, steel — each with proper metalness/roughness for distinct visual identity
+- FIXED landing contrast issue in `src/components/museum/layout/LandingPage.tsx`:
+  - Added a readability scrim (soft gradient from `var(--background)` at left → transparent at right) behind hero text, so headline is always legible regardless of 3D model position
+  - Added `textShadow: "0 2px 30px var(--background)"` on headline + `"0 1px 20px var(--background)"` on paragraph — creates a soft halo around text that adapts to theme (dark shadow in light mode, light halo in dark mode)
+  - Bumped paragraph opacity from `/70` to `/80` for better contrast
+  - Wrapped hero content in `relative z-10` div above the scrim
+- Verified new model renders correctly in BOTH modes (dark + light) on landing AND in exhibit modal.
+
+Verification (agent-browser + VLM):
+- Dark landing: VLM "headline perfectly readable, subtle backdrop/scrim improves legibility, 3D steam engine still visible, no contrast issues". ✓
+- Light landing: VLM "headline perfectly readable, 3D steam engine recognizable (boiler, flywheel, governor visible), no contrast issues". ✓
+- Dark exhibit modal (Watt): VLM "detailed and recognizable with distinct components, well-lit, no rendering issues". ✓
+- Light exhibit modal (Watt): VLM "detailed and recognizable (boiler, flywheel, governor, steam dome), well-lit, no contrast problems". ✓
+- Lint: clean (0 errors).
+- Console: no errors (only THREE.js deprecation warnings).
+
+Stage Summary:
+- Watt steam engine 3D model is now a proper detailed animated machine with 8 distinct component groups (basebed, boiler, cylinder/piston, connecting rod, flywheel, governor, steam puffs, gauges/pipes) — VLM confirms "far more detailed than an abstract shape, with realistic proportions and mechanical features".
+- Flywheel spins, piston oscillates, connecting rod tracks crank, steam puffs drift — proper mechanical animation.
+- Landing headline contrast fixed via theme-adaptive scrim + text-shadow halo — works in both light and dark modes.
+- Model displays correctly in CinematicHero (landing background) AND Artifact3DStage (exhibit modal + Scene Lab, since Scene Lab uses its own ExplodedSteamEngine but the regular stage uses ArtifactModel).
+
+Unresolved / next-phase recommendations:
+- Scene Lab's ExplodedSteamEngine (separate file) still uses the old simplified parts — could be updated to match the new detailed model for consistency.
+- Other hero exhibits (light-bulb, intel-4004, neural-net) could be similarly enriched for consistency.
+- Consider adding sound effect tied to flywheel rotation (rhythmic chug) when ambient audio is on.

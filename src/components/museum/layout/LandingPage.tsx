@@ -50,8 +50,16 @@ export function LandingPage() {
         </header>
 
         {/* hero */}
-        <main className="flex flex-1 flex-col justify-center px-5 pb-6 sm:px-8 sm:pb-10">
-          <div className="mx-auto w-full max-w-5xl">
+        <main className="relative flex flex-1 flex-col justify-center px-5 pb-6 sm:px-8 sm:pb-10">
+          {/* Readability scrim — soft gradient behind hero text so headline is always legible over the 3D scene */}
+          <div
+            className="pointer-events-none absolute inset-0 z-0"
+            style={{
+              background:
+                "linear-gradient(105deg, var(--background) 0%, var(--background) 38%, color-mix(in oklch, var(--background) 70%, transparent) 60%, transparent 100%)",
+            }}
+          />
+          <div className="relative z-10 mx-auto w-full max-w-5xl">
             <motion.div
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
@@ -69,6 +77,7 @@ export function LandingPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1, delay: 0.35 }}
               className="font-serif text-[2.4rem] font-bold leading-[1.04] tracking-tight text-balance sm:text-6xl lg:text-7xl"
+              style={{ textShadow: "0 2px 30px var(--background)" }}
             >
               <span className="text-foreground">Làm thế nào mà chúng ta </span>
               <span style={{ color: "#00d4aa", fontStyle: "italic" }}>đi</span>
@@ -81,7 +90,8 @@ export function LandingPage() {
               initial={{ opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1, delay: 0.55 }}
-              className="mt-6 max-w-2xl text-base leading-relaxed text-foreground/70 sm:text-lg"
+              className="mt-6 max-w-2xl text-base leading-relaxed text-foreground/80 sm:text-lg"
+              style={{ textShadow: "0 1px 20px var(--background)" }}
             >
               Một chuyến đi xuyên qua bốn kỷ nguyên công nghiệp — từ tiếng rít
               của động cơ hơi nước Watt năm 1769, qua ánh sáng đèn Edison, qua
