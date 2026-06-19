@@ -50,6 +50,18 @@ const Artifact3DStage = dynamic(
   }
 );
 
+const LoomStageDemo = dynamic(
+  () => import("@/components/museum/3d/loom/LoomStageDemo").then((m) => m.LoomStageDemo),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="grid h-80 place-items-center">
+        <div className="h-10 w-10 animate-spin rounded-full border-2 border-foreground/15 border-t-foreground/60" />
+      </div>
+    ),
+  }
+);
+
 export function ExhibitModal() {
   const openExhibitId = useMuseum((s) => s.openExhibitId);
   const closeExhibit = useMuseum((s) => s.closeExhibit);
@@ -228,12 +240,16 @@ function ExhibitModalBody({
       <div className="relative flex flex-col border-b border-foreground/10 md:border-b-0 md:border-r">
         {/* 3D stage */}
         <div className="relative p-3 sm:p-4">
-          <Artifact3DStage
-            motif={exhibit.motif}
-            accent={phase.accent}
-            hero={exhibit.hero}
-            height={320}
-          />
+          {exhibit.motif === "loom" ? (
+            <LoomStageDemo height={320} />
+          ) : (
+            <Artifact3DStage
+              motif={exhibit.motif}
+              accent={phase.accent}
+              hero={exhibit.hero}
+              height={320}
+            />
+          )}
           {/* narrator pill */}
           <button
             onClick={toggleNarrate}

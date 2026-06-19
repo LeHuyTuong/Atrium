@@ -455,3 +455,50 @@ Unresolved / next-phase recommendations:
 - Scene Lab's ExplodedSteamEngine (separate file) still uses the old simplified parts — could be updated to match the new detailed model for consistency.
 - Other hero exhibits (light-bulb, intel-4004, neural-net) could be similarly enriched for consistency.
 - Consider adding sound effect tied to flywheel rotation (rhythmic chug) when ambient audio is on.
+
+---
+Task ID: 12
+Agent: main (user request)
+Task: Build modular 3D loom (máy dệt) sample following reference pattern — PowerLoom + Annotations + palette + loom-types + LoomScene
+
+Work Log:
+- User reported "hình ảnh 3D đang bị lỗi" (3D images broken) and provided a reference `LoomScene` pattern with modular architecture: separate PowerLoom, Annotations, palette, loom-types modules. Asked for a máy dệt (loom) sample.
+- Created modular architecture in `src/components/museum/3d/loom/`:
+  - `palette.ts` — color system: frameWood (#6b3a1a), beamWood, treadleWood, brass, darkBrass, steel, warpRed (#c4392f), weftCream, cloth, floorWood, bgColor, annotation colors
+  - `loom-types.ts` — `LoomPartId` type (9 parts: frame, warp-beam, warp-threads, heddles, harness, shuttle, reed, cloth-beam, treadles) + `LoomPart` interface + `LOOM_PARTS` array with Vietnamese labels/descriptions/3D positions
+  - `PowerLoom.tsx` — detailed animated loom model with 9 component groups:
+    - FrameSide (A-frame wooden sides, 2x) — castShadow, click-to-select
+    - WoodenBeam (reusable for warp beam + cloth beam) — rotating via useFrame, brass bearing rings
+    - WarpThreads (24 red threads, alternating top/bottom) — shed opens/closes via useFrame
+    - HeddleHarness (2x, counter-phase vertical motion) — 12 steel wires + 6 brass eye holes
+    - Shuttle (animated sliding via useFrame) — capsule body + cream weft thread trailing
+    - Reed (animated beating via useFrame) — 22 brass vertical teeth
+    - Treadles (2 foot pedals, counter-phase via useFrame) — rope connections to harness
+    - ClothRoll — rolled cloth on cloth beam
+  - `Annotations.tsx` — HTML labels via drei `<Html>` with `distanceFactor={6}`, pill-shaped buttons, click-to-select, highlight selected
+  - `LoomScene.tsx` — Canvas wrapper with: workshop floor (wood planks), 5-light setup (ambient + hemisphere + directional shadow + spotlight + point fill), FogExp2, ACESFilmicToneMapping, ContactShadows, Sparkles (dust), Float (floating thread debris), OrbitControls with damping + autoRotate + reset
+  - `LoomStageDemo.tsx` — self-contained wrapper managing state (playing, speed, selectedPart, showAnnotations, autoRotate, resetSignal) + control bar overlay (play/pause, reset, annotation toggle, autoRotate toggle, speed slider) + selected-part info panel
+- Wired into `ExhibitModal.tsx`: when `exhibit.motif === "loom"`, renders `<LoomStageDemo>` instead of `<Artifact3DStage>`. Both loaded via `next/dynamic` (ssr: false).
+- Fixed all lint errors: refactored PowerLoom to avoid reading `tRef.current` during render (moved animation into child components via their own `useFrame` + mesh refs — proper R3F pattern). Fixed LoomStageDemo reduced-motion detection (lazy useState init instead of setState-in-effect).
+
+Verification (agent-browser + VLM):
+- Loom modal opens correctly, model renders without errors. VLM: "all 9 parts visible (frame, warp beam, warp threads red, heddles, shuttle, reed, cloth beam, treadles), annotations visible pointing to correct parts, detail level 8/10".
+- Play/pause toggle works ("Tạm dừng" ↔ "Chạy").
+- Annotation toggle works (labels show/hide).
+- Part selection works: clicking "Con thoi" annotation → info panel shows "Con thoi" + "Con thoi mang sợi ngang (weft) đi qua shed."
+- Lint: clean (0 errors).
+- Console: no new errors (only pre-existing ExhibitCard nested-button warning + THREE.js deprecation warnings).
+- Works in both dark and light mode (loom canvas always uses warm dark workshop background — consistent atmosphere).
+
+Stage Summary:
+- Built a complete modular 3D loom sample following the user's reference pattern (LoomScene + PowerLoom + Annotations + palette + loom-types).
+- 9 animated, labeled, clickable parts with proper lighting, fog, shadows, workshop floor, and atmospheric details (dust sparkles, floating thread debris).
+- Control bar: play/pause, reset camera, toggle annotations, toggle auto-rotate, speed slider (0.2×–2×).
+- Selected-part info panel with Vietnamese descriptions.
+- This serves as the architectural SAMPLE for how to build detailed 3D exhibit scenes — same pattern can be applied to other hero exhibits (light-bulb, intel-4004, neural-net) and to upgrading Scene Lab's exploded views.
+
+Unresolved / next-phase recommendations:
+- Apply same modular pattern to other hero exhibits (light-bulb, intel-4004, neural-net) for consistency.
+- Update Scene Lab's ExplodedSteamEngine to match the new detailed SteamEngine from Task 11.
+- Consider adding sound effects tied to loom animation (rhythmic clack) when ambient audio is on.
+- Fix pre-existing ExhibitCard nested-button warning (bookmark button inside motion.button — should use a div container instead).
