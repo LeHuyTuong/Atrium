@@ -1,0 +1,80 @@
+// Atrium — Bảo tàng Lịch sử Kỹ thuật số
+// Prisma schema (SQLite)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Visit {
+  id        String   @id @default(cuid())
+  visitorId String
+  mode      String   @default("free") // "guided" | "free"
+  startedAt DateTime @default(now())
+  endedAt   DateTime?
+  phaseSeen Int      @default(0) // bitmask of phases entered (1|2|4|8)
+  exhibitsSeen Int   @default(0)
+  quizzesPassed  Int @default(0)
+  events    VisitEvent[]
+
+  @@index([visitorId])
+}
+
+model VisitEvent {
+  id        String   @id @default(cuid())
+  visitId   String
+  visit     Visit    @relation(fields: [visitId], references: [id], onDelete: Cascade)
+  kind      String   // "enter_phase" | "open_exhibit" | "bookmark" | "quiz" | "exit" | ...
+  refId     String?  // exhibit id / phase id / quiz id
+  meta      String?  // JSON string
+  createdAt DateTime @default(now())
+
+  @@index([visitId])
+  @@index([kind])
+}
+
+model GuestbookEntry {
+  id        String   @id @default(cuid())
+  name      String
+  message   String
+  phase     String?  // favorite phase id
+  rating    Int?     // 1..5
+  approved  Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([approved, createdAt])
+}
+
+model Tour {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  description String?
+  author      String   @default("Khách")
+  exhibitIds  String   // JSON array of exhibit ids in order
+  featured    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  visits      Int      @default(0)
+
+  @@index([featured])
+}
+
+model Feedback {
+  id        String   @id @default(cuid())
+  visitorId String
+  kind      String   // "bug" | "idea" | "praise"
+  message   String
+  createdAt DateTime @default(now())
+}
+
+model DailySpotlight {
+  id        String   @id @default(cuid())
+  dateKey   String   @unique // YYYY-MM-DD
+  exhibitId String
+  curatorNote String?
+  createdAt DateTime @default(now())
+}
