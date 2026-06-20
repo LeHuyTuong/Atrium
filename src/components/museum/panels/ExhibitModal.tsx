@@ -62,6 +62,42 @@ const LoomStageDemo = dynamic(
   }
 );
 
+const NeuralStageDemo = dynamic(
+  () => import("@/components/museum/3d/neural/NeuralStageDemo").then((m) => m.NeuralStageDemo),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="grid h-80 place-items-center">
+        <div className="h-10 w-10 animate-spin rounded-full border-2 border-foreground/15 border-t-foreground/60" />
+      </div>
+    ),
+  }
+);
+
+const BulbStageDemo = dynamic(
+  () => import("@/components/museum/3d/bulb/BulbStageDemo").then((m) => m.BulbStageDemo),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="grid h-80 place-items-center">
+        <div className="h-10 w-10 animate-spin rounded-full border-2 border-foreground/15 border-t-foreground/60" />
+      </div>
+    ),
+  }
+);
+
+const ChipStageDemo = dynamic(
+  () => import("@/components/museum/3d/chip/ChipStageDemo").then((m) => m.ChipStageDemo),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="grid h-80 place-items-center">
+        <div className="h-10 w-10 animate-spin rounded-full border-2 border-foreground/15 border-t-foreground/60" />
+      </div>
+    ),
+  }
+);
+
 export function ExhibitModal() {
   const openExhibitId = useMuseum((s) => s.openExhibitId);
   const closeExhibit = useMuseum((s) => s.closeExhibit);
@@ -242,6 +278,12 @@ function ExhibitModalBody({
         <div className="relative p-3 sm:p-4">
           {exhibit.motif === "loom" ? (
             <LoomStageDemo height={320} />
+          ) : exhibit.motif === "chip" ? (
+            <ChipStageDemo height={320} />
+          ) : exhibit.motif === "light-bulb" ? (
+            <BulbStageDemo height={320} />
+          ) : exhibit.motif === "neural-net" ? (
+            <NeuralStageDemo height={320} />
           ) : (
             <Artifact3DStage
               motif={exhibit.motif}
