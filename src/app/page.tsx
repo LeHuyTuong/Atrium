@@ -28,6 +28,11 @@ import { TourPlayerBar } from "@/components/museum/panels/TourPlayerBar";
 import { SceneLabModal } from "@/components/museum/panels/SceneLabModal";
 import { PhotoWall } from "@/components/museum/panels/PhotoWall";
 import { Lightbox } from "@/components/museum/panels/Lightbox";
+import { LibraryEntrance } from "@/components/museum/library/LibraryEntrance";
+import { KnowledgeLibrary } from "@/components/museum/library/KnowledgeLibrary";
+import { LessonViewer } from "@/components/museum/library/LessonViewer";
+import { QuizArena } from "@/components/museum/library/QuizArena";
+import { LibraryHistoryRoom } from "@/components/museum/library/LibraryHistoryRoom";
 
 export default function Home() {
   const stage = useMuseum((s) => s.stage);
@@ -118,6 +123,11 @@ export default function Home() {
         {stage === "map" && <MuseumMap />}
         {stage === "room" && <PhaseRoom />}
         {stage === "exit" && <ExitSummary />}
+        {stage === "library-entrance" && <LibraryEntrance />}
+        {stage === "library" && <KnowledgeLibrary />}
+        {stage === "library-lesson" && <LessonViewer />}
+        {stage === "library-quiz" && <QuizArena />}
+        {stage === "library-history" && <LibraryHistoryRoom />}
       </main>
 
       {/* Sticky footer (hidden on landing for cinematic full-bleed) */}

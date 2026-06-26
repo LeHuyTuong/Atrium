@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Compass, Map as MapIcon, ArrowLeft, Route, Infinity as Inf } from "lucide-react";
+import { Compass, Map as MapIcon, ArrowLeft, Route, Infinity as Inf, BookOpen, Library } from "lucide-react";
 import { useMuseum, JourneyMode } from "@/lib/store";
 import { BrandMark } from "./brand";
 import { ThemeToggle } from "./ThemeToggle";
@@ -77,6 +77,31 @@ export function PortalEntry() {
               accent="#4ade80"
             />
           </div>
+
+          {/* Library — separate area */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3, duration: 0.6 }}
+            className="mt-6 w-full max-w-4xl"
+          >
+            <button
+              onClick={() => setStage("library-entrance")}
+              className="group relative flex w-full items-center gap-4 overflow-hidden rounded-2xl border p-5 text-left transition-all hover:bg-foreground/[0.05]"
+              style={{ borderColor: "rgba(232,180,58,0.3)", background: "rgba(232,180,58,0.04)" }}
+            >
+              <div className="absolute inset-x-0 top-0 h-px" style={{ background: "linear-gradient(90deg, transparent, #e8b53a, transparent)" }} />
+              <div className="grid h-12 w-12 shrink-0 place-items-center rounded-xl border" style={{ borderColor: "#e8b53a44", background: "#e8b53a14", color: "#e8b53a" }}>
+                <BookOpen className="h-6 w-6" />
+              </div>
+              <div className="flex-1">
+                <div className="text-[0.65rem] uppercase tracking-[0.2em] text-foreground/50">Khu vực mới · Bên trong bảo tàng</div>
+                <div className="mt-0.5 font-serif text-lg font-bold text-foreground">Thư viện tri thức</div>
+                <p className="mt-0.5 text-xs text-foreground/60">Học lý thuyết về CNH-HĐH và hội nhập kinh tế quốc tế của Việt Nam — 3 chương, 15 bài học, 10 câu quiz.</p>
+              </div>
+              <Library className="h-5 w-5 shrink-0 text-amber-300 transition-transform group-hover:translate-x-1" />
+            </button>
+          </motion.div>
 
           <motion.button
             initial={{ opacity: 0, y: 10 }}

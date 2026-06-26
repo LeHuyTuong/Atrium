@@ -727,3 +727,54 @@ Unresolved / next-phase recommendations:
 - Upgrade remaining 28 non-hero exhibits if user wants even more detail (locomotive, dynamo, rocket, robot, etc. are good candidates).
 - Apply same modular pattern to Scene Lab's ExplodedSteamEngine for consistency.
 - Consider adding sound effects tied to each scene's animation (loom clack, bulb hum, chip buzz, neural pulse).
+
+---
+Task ID: 20
+Agent: main (user request — "Thiết kế lại khu Thư viện Tri thức: phòng thư viện lịch sử CMCN")
+Task: Build specialized "Phòng thư viện lịch sử" — LibraryHistoryRoom — for "Khái quát về cách mạng công nghiệp". Extracted content from uploaded pptx (Session 24-29). Preserve museum aesthetic.
+
+Work Log:
+- Extracted pptx content from "upload/Session 24...pptx" via markitdown — got full Vietnamese content for 4 cuộc CMCN, vai trò CMCN (3 cards), historical context.
+- Created `src/components/museum/library/LibraryHistoryRoom.tsx` — specialized "phòng thư viện lịch sử" with 4 sections:
+  1. **Hero + curved timeline**: Large title "Lịch sử cách mạng công nghiệp" + SVG curved path connecting 4 milestones (1.0-4.0) with animated dasharray draw-in. Each milestone is clickable, active one gets pulsing glow ring + larger dot. Color-coded: orange/yellow/green/pink per phase.
+  2. **4 lesson cards grid**: Cards for 1.0 (Hơi nước), 2.0 (Điện), 3.0 (Điện tử), 4.0 (AI). Each card: icon + label + period + short title + gradient illustration + tech tags. Click → scrolls to top + updates activeRev. Hover glow effect.
+  3. **Active revolution detail card**: Large card with icon, period, location, 4 bullet points (verbatim from pptx), tech tags. Animated bullet entrance. Click any timeline milestone or card to switch.
+  4. **3 knowledge cards** "Vai trò CMCN": Một là (Thúc đẩy lực lượng sản xuất), Hai là (Hoàn thiện quan hệ sản xuất), Ba là (Đổi mới phương thức quản trị). Each with icon + accent + body text verbatim from pptx.
+  5. **Mini quiz 3 câu**: 3 multiple-choice questions (Anh khởi phát CMCN 1, 2011 Hannover, CNTT tự động hóa). Click options → "Nộp bài" → score X/3 + green checkmarks/red X + explanations + "Làm lại".
+- Atmospheric details: 24 floating dust particles (amber, animated), spotlight-floor overlay, vignette, grain texture — all consistent with museum aesthetic.
+- Top nav: BrandMark + "Phòng thư viện lịch sử" label + progress tracker (X/3 quiz answered, %) + narration toggle ("Nghe kể" → /api/narrate TTS) + "Thư viện" back button.
+- Footer: italic quote "Bạn đã đi qua phòng lịch sử..." + "Về thư viện" + "Tiếp tục khám phá bảo tàng" buttons.
+- Added `library-history` stage to store + page.tsx router.
+- Added entry button in KnowledgeLibrary.tsx (special amber card "Phòng thư viện lịch sử" above chapter grid).
+
+Content (verbatim from pptx):
+- CMCN 1.0: "Khởi phát ở Anh từ thế kỷ XVIII đến giữa thế kỷ XIX. Diễn ra đầu tiên trong ngành dệt vải. Chuyển từ lao động thủ công sang máy móc. Sử dụng năng lượng nước và hơi nước."
+- CMCN 2.0: "Nửa cuối thế kỷ XIX đến đầu thế kỷ XX. Chuyển từ sản xuất cơ khí sang điện – cơ khí. Hình thành sản xuất hàng loạt. Tự động hóa cục bộ."
+- CMCN 3.0: "Bắt đầu từ thập niên 60 thế kỷ XX. Xuất hiện công nghệ thông tin. Tự động hóa sản xuất. Máy tính và điện tử phát triển mạnh."
+- CMCN 4.0: "Được đề cập lần đầu tại triển lãm Hannover 2011. Công nghệ đột phá: AI, Big Data, IoT, in 3D, robot thông minh."
+- Vai trò 1: "Thúc đẩy phát triển lực lượng sản xuất..."
+- Vai trò 2: "Thúc đẩy hoàn thiện quan hệ sản xuất..."
+- Vai trò 3: "Thúc đẩy đổi mới phương thức quản trị phát triển..."
+
+Verification (agent-browser + VLM):
+- History room entry visible in KnowledgeLibrary ✓
+- Hero title "Lịch sử cách mạng công nghiệp" + curved SVG timeline with 4 milestones ✓
+- Click 4.0 card → detail card switches to "Cách mạng công nghiệp lần thứ tư" with AI/Big Data tags + purple accent ✓
+- 4 lesson cards (1.0-4.0) with icons + accent colors + tech tags ✓
+- 3 knowledge cards (Vai trò CMCN: Một là, Hai là, Ba là) ✓
+- Mini quiz: 3 questions, answer + submit → 2/3 score, green/red feedback, explanations ✓
+- "Tiếp tục khám phá bảo tàng" + "Về thư viện" buttons + italic quote ✓
+- Narration mode: "Nghe kể" → "Đang tải" → "Dừng" (TTS playing) ✓
+- Mobile 375px: responsive, timeline + cards + quiz stack vertically, no overflow ✓
+- Lint clean, no console errors.
+
+Stage Summary:
+- "Phòng thư viện lịch sử" complete — a dedicated room inside the museum library for "Khái quát CMCN".
+- Curved interactive timeline (SVG path) connecting 4 milestones — click to expand details.
+- 4 lesson cards with hover glow + gradient illustrations.
+- 3 knowledge cards for "Vai trò CMCN".
+- Mini quiz 3 câu with scoring + explanations + retake.
+- Narration mode (TTS) for all 4 revolutions.
+- Progress tracker, floating dust, spotlight, warm brown aesthetic — all consistent with museum.
+- Entry from KnowledgeLibrary main page (special amber card).
+- Content verbatim from uploaded pptx (Session 24-29, Chương 6).

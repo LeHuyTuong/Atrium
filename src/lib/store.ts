@@ -27,7 +27,12 @@ export type Stage =
   | "analytics"
   | "tours"
   | "timeline"
-  | "exit";
+  | "exit"
+  | "library-entrance"
+  | "library"
+  | "library-lesson"
+  | "library-quiz"
+  | "library-history";
 
 export interface MuseumState {
   // journey
@@ -103,6 +108,17 @@ export interface MuseumState {
   completeOnboarding: () => void;
   setSceneLabOpen: (v: boolean) => void;
   setLastAchievement: (id: string | null) => void;
+
+  // knowledge library
+  completedLessons: string[];
+  bookmarkedLessons: string[];
+  currentLessonId: string | null;
+  knowledgeQuizScore: number | null;
+  knowledgeQuizCompleted: boolean;
+  completeLesson: (lessonId: string) => void;
+  toggleLessonBookmark: (lessonId: string) => void;
+  setCurrentLessonId: (id: string | null) => void;
+  recordKnowledgeQuiz: (score: number) => void;
   setAudioMuted: (v: boolean) => void;
   setAmbientOn: (v: boolean) => void;
   setActiveTour: (tour: {
@@ -168,6 +184,13 @@ export const useMuseum = create<MuseumState>()(
 
       lastAchievement: null,
 
+      // knowledge library
+      completedLessons: [],
+      bookmarkedLessons: [],
+      currentLessonId: null,
+      knowledgeQuizScore: null,
+      knowledgeQuizCompleted: false,
+
       setStage: (s) => set({ stage: s }),
       setMode: (m) => set({ mode: m }),
       startVisit: () =>
@@ -231,6 +254,25 @@ export const useMuseum = create<MuseumState>()(
       completeOnboarding: () => set({ onboardingCompleted: true, onboardingOpen: false }),
       setSceneLabOpen: (v) => set({ sceneLabOpen: v }),
       setLastAchievement: (id) => set({ lastAchievement: id }),
+
+      completeLesson: (lessonId) =>
+        set((s) => ({
+          completedLessons: s.completedLessons.includes(lessonId)
+            ? s.completedLessons
+            : [...s.completedLessons, lessonId],
+        })),
+      toggleLessonBookmark: (lessonId) =>
+        set((s) => ({
+          bookmarkedLessons: s.bookmarkedLessons.includes(lessonId)
+            ? s.bookmarkedLessons.filter((b) => b !== lessonId)
+            : [...s.bookmarkedLessons, lessonId],
+        })),
+      setCurrentLessonId: (id) => set({ currentLessonId: id }),
+      recordKnowledgeQuiz: (score) =>
+        set((s) => ({
+          knowledgeQuizScore: s.knowledgeQuizScore === null ? score : Math.max(s.knowledgeQuizScore, score),
+          knowledgeQuizCompleted: true,
+        })),
       setAudioMuted: (v) => set({ audioMuted: v }),
       setAmbientOn: (v) => set({ ambientOn: v }),
 
@@ -292,6 +334,10 @@ export const useMuseum = create<MuseumState>()(
         activeTour: s.activeTour,
         audioMuted: s.audioMuted,
         ambientOn: s.ambientOn,
+        completedLessons: s.completedLessons,
+        bookmarkedLessons: s.bookmarkedLessons,
+        knowledgeQuizScore: s.knowledgeQuizScore,
+        knowledgeQuizCompleted: s.knowledgeQuizCompleted,
       }),
     }
   )
