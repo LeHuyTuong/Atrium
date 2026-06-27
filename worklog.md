@@ -778,3 +778,40 @@ Stage Summary:
 - Progress tracker, floating dust, spotlight, warm brown aesthetic — all consistent with museum.
 - Entry from KnowledgeLibrary main page (special amber card).
 - Content verbatim from uploaded pptx (Session 24-29, Chương 6).
+
+---
+Task ID: 21
+Agent: main (user request — re-verify "Phòng thư viện lịch sử" per detailed spec + pptx reference)
+Task: Verify the existing LibraryHistoryRoom matches the user's detailed spec and the uploaded pptx content. All sections already built in Task 20 — this is a QA verification pass.
+
+Work Log:
+- LibraryHistoryRoom already exists from Task 20. Verified against user's detailed spec and pptx (Session 24 Chương 6).
+- Extracted pptx content via markitdown earlier — confirmed all 4 CMCN content verbatim matches:
+  - 1.0: "Khởi phát ở Anh từ thế kỷ XVIII đến giữa thế kỷ XIX. Diễn ra đầu tiên trong ngành dệt vải. Chuyển từ lao động thủ công sang máy móc. Sử dụng năng lượng nước và hơi nước."
+  - 2.0: "Nửa cuối thế kỷ XIX đến đầu thế kỷ XX. Chuyển từ sản xuất cơ khí sang điện – cơ khí. Hình thành sản xuất hàng loạt. Tự động hóa cục bộ."
+  - 3.0: "Bắt đầu từ thập niên 60 thế kỷ XX. Xuất hiện công nghệ thông tin. Tự động hóa sản xuất. Máy tính và điện tử phát triển mạnh."
+  - 4.0: "Được đề cập lần đầu tại triển lãm Hannover 2011. Công nghệ đột phá: AI, Big Data, IoT, in 3D, robot thông minh."
+- 3 vai trò cards match pptx: "Thúc đẩy phát triển lực lượng sản xuất", "Thúc đẩy hoàn thiện quan hệ sản xuất", "Thúc đẩy đổi mới phương thức quản trị phát triển".
+
+Verification (agent-browser + VLM):
+- Hero: title "Lịch sử cách mạng công nghiệp" + curved SVG timeline with 4 milestones ✓
+- VLM: "atmospheric: dark warm brown, spotlight, dust particles — feels like a phòng thư viện inside the museum, not separate website" ✓
+- Timeline interactivity: clicked all 4 cards (1.0→2.0→3.0→4.0), detail card switches correctly each time ✓
+- 4 lesson cards with icons + accent colors + historical illustrations + hover glow ✓
+- 3 knowledge cards (Vai trò CMCN: Một là/Hai là/Ba là) ✓
+- Mini quiz 3 câu: answered all 3 correctly (B/Anh, C/2011, C/CNTT) → 3/3 score + green checkmarks + explanations ✓
+- "Tiếp tục khám phá bảo tàng" + "Về thư viện" buttons visible at bottom ✓
+- Mobile 375px: responsive, all sections stack vertically, no overflow ✓
+- Lint: clean (0 errors).
+- Console: no errors.
+
+Stage Summary:
+- "Phòng thư viện lịch sử" fully verified — matches user spec and pptx content.
+- All 4 sections render correctly: hero timeline + 4 lesson cards + 3 vai trò cards + mini quiz.
+- Interactive timeline works (click → switch detail).
+- Quiz scoring + feedback works (3/3 with explanations).
+- Narration mode available ("Nghe kể" TTS).
+- Progress tracker in top nav.
+- Mobile responsive.
+- Museum aesthetic preserved: dark warm brown, spotlight, dust particles, serif typography, cinematic feel.
+- This is a room inside the museum library, accessed from KnowledgeLibrary main page — not a separate website.
