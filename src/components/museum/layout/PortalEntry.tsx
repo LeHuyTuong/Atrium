@@ -97,7 +97,7 @@ export function PortalEntry() {
               <div className="flex-1">
                 <div className="text-[0.65rem] uppercase tracking-[0.2em] text-foreground/50">Khu vực mới · Bên trong bảo tàng</div>
                 <div className="mt-0.5 font-serif text-lg font-bold text-foreground">Thư viện tri thức</div>
-                <p className="mt-0.5 text-xs text-foreground/60">Học lý thuyết về CNH-HĐH và hội nhập kinh tế quốc tế của Việt Nam — 3 chương, 15 bài học, 10 câu quiz.</p>
+                <p className="mt-0.5 text-xs text-foreground/60">Đọc « Khái quát về cách mạng công nghiệp » — timeline 4 cuộc CMCN, lesson cards, mini quiz.</p>
               </div>
               <Library className="h-5 w-5 shrink-0 text-amber-300 transition-transform group-hover:translate-x-1" />
             </button>

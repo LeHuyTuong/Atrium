@@ -37,9 +37,9 @@ export function LibraryEntrance() {
             <h2 className="font-serif text-4xl font-bold leading-tight text-foreground sm:text-6xl text-balance">Thư viện tri thức</h2>
             <p className="mx-auto mt-4 max-w-xl text-sm leading-relaxed text-foreground/70 sm:text-base">
               Bước qua cánh cửa, bạn rời bảo tàng 3D và bước vào một thư viện cổ.
-              Ánh sáng vàng ấm, giá sách cao, bàn học cũ. Tại đây, bạn học lý
-              thuyết về « Công nghiệp hóa, hiện đại hóa và hội nhập kinh tế quốc
-              tế của Việt Nam ».
+              Ánh sáng vàng ấm, giá sách cao, bàn học cũ. Tại đây, bạn đọc
+              « Khái quát về cách mạng công nghiệp » — bốn cuộc cách mạng
+              đã thay đổi thế giới.
             </p>
           </motion.div>
           <motion.button
@@ -53,9 +53,9 @@ export function LibraryEntrance() {
             <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
           </motion.button>
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1, duration: 1 }} className="mt-10 flex items-center gap-6 text-[0.7rem] uppercase tracking-[0.18em] text-foreground/45">
-            <span className="flex items-center gap-1.5"><Sparkles className="h-3 w-3" style={{ color: "#e8b53a" }} /> 3 chương học</span>
-            <span>·</span><span>15 bài học</span>
-            <span>·</span><span>10 câu trắc nghiệm</span>
+            <span className="flex items-center gap-1.5"><Sparkles className="h-3 w-3" style={{ color: "#e8b53a" }} /> 1 chương</span>
+            <span>·</span><span>4 cuộc CMCN</span>
+            <span>·</span><span>3 câu quiz</span>
           </motion.div>
         </main>
       </div>

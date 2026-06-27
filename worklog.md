@@ -815,3 +815,55 @@ Stage Summary:
 - Mobile responsive.
 - Museum aesthetic preserved: dark warm brown, spotlight, dust particles, serif typography, cinematic feel.
 - This is a room inside the museum library, accessed from KnowledgeLibrary main page — not a separate website.
+
+---
+Task ID: 22
+Agent: main (user request — "Thư viện tri thức chỉ chứa nội dung 'Khái quát CMCN' thôi")
+Task: Simplify KnowledgeLibrary to ONLY show "Khái quát về cách mạng công nghiệp" — remove other chapters + quiz card. Single entry → LibraryHistoryRoom.
+
+Work Log:
+- User clarified: Thư viện tri thức should ONLY contain "Khái quát về cách mạng công nghiệp" — not 3 chapters + quiz (those were from earlier tasks).
+- Rewrote `src/components/museum/library/KnowledgeLibrary.tsx`:
+  - Removed CHAPTERS map, ChapterCard component, all chapter cards grid.
+  - Removed Chapter 4 quiz card.
+  - Replaced with single large entry card: "Lịch sử cách mạng công nghiệp" with:
+    - BookOpen icon (amber)
+    - "Chương duy nhất · Khái quát CMCN" kicker
+    - Description: "Timeline tương tác nối 4 cuộc cách mạng, lesson cards chi tiết, 3 knowledge cards về vai trò CMCN, và mini quiz 3 câu."
+    - Preview grid of 4 CMCN (1.0-4.0) with icons + accent colors (Flame/Zap/Cpu/Brain)
+    - "Vào phòng đọc" CTA → setStage("library-history")
+    - Hover glow effect
+  - Floating dust particles (18 amber motes)
+  - Footer italic quote
+  - Top nav: BrandMark + "Thư viện tri thức" + best quiz score badge + "Bảo tàng" back button
+- Updated `LibraryEntrance.tsx`:
+  - Subtitle: "« Khái quát về cách mạng công nghiệp » — bốn cuộc cách mạng đã thay đổi thế giới."
+  - Count: "1 chương · 4 cuộc CMCN · 3 câu quiz" (was "3 chương · 15 bài · 10 câu")
+- Updated `PortalEntry.tsx` library option card description:
+  - "Đọc « Khái quát về cách mạng công nghiệp » — timeline 4 cuộc CMCN, lesson cards, mini quiz."
+- Verified LibraryHistoryRoom content matches spec verbatim:
+  - CMCN 1.0: "Khởi phát ở Anh từ thế kỷ XVIII đến giữa thế kỷ XIX. Diễn ra đầu tiên trong ngành dệt vải. Chuyển từ lao động thủ công sang máy móc. Sử dụng năng lượng nước và hơi nước." ✓
+  - CMCN 2.0: "Nửa cuối thế kỷ XIX đến đầu thế kỷ XX. Chuyển từ sản xuất cơ khí sang điện – cơ khí. Hình thành sản xuất hàng loạt. Tự động hóa cục bộ." ✓
+  - CMCN 3.0: "Bắt đầu từ thập niên 60 thế kỷ XX. Xuất hiện công nghệ thông tin. Tự động hóa sản xuất. Máy tính và điện tử phát triển mạnh." ✓
+  - CMCN 4.0: "Xuất hiện từ năm 2011. Công nghệ đột phá: AI, Big Data, IoT, In 3D, Robot thông minh." ✓
+  - 3 vai trò cards: "Thúc đẩy phát triển lực lượng sản xuất", "Thúc đẩy hoàn thiện quan hệ sản xuất", "Thúc đẩy đổi mới phương thức quản trị phát triển" ✓
+  - Mini quiz 3 câu ✓
+  - "Tiếp tục khám phá bảo tàng" button ✓
+
+Flow now:
+  Portal → "Thư viện tri thức" → LibraryEntrance (3D room) → "Vào thư viện" → KnowledgeLibrary (single card) → "Vào phòng đọc" → LibraryHistoryRoom (full CMCN content)
+
+Verification (agent-browser + VLM):
+- KnowledgeLibrary: ONLY 1 entry card "Lịch sử cách mạng công肠道" with 4 CMCN preview ✓
+- VLM: "only one entry card, not multiple chapters, description about Khái quát CMCN, preview of 4 CMCN 1.0-4.0" ✓
+- LibraryHistoryRoom: all 4 sections verified (hero timeline, 4 lesson cards, 3 vai trò cards, mini quiz + continue button) ✓
+- Mobile 375px: single card responsive, 2x2 preview, no overflow ✓
+- Lint: clean (0 errors).
+- Console: no errors.
+
+Stage Summary:
+- Thư viện tri thức simplified to ONLY "Khái quát về cách mạng công nghiệp".
+- KnowledgeLibrary = single entry card → LibraryHistoryRoom.
+- LibraryHistoryRoom unchanged (already matches spec verbatim from Task 20).
+- All other library files (LessonViewer, QuizArena, InteractiveRenderer, knowledge-data.ts, knowledge-quiz.ts) still exist but no longer linked from main library flow — they're dormant code.
+- Flow: Portal → Library entrance (3D) → Library main (single card) → History room (full CMCN content).
