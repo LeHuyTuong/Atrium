@@ -1,13 +1,14 @@
 // Atrium — Bảo tàng Lịch sử Kỹ thuật số
-// Prisma schema (SQLite)
+// Prisma schema (PostgreSQL - Neon)
 
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model Visit {

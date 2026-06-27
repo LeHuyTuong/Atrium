@@ -36,6 +36,16 @@ yarn-error.log*
 # vercel
 .vercel
 
+# database files (SQLite / local db)
+/db/
+*.db
+*.db-journal
+*.db-shm
+*.db-wal
+
+# uploaded files
+/upload/
+
 
 # typescript
 *.tsbuildinfo
