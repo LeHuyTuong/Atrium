@@ -3,6 +3,7 @@ import { Geist, Geist_Mono, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { Providers } from "./providers";
+import { AIChat } from "@/components/ai/AIChat";
 
 const geistSans = Geist({
   variable: "--font-sans",
@@ -66,6 +67,7 @@ export default function RootLayout({
           {children}
         </Providers>
         <Toaster position="bottom-center" />
+        <AIChat />
       </body>
     </html>
   );

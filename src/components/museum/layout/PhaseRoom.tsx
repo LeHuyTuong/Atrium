@@ -5,7 +5,6 @@ import { ArrowLeft, ArrowRight, Map as MapIcon, LayoutGrid, Clock, Sparkles, Lay
 import { useState } from "react";
 import { PHASES, exhibitsByPhase, PhaseId } from "@/lib/museum-data";
 import { useMuseum } from "@/lib/store";
-import { audio } from "@/lib/audio";
 import { BrandMark, PhaseNumeral, ProgressRing } from "./brand";
 import { ExhibitCard } from "@/components/museum/cards/ExhibitCard";
 import { VisitorHud } from "@/components/museum/layout/VisitorHud";
@@ -44,7 +43,6 @@ export function PhaseRoom() {
   const prevPhase = PHASES[phaseIdx - 1];
 
   const goPhase = (p: PhaseId) => {
-    if (!audio.muted) audio.playNavigate();
     enterPhase(p);
     setCurrentPhase(p);
   };
@@ -104,7 +102,6 @@ export function PhaseRoom() {
                       {currentPhase === "industry-1" && (
                         <button
                           onClick={() => {
-                            if (!audio.muted) audio.playOpen();
                             setSceneLabOpen(true);
                           }}
                           className="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[0.65rem] font-medium transition"

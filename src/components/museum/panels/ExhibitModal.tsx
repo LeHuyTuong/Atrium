@@ -13,13 +13,9 @@ import {
   Network,
   ArrowRight,
   Quote,
-  Volume2,
-  Square,
-  Loader2,
   FlaskConical,
 } from "lucide-react";
-import { useEffect, useState } from "react";
-import { toast } from "sonner";
+import { useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -33,7 +29,6 @@ import {
   connectionsForExhibit,
 } from "@/lib/museum-data";
 import { useMuseum } from "@/lib/store";
-import { audio as audioEngine } from "@/lib/audio";
 import { MotifIcon } from "@/components/museum/cards/MotifIcon";
 import { imageForExhibit, gradientForExhibit } from "@/lib/historical-images";
 import { PhasePill } from "@/components/museum/layout/brand";
@@ -111,11 +106,7 @@ export function ExhibitModal() {
   const exhibit = openExhibitId ? exhibitById(openExhibitId) : undefined;
   const open = !!exhibit;
 
-  // Soft chime whenever a new exhibit opens (mount of ExhibitModalBody,
-  // which is keyed by exhibit.id so it remounts on prev/next navigation).
-  // Also plays the close thunk when the modal closes.
   const handleClose = () => {
-    if (!audioEngine.muted) audioEngine.playClose();
     closeExhibit();
   };
 
@@ -158,10 +149,7 @@ export function ExhibitModal() {
                 if (n) openExhibit(n.id);
               }}
               bookmarked={bookmarks.includes(exhibit.id)}
-              onBookmark={() => {
-                if (!audioEngine.muted) audioEngine.playBookmark();
-                toggleBookmark(exhibit.id);
-              }}
+              onBookmark={() => toggleBookmark(exhibit.id)}
               inCompare={compareIds.includes(exhibit.id)}
               onCompare={() => addCompare(exhibit.id)}
               onExploreConnections={() => {
@@ -208,68 +196,6 @@ function ExhibitModalBody({
     setSceneLabOpen(true);
   };
 
-  const [narrating, setNarrating] = useState(false);
-  const [narrLoading, setNarrLoading] = useState(false);
-  const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
-
-  // Soft chime when this exhibit body mounts (i.e. when an exhibit opens or
-  // the visitor navigates to a different one via prev/next).
-  useEffect(() => {
-    if (!audioEngine.muted) audioEngine.playOpen();
-  }, []);
-
-  // Stop narration when exhibit changes
-  useEffect(() => {
-    if (audio) {
-      audio.pause();
-      audio.currentTime = 0;
-    }
-    setAudio(null);
-    setNarrating(false);
-  }, [exhibitId, audio]);
-
-  const toggleNarrate = async () => {
-    if (narrating && audio) {
-      audio.pause();
-      setNarrating(false);
-      return;
-    }
-    if (audio) {
-      audio.play();
-      setNarrating(true);
-      return;
-    }
-    setNarrLoading(true);
-    try {
-      const text = `${exhibit.name}. ${exhibit.tagline}. ${exhibit.story} ${exhibit.whyItMatters} Bạn có biết: ${exhibit.didYouKnow}`;
-      const res = await fetch("/api/narrate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text, phase: exhibit.phase }),
-      });
-      if (!res.ok) throw new Error("narrate failed");
-      const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
-      const el = new Audio(url);
-      el.onended = () => {
-        setNarrating(false);
-        URL.revokeObjectURL(url);
-      };
-      el.onerror = () => {
-        setNarrating(false);
-        URL.revokeObjectURL(url);
-        toast.error("Không thể phát âm thanh.");
-      };
-      setAudio(el);
-      await el.play();
-      setNarrating(true);
-    } catch {
-      toast.error("Giọng đọc tạm thời không sẵn sàng.");
-    } finally {
-      setNarrLoading(false);
-    }
-  };
-
   return (
     <div className="grid max-h-[92vh] grid-cols-1 overflow-y-auto elegant-scroll md:grid-cols-2 md:overflow-hidden">
       {/* LEFT: visual */}
@@ -292,24 +218,6 @@ function ExhibitModalBody({
               height={320}
             />
           )}
-          {/* narrator pill */}
-          <button
-            onClick={toggleNarrate}
-            className="absolute right-5 top-5 z-10 inline-flex items-center gap-2 rounded-full border bg-card/85 px-3 py-1.5 text-[0.7rem] font-medium backdrop-blur-md transition hover:bg-card"
-            style={{
-              borderColor: narrating ? phase.accent : "oklch(0.5 0.02 60 / 0.22)",
-              color: narrating ? phase.accent : "oklch(0.5 0.02 60 / 0.88)",
-            }}
-          >
-            {narrLoading ? (
-              <Loader2 className="h-3.5 w-3.5 animate-spin" />
-            ) : narrating ? (
-              <Square className="h-3.5 w-3.5" style={{ fill: phase.accent }} />
-            ) : (
-              <Volume2 className="h-3.5 w-3.5" />
-            )}
-            {narrating ? "Đang đọc" : narrLoading ? "Đang tải" : "Người dẫn tuyến"}
-          </button>
         </div>
 
         {/* metrics */}
@@ -339,13 +247,13 @@ function ExhibitModalBody({
               <div className="absolute inset-0 grain opacity-[0.08] mix-blend-overlay" />
               <MotifIcon motif={exhibit.motif} className="absolute right-3 top-3 h-8 w-8 text-foreground/20" strokeWidth={1} />
               <div className="relative p-3">
-                <div className="text-[0.55rem] uppercase tracking-[0.18em] text-foreground/55">
+                <div className="text-[0.55rem] uppercase tracking-[0.18em] text-white/60">
                   Ảnh lịch sử · {img.year}
                 </div>
-                <div className="mt-0.5 text-xs font-medium text-foreground/85">
+                <div className="mt-0.5 text-xs font-medium text-white/85">
                   {img.caption}
                 </div>
-                <div className="mt-0.5 text-[0.6rem] italic text-foreground/45">
+                <div className="mt-0.5 text-[0.6rem] italic text-white/50">
                   Nguồn: {img.source}
                 </div>
               </div>

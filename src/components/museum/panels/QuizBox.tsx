@@ -9,7 +9,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useMuseum } from "@/lib/store";
-import { audio } from "@/lib/audio";
 import { questionsForPhase } from "@/lib/quiz-data";
 import { phaseById } from "@/lib/museum-data";
 
@@ -67,7 +66,6 @@ export function QuizModal({ open, onClose }: { open: boolean; onClose: () => voi
       const correct = next.filter((a, i) => a === questions[i].answer).length;
       if (correct >= 2) {
         recordQuizPass();
-        if (!audio.muted) audio.playSuccess();
       }
     }
   };

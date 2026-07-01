@@ -25,7 +25,13 @@ export type SteamPartId =
   | "piston-rod"
   | "piston-cylinder"
   | "flywheel"
-  | "steam-puff";
+  | "steam-puff"
+  | "basebed"
+  | "walking-beam"
+  | "connecting-rod"
+  | "steam-dome"
+  | "governor"
+  | "steam-chest";
 
 export interface SteamPart {
   id: SteamPartId;
@@ -43,6 +49,12 @@ export const STEAM_PARTS: SteamPart[] = [
   { id: "piston-cylinder", label: "Xi-lanh", desc: "Buồng chứa piston chuyển động tịnh tiến." },
   { id: "flywheel", label: "Bánh đà", desc: "Tích lũy đà quay, làm đều chuyển động cơ." },
   { id: "steam-puff", label: "Hơi nước", desc: "Hơi nước dư thoát ra khỏi lò hơi." },
+  { id: "basebed", label: "Bệ máy", desc: "Khung gang đỡ toàn bộ động cơ." },
+  { id: "walking-beam", label: "Đòn bẩy (beam)", desc: "Truyền chuyển động từ piston đến trục khuỷu." },
+  { id: "connecting-rod", label: "Tay biên", desc: "Kết nối đòn bẩy với bánh đà." },
+  { id: "steam-dome", label: "Nắp hơi", desc: "Thu hơi áp suất cao từ lò hơi." },
+  { id: "governor", label: "Bộ điều tốc", desc: "Điều chỉnh van hơi — giữ tốc độ ổn định." },
+  { id: "steam-chest", label: "Van phân phối", desc: "Điều phối hơi vào/ra xi-lanh." },
 ];
 
 interface ExplodedSteamEngineProps {
@@ -217,6 +229,178 @@ function SteamPuffPart({ dimmed, highlighted }: PartRenderProps) {
   );
 }
 
+function BasebedPart({ dimmed, highlighted }: PartRenderProps) {
+  return (
+    <mesh position={[0, -0.6, 0]} castShadow>
+      <boxGeometry args={[4.4, 0.28, 1.6]} />
+      <meshStandardMaterial
+        color="#3a2a1a"
+        roughness={0.7}
+        metalness={0.7}
+        emissive={highlighted ? ACCENT : "#000000"}
+        emissiveIntensity={highlighted ? 0.6 : 0}
+        transparent={dimmed}
+        opacity={dimmed ? 0.3 : 1}
+      />
+    </mesh>
+  );
+}
+
+function WalkingBeamPart({ dimmed, highlighted }: PartRenderProps) {
+  return (
+    <group position={[0.2, 0.25, 0]}>
+      <mesh castShadow>
+        <boxGeometry args={[2.2, 0.07, 0.25]} />
+        <meshStandardMaterial
+          color="#7a5a2e"
+          roughness={0.35}
+          metalness={0.85}
+          emissive={highlighted ? ACCENT : "#000000"}
+          emissiveIntensity={highlighted ? 0.6 : 0}
+          transparent={dimmed}
+          opacity={dimmed ? 0.3 : 1}
+        />
+      </mesh>
+      <mesh position={[0, 0, 0]}>
+        <cylinderGeometry args={[0.06, 0.06, 0.4, 16]} />
+        <meshStandardMaterial
+          color="#b8893f"
+          roughness={0.3}
+          metalness={0.9}
+          emissive={highlighted ? ACCENT : "#000000"}
+          emissiveIntensity={highlighted ? 0.6 : 0}
+          transparent={dimmed}
+          opacity={dimmed ? 0.3 : 1}
+        />
+      </mesh>
+    </group>
+  );
+}
+
+function ConnectingRodPart({ dimmed, highlighted }: PartRenderProps) {
+  return (
+    <mesh position={[1.2, 0.1, 0]} rotation={[0, 0, 0.4]}>
+      <boxGeometry args={[0.05, 0.6, 0.06]} />
+      <meshStandardMaterial
+        color="#9a9a9a"
+        roughness={0.2}
+        metalness={0.95}
+        emissive={highlighted ? ACCENT : "#000000"}
+        emissiveIntensity={highlighted ? 0.6 : 0}
+        transparent={dimmed}
+        opacity={dimmed ? 0.3 : 1}
+      />
+    </mesh>
+  );
+}
+
+function SteamDomePart({ dimmed, highlighted }: PartRenderProps) {
+  return (
+    <group position={[-1.3, 0.45, 0]}>
+      <mesh position={[0.1, 0.15, 0]} castShadow>
+        <cylinderGeometry args={[0.18, 0.22, 0.3, 24]} />
+        <meshStandardMaterial
+          color="#c9762e"
+          roughness={0.35}
+          metalness={0.85}
+          emissive={highlighted ? ACCENT : "#000000"}
+          emissiveIntensity={highlighted ? 0.6 : 0}
+          transparent={dimmed}
+          opacity={dimmed ? 0.3 : 1}
+        />
+      </mesh>
+      <mesh position={[0.1, 0.33, 0]}>
+        <sphereGeometry args={[0.18, 24, 24, 0, Math.PI * 2, 0, Math.PI / 2]} />
+        <meshStandardMaterial
+          color="#c9762e"
+          roughness={0.3}
+          metalness={0.85}
+          emissive={highlighted ? ACCENT : "#000000"}
+          emissiveIntensity={highlighted ? 0.6 : 0}
+          transparent={dimmed}
+          opacity={dimmed ? 0.3 : 1}
+        />
+      </mesh>
+    </group>
+  );
+}
+
+function GovernorPart({ dimmed, highlighted }: PartRenderProps) {
+  return (
+    <group position={[1.4, 0.55, 0]}>
+      <mesh position={[0, 0.5, 0]} castShadow>
+        <cylinderGeometry args={[0.04, 0.04, 0.6, 12]} />
+        <meshStandardMaterial
+          color="#b8893f"
+          roughness={0.3}
+          metalness={0.85}
+          emissive={highlighted ? ACCENT : "#000000"}
+          emissiveIntensity={highlighted ? 0.6 : 0}
+          transparent={dimmed}
+          opacity={dimmed ? 0.3 : 1}
+        />
+      </mesh>
+      <mesh position={[0, 0.82, 0]}>
+        <sphereGeometry args={[0.06, 16, 16]} />
+        <meshStandardMaterial
+          color="#b8893f"
+          roughness={0.3}
+          metalness={0.85}
+          emissive={highlighted ? ACCENT : "#000000"}
+          emissiveIntensity={highlighted ? 0.6 : 0}
+          transparent={dimmed}
+          opacity={dimmed ? 0.3 : 1}
+        />
+      </mesh>
+      {[-1, 1].map((s, i) => (
+        <group key={i} position={[0, 0.8, 0]} rotation={[0, 0, s * 0.5]}>
+          <mesh position={[s * 0.22, -0.05, 0]}>
+            <cylinderGeometry args={[0.015, 0.015, 0.3, 8]} />
+            <meshStandardMaterial
+              color="#9a9a9a"
+              roughness={0.2}
+              metalness={0.95}
+              emissive={highlighted ? ACCENT : "#000000"}
+              emissiveIntensity={highlighted ? 0.6 : 0}
+              transparent={dimmed}
+              opacity={dimmed ? 0.3 : 1}
+            />
+          </mesh>
+          <mesh position={[s * 0.34, -0.18, 0]} castShadow>
+            <sphereGeometry args={[0.07, 16, 16]} />
+            <meshStandardMaterial
+              color="#b8893f"
+              roughness={0.3}
+              metalness={0.85}
+              emissive={highlighted ? ACCENT : "#000000"}
+              emissiveIntensity={highlighted ? 0.6 : 0}
+              transparent={dimmed}
+              opacity={dimmed ? 0.3 : 1}
+            />
+          </mesh>
+        </group>
+      ))}
+    </group>
+  );
+}
+
+function SteamChestPart({ dimmed, highlighted }: PartRenderProps) {
+  return (
+    <mesh position={[-0.95, 0.55, 0]}>
+      <boxGeometry args={[0.3, 0.14, 0.22]} />
+      <meshStandardMaterial
+        color="#7a5a2e"
+        roughness={0.45}
+        metalness={0.8}
+        emissive={highlighted ? ACCENT : "#000000"}
+        emissiveIntensity={highlighted ? 0.6 : 0}
+        transparent={dimmed}
+        opacity={dimmed ? 0.3 : 1}
+      />
+    </mesh>
+  );
+}
+
 /* ---------- Part configs ---------- */
 
 const PARTS: PartConfig[] = [
@@ -228,6 +412,12 @@ const PARTS: PartConfig[] = [
   { id: "piston-cylinder", offset: [2.5, 0, 0], label: "Xi-lanh", labelPosition: [1.85, 0.85, 0], Mesh: PistonCylinderPart },
   { id: "flywheel", offset: [3.5, 0, 0], label: "Bánh đà", labelPosition: [1.85, 1.15, 0], Mesh: FlywheelPart },
   { id: "steam-puff", offset: [0, 1.4, 0], label: "Hơi nước", labelPosition: [-1.2, 0.85, 0], Mesh: SteamPuffPart },
+  { id: "basebed", offset: [0, -1.2, 0], label: "Bệ máy", labelPosition: [0, -0.3, 0], Mesh: BasebedPart },
+  { id: "walking-beam", offset: [0, 1.4, 0], label: "Đòn bẩy", labelPosition: [0.2, 0.65, 0], Mesh: WalkingBeamPart },
+  { id: "connecting-rod", offset: [2.0, 0.6, 0], label: "Tay biên", labelPosition: [1.2, 0.5, 0], Mesh: ConnectingRodPart },
+  { id: "steam-dome", offset: [0, 1.2, 0], label: "Nắp hơi", labelPosition: [-1.2, 0.85, 0], Mesh: SteamDomePart },
+  { id: "governor", offset: [0, 1.8, 0], label: "Bộ điều tốc", labelPosition: [1.4, 1.1, 0], Mesh: GovernorPart },
+  { id: "steam-chest", offset: [1.0, 0.8, 0], label: "Van phân phối", labelPosition: [-0.95, 0.8, 0], Mesh: SteamChestPart },
 ];
 
 /* ---------- Part wrapper: position lerp + label ---------- */

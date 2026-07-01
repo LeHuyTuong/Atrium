@@ -3,6 +3,7 @@
 import { Suspense, useRef, useState, useEffect } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Sparkles, Environment } from "@react-three/drei";
+import { EffectComposer, Bloom, ChromaticAberration, ToneMapping } from "@react-three/postprocessing";
 import * as THREE from "three";
 import { ArtifactModel } from "./ArtifactModels";
 import { usePrefersReducedMotion } from "@/hooks/museum/use-prefers-reduced-motion";
@@ -79,6 +80,22 @@ export function CinematicHero({ accent = "#e89446" }: { accent?: string }) {
         gl={{ antialias: true, alpha: true }}
       >
         <Suspense fallback={null}>
+          <EffectComposer enableNormalPass={false} autoClear>
+            <Bloom
+              mipmapBlur
+              luminanceThreshold={0.12}
+              luminanceSmoothing={0.06}
+              intensity={dark ? 2.0 : 1.2}
+              levels={6}
+            />
+            <ChromaticAberration
+              offset={[0.002, 0.0005]}
+              radialModulation={false}
+              modulationOffset={0}
+            />
+            <ToneMapping adaptive luminanceThreshold={0.002} middleGrey={0.7} />
+          </EffectComposer>
+
           <fog attach="fog" args={[fogColor, 8, 22]} />
           <ambientLight intensity={dark ? 0.3 : 0.7} />
           <spotLight

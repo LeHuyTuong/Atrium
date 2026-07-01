@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, ArrowRight, ChevronDown, Bookmark, Volume2, Square, Loader2, CheckCircle2, Sparkles, Lightbulb, Clock, ListChecks } from "lucide-react";
+import { ArrowLeft, ArrowRight, ChevronDown, Bookmark, CheckCircle2, Sparkles, Lightbulb, Clock, ListChecks } from "lucide-react";
 import { CHAPTERS, lessonById, LessonSection } from "@/lib/knowledge-data";
 import { useMuseum } from "@/lib/store";
 import { toast } from "sonner";
@@ -18,9 +18,6 @@ export function LessonViewer() {
   const toggleLessonBookmark = useMuseum((s) => s.toggleLessonBookmark);
 
   const [openSections, setOpenSections] = useState<Set<number>>(new Set([0]));
-  const [narrating, setNarrating] = useState(false);
-  const [narrLoading, setNarrLoading] = useState(false);
-  const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
 
   const lesson = currentLessonId ? lessonById(currentLessonId) : undefined;
   const chapter = lesson ? CHAPTERS.find((c) => c.id === lesson.chapterId) : undefined;
@@ -32,12 +29,7 @@ export function LessonViewer() {
 
   useEffect(() => {
     setOpenSections(new Set([0]));
-    if (audio) {
-      audio.pause();
-      setAudio(null);
-      setNarrating(false);
-    }
-  }, [currentLessonId, audio]);
+  }, [currentLessonId]);
 
   if (!lesson || !chapter) {
     return (
@@ -66,29 +58,6 @@ export function LessonViewer() {
       setTimeout(() => setCurrentLessonId(nextLesson.id), 800);
     } else {
       setTimeout(() => setStage("library-quiz"), 800);
-    }
-  };
-
-  const narrateText = async () => {
-    if (narrating && audio) { audio.pause(); setNarrating(false); return; }
-    if (audio) { audio.play(); setNarrating(true); return; }
-    setNarrLoading(true);
-    try {
-      const text = lesson.sections.map((s) => `${s.heading}. ${s.body}`).join(" ");
-      const res = await fetch("/api/narrate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text }) });
-      if (!res.ok) throw new Error("narrate failed");
-      const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
-      const el = new Audio(url);
-      el.onended = () => { setNarrating(false); URL.revokeObjectURL(url); };
-      el.onerror = () => { setNarrating(false); URL.revokeObjectURL(url); toast.error("Không thể phát âm thanh."); };
-      setAudio(el);
-      await el.play();
-      setNarrating(true);
-    } catch {
-      toast.error("Giọng đọc tạm thời không sẵn sàng.");
-    } finally {
-      setNarrLoading(false);
     }
   };
 
@@ -125,10 +94,6 @@ export function LessonViewer() {
             </div>
             <h1 className="font-serif text-3xl font-bold leading-tight text-foreground sm:text-4xl text-balance">{lesson.title}</h1>
             <p className="mt-2 font-serif text-base italic text-foreground/55 sm:text-lg">{lesson.subtitle}</p>
-            <button onClick={narrateText} className="mt-4 inline-flex items-center gap-2 rounded-full border bg-foreground/[0.03] px-4 py-2 text-xs font-medium transition hover:bg-foreground/[0.06]" style={{ borderColor: narrating ? chapter.accent : "oklch(0.5 0.02 60 / 0.18)", color: narrating ? chapter.accent : "oklch(0.5 0.02 60 / 0.88)" }}>
-              {narrLoading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : narrating ? <Square className="h-3.5 w-3.5" style={{ fill: chapter.accent }} /> : <Volume2 className="h-3.5 w-3.5" />}
-              {narrating ? "Đang đọc — dừng" : narrLoading ? "Đang tải giọng đọc" : "Đọc bằng giọng nói"}
-            </button>
           </motion.div>
           <div className="mt-8 space-y-3">
             {lesson.sections.map((section, i) => (

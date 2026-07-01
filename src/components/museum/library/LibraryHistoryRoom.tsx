@@ -1,13 +1,10 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowLeft,
   ArrowRight,
-  Volume2,
-  Square,
-  Loader2,
   CheckCircle2,
   Sparkles,
   Flame,
@@ -190,57 +187,12 @@ const MINI_QUIZ: MiniQuestion[] = [
 export function LibraryHistoryRoom() {
   const setStage = useMuseum((s) => s.setStage);
   const [activeRev, setActiveRev] = useState<number>(1);
-  const [narrating, setNarrating] = useState(false);
-  const [narrLoading, setNarrLoading] = useState(false);
-  const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
   const [quizAnswers, setQuizAnswers] = useState<(number | null)[]>([null, null, null]);
   const [quizSubmitted, setQuizSubmitted] = useState(false);
 
   const activeRevolution = REVOLUTIONS.find((r) => r.id === activeRev)!;
   const quizScore = quizAnswers.filter((a, i) => a === MINI_QUIZ[i].answer).length;
   const progressPct = Math.round((quizAnswers.filter((a) => a !== null).length / MINI_QUIZ.length) * 100);
-
-  const narrateAll = async () => {
-    if (narrating && audio) {
-      audio.pause();
-      setNarrating(false);
-      return;
-    }
-    if (audio) {
-      audio.play();
-      setNarrating(true);
-      return;
-    }
-    setNarrLoading(true);
-    try {
-      const text = REVOLUTIONS.map((r) => `${r.title}, ${r.period}. ${r.bullets.join(". ")}`).join(". ");
-      const res = await fetch("/api/narrate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text }),
-      });
-      if (!res.ok) throw new Error("narrate failed");
-      const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
-      const el = new Audio(url);
-      el.onended = () => {
-        setNarrating(false);
-        URL.revokeObjectURL(url);
-      };
-      el.onerror = () => {
-        setNarrating(false);
-        URL.revokeObjectURL(url);
-        toast.error("Không thể phát âm thanh.");
-      };
-      setAudio(el);
-      await el.play();
-      setNarrating(true);
-    } catch {
-      toast.error("Giọng đọc tạm thời không sẵn sàng.");
-    } finally {
-      setNarrLoading(false);
-    }
-  };
 
   const submitQuiz = () => {
     setQuizSubmitted(true);
@@ -317,18 +269,6 @@ export function LibraryHistoryRoom() {
               </div>
               <span className="font-mono text-[0.65rem] text-foreground/55">{progressPct}%</span>
             </div>
-            {/* Narration toggle */}
-            <button
-              onClick={narrateAll}
-              className="inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs transition hover:bg-foreground/[0.05]"
-              style={{
-                borderColor: narrating ? "#e8b53a" : "oklch(0.5 0.02 60 / 0.2)",
-                color: narrating ? "#e8b53a" : "oklch(0.5 0.02 60 / 0.8)",
-              }}
-            >
-              {narrLoading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : narrating ? <Square className="h-3.5 w-3.5" /> : <Volume2 className="h-3.5 w-3.5" />}
-              <span className="hidden sm:inline">{narrating ? "Dừng" : narrLoading ? "Đang tải" : "Nghe kể"}</span>
-            </button>
             <button
               onClick={() => setStage("library")}
               className="inline-flex items-center gap-1.5 rounded-full border border-foreground/15 px-3 py-1.5 text-xs text-foreground/70 transition hover:border-foreground/30 hover:text-foreground"
