@@ -1,0 +1,66 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model GuestbookEntry {
+  id        String   @id @default(cuid())
+  name      String
+  message   String
+  phase     String?
+  rating    Int?
+  approved  Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model Tour {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  description String?
+  author      String   @default("Khách")
+  exhibitIds  String
+  featured    Boolean  @default(false)
+  visits      Int      @default(0)
+  createdAt   DateTime @default(now())
+}
+
+model Feedback {
+  id        String   @id @default(cuid())
+  visitorId String
+  kind      String   @default("idea")
+  message   String
+  createdAt DateTime @default(now())
+}
+
+model Visit {
+  id            String      @id @default(cuid())
+  visitorId     String
+  mode          String      @default("free")
+  startedAt     DateTime    @default(now())
+  endedAt       DateTime?
+  phaseSeen     Int?
+  exhibitsSeen  Int?
+  quizzesPassed Int?
+  events        VisitEvent[]
+}
+
+model VisitEvent {
+  id        String   @id @default(cuid())
+  visitId   String
+  kind      String
+  refId     String?
+  meta      String?
+  createdAt DateTime @default(now())
+  visit     Visit    @relation(fields: [visitId], references: [id])
+}
+
+model DailySpotlight {
+  dateKey     String @id
+  exhibitId   String
+  curatorNote String
+}
