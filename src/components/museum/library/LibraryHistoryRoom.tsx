@@ -413,7 +413,7 @@ export function LibraryHistoryRoom() {
               <span className="text-[0.65rem] uppercase tracking-[0.25em] text-foreground/50">02</span>
               <h2 className="font-serif text-2xl font-bold text-foreground sm:text-3xl">Bốn cuộc cách mạng</h2>
             </div>
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
               {REVOLUTIONS.map((rev, i) => (
                 <motion.button
                   key={rev.id}
@@ -425,47 +425,39 @@ export function LibraryHistoryRoom() {
                     setActiveRev(rev.id);
                     window.scrollTo({ top: 0, behavior: "smooth" });
                   }}
-                  className="group relative overflow-hidden rounded-2xl border p-5 text-left transition-all hover:-translate-y-1"
+                  className="group relative overflow-hidden rounded-[2rem] border p-6 text-left transition-all duration-300 hover:-translate-y-2"
                   style={{
                     borderColor: activeRev === rev.id ? rev.accent : "oklch(0.5 0.02 60 / 0.15)",
-                    background: activeRev === rev.id ? `${rev.accent}0d` : "oklch(0.5 0.02 60 / 0.03)",
-                    boxShadow: activeRev === rev.id ? `0 0 30px -8px ${rev.accent}66` : "none",
+                    background: activeRev === rev.id ? `${rev.accent}0a` : "oklch(0.5 0.02 60 / 0.02)",
+                    boxShadow: activeRev === rev.id ? `0 10px 40px -10px ${rev.accent}40` : "0 4px 20px -10px rgba(0,0,0,0.05)",
                   }}
                 >
                   {/* Top accent line */}
-                  <div className="absolute inset-x-0 top-0 h-px" style={{ background: `linear-gradient(90deg, transparent, ${rev.accent}, transparent)` }} />
+                  <div className="absolute inset-x-0 top-0 h-1" style={{ background: `linear-gradient(90deg, transparent, ${rev.accent}, transparent)` }} />
                   {/* Hover glow */}
                   <div
                     className="absolute inset-0 opacity-0 transition-opacity group-hover:opacity-100"
-                    style={{ background: `radial-gradient(ellipse at top, ${rev.accent}10, transparent 70%)` }}
+                    style={{ background: `radial-gradient(ellipse at top, ${rev.accent}15, transparent 70%)` }}
                   />
                   <div className="relative">
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between mb-4">
                       <div
-                        className="grid h-11 w-11 place-items-center rounded-xl border"
+                        className="grid h-14 w-14 place-items-center rounded-2xl border shadow-sm"
                         style={{ borderColor: `${rev.accent}44`, background: `${rev.accent}14`, color: rev.accent }}
                       >
-                        <rev.icon className="h-5 w-5" />
+                        <rev.icon className="h-6 w-6" />
                       </div>
-                      <span className="font-serif text-2xl font-bold" style={{ color: rev.accent }}>{rev.label}</span>
+                      <span className="font-serif text-3xl font-bold" style={{ color: rev.accent }}>{rev.label}</span>
                     </div>
-                    <h3 className="mt-3 font-serif text-sm font-bold leading-tight text-foreground/90">{rev.shortTitle}</h3>
-                    <p className="mt-1 text-[0.7rem] text-foreground/50">{rev.period}</p>
-                    {/* Historical illustration placeholder (gradient + icon) */}
-                    <div
-                      className="mt-3 h-16 overflow-hidden rounded-lg border border-foreground/10"
-                      style={{ background: rev.gradient }}
-                    >
-                      <div className="flex h-full items-center justify-center">
-                        <rev.icon className="h-7 w-7" style={{ color: rev.accent, opacity: 0.6 }} strokeWidth={1} />
-                      </div>
-                    </div>
-                    <div className="mt-3 flex flex-wrap gap-1">
+                    <h3 className="font-serif text-lg font-bold leading-tight text-foreground/90">{rev.shortTitle}</h3>
+                    <p className="mt-1.5 text-xs text-foreground/60 font-medium">{rev.period}</p>
+                    
+                    <div className="mt-5 flex flex-wrap gap-1.5">
                       {rev.tech.slice(0, 2).map((t) => (
                         <span
                           key={t}
-                          className="rounded-full border px-1.5 py-0.5 text-[0.55rem] uppercase tracking-[0.1em]"
-                          style={{ borderColor: `${rev.accent}33`, color: rev.accent, background: `${rev.accent}0a` }}
+                          className="rounded-full border px-2.5 py-1 text-[0.6rem] uppercase tracking-[0.1em] font-semibold bg-background/50"
+                          style={{ borderColor: `${rev.accent}44`, color: rev.accent }}
                         >
                           {t}
                         </span>
@@ -485,7 +477,7 @@ export function LibraryHistoryRoom() {
                 Vai trò của cách mạng công nghiệp đối với phát triển
               </h2>
             </div>
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
               {ROLES.map((role, i) => (
                 <motion.div
                   key={role.id}
@@ -493,33 +485,32 @@ export function LibraryHistoryRoom() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: i * 0.1, duration: 0.5 }}
-                  className="group relative overflow-hidden rounded-2xl border p-5 transition-all hover:-translate-y-1"
+                  className="group relative overflow-hidden rounded-[2rem] border p-8 transition-all hover:-translate-y-2 bg-background/60 backdrop-blur-xl shadow-sm"
                   style={{
-                    borderColor: `${role.accent}33`,
-                    background: `${role.accent}08`,
+                    borderColor: `${role.accent}40`,
                   }}
                 >
-                  <div className="absolute inset-x-0 top-0 h-px" style={{ background: `linear-gradient(90deg, transparent, ${role.accent}, transparent)` }} />
+                  <div className="absolute inset-x-0 top-0 h-1.5" style={{ background: `linear-gradient(90deg, transparent, ${role.accent}, transparent)` }} />
                   <div
                     className="absolute inset-0 opacity-0 transition-opacity group-hover:opacity-100"
-                    style={{ background: `radial-gradient(ellipse at top, ${role.accent}12, transparent 70%)` }}
+                    style={{ background: `radial-gradient(ellipse at top, ${role.accent}0a, transparent 70%)` }}
                   />
                   <div className="relative">
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-4 mb-4">
                       <div
-                        className="grid h-10 w-10 shrink-0 place-items-center rounded-full border"
+                        className="grid h-12 w-12 shrink-0 place-items-center rounded-xl border shadow-sm"
                         style={{ borderColor: `${role.accent}44`, background: `${role.accent}14`, color: role.accent }}
                       >
-                        <role.icon className="h-4 w-4" />
+                        <role.icon className="h-5 w-5" />
                       </div>
-                      <span className="text-[0.65rem] uppercase tracking-[0.18em]" style={{ color: role.accent }}>
+                      <span className="text-[0.75rem] uppercase tracking-[0.2em] font-bold" style={{ color: role.accent }}>
                         {role.number}
                       </span>
                     </div>
-                    <h3 className="mt-3 font-serif text-base font-bold leading-tight text-foreground/90">
+                    <h3 className="font-serif text-2xl font-bold leading-snug text-foreground/90">
                       {role.title}
                     </h3>
-                    <p className="mt-2 text-xs leading-relaxed text-foreground/65">{role.body}</p>
+                    <p className="mt-4 text-[0.95rem] leading-relaxed text-foreground/70 font-medium">{role.body}</p>
                   </div>
                 </motion.div>
               ))}
@@ -534,17 +525,17 @@ export function LibraryHistoryRoom() {
                 Kiểm tra nhanh — 3 câu trắc nghiệm
               </h2>
             </div>
-            <div className="rounded-2xl border border-foreground/12 bg-foreground/[0.025] p-5 sm:p-6">
-              <div className="space-y-5">
+            <div className="rounded-[2rem] border shadow-sm bg-background/60 backdrop-blur-xl p-8 sm:p-10" style={{ borderColor: "oklch(0.5 0.02 60 / 0.15)" }}>
+              <div className="space-y-8">
                 {MINI_QUIZ.map((q, qi) => (
-                  <div key={qi}>
-                    <div className="mb-2 flex items-center gap-2">
-                      <span className="grid h-6 w-6 place-items-center rounded-full bg-foreground/10 font-serif text-xs font-bold text-foreground/70">
+                  <div key={qi} className="pb-8 border-b border-foreground/5 last:border-0 last:pb-0">
+                    <div className="mb-4 flex items-center gap-3">
+                      <span className="grid h-8 w-8 place-items-center rounded-xl bg-foreground/5 font-serif text-sm font-bold text-foreground/70 shadow-sm border border-foreground/5">
                         {qi + 1}
                       </span>
-                      <span className="text-sm font-semibold text-foreground/90">{q.prompt}</span>
+                      <span className="text-lg font-bold text-foreground/90">{q.prompt}</span>
                     </div>
-                    <div className="grid grid-cols-1 gap-1.5 pl-8 sm:grid-cols-2">
+                    <div className="grid grid-cols-1 gap-3 pl-11 sm:grid-cols-2">
                       {q.options.map((opt, oi) => {
                         const isSel = quizAnswers[qi] === oi;
                         const isCorrect = quizSubmitted && oi === q.answer;
@@ -558,7 +549,7 @@ export function LibraryHistoryRoom() {
                               next[qi] = oi;
                               setQuizAnswers(next);
                             }}
-                            className="flex items-center gap-2 rounded-lg border px-3 py-2 text-left text-xs transition"
+                            className="flex items-center gap-3 rounded-xl border px-4 py-3 text-left text-sm font-medium transition-all hover:bg-foreground/[0.02] shadow-sm"
                             style={{
                               borderColor: isCorrect
                                 ? "#4ade80"
@@ -573,21 +564,21 @@ export function LibraryHistoryRoom() {
                                 ? "#f8717114"
                                 : isSel
                                 ? "#e8b53a14"
-                                : "transparent",
+                                : "var(--background)",
                               color: isCorrect
-                                ? "#4ade80"
+                                ? "#166534"
                                 : isWrong
-                                ? "#f87171"
+                                ? "#991b1b"
                                 : isSel
-                                ? "#e8b53a"
-                                : "oklch(0.5 0.02 60 / 0.85)",
-                              opacity: quizSubmitted && !isCorrect && !isSel ? 0.4 : 1,
+                                ? "#854d0e"
+                                : "oklch(0.3 0.02 60)",
+                              opacity: quizSubmitted && !isCorrect && !isSel ? 0.5 : 1,
                             }}
                           >
-                            <span className="font-bold">{String.fromCharCode(65 + oi)}.</span>
+                            <span className="font-bold opacity-60">{String.fromCharCode(65 + oi)}.</span>
                             <span className="flex-1">{opt}</span>
-                            {isCorrect && <CheckCircle2 className="h-3.5 w-3.5" />}
-                            {isWrong && <X className="h-3.5 w-3.5" />}
+                            {isCorrect && <CheckCircle2 className="h-5 w-5" color="#166534" />}
+                            {isWrong && <X className="h-5 w-5" color="#991b1b" />}
                           </button>
                         );
                       })}
@@ -597,7 +588,7 @@ export function LibraryHistoryRoom() {
                       <motion.p
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: "auto" }}
-                        className="mt-2 pl-8 text-[0.7rem] italic leading-relaxed text-foreground/55"
+                        className="mt-4 pl-11 text-sm italic leading-relaxed text-foreground/70 font-medium"
                       >
                         → {q.explanation}
                       </motion.p>
@@ -607,7 +598,7 @@ export function LibraryHistoryRoom() {
               </div>
 
               {/* Quiz actions */}
-              <div className="mt-6 flex items-center justify-between gap-3 border-t border-foreground/10 pt-4">
+              <div className="mt-8 flex items-center justify-between gap-4 border-t border-foreground/10 pt-6">
                 {quizSubmitted ? (
                   <div className="flex items-center gap-2">
                     <Award className="h-5 w-5 text-amber-300" />
@@ -678,52 +669,51 @@ export function LibraryHistoryRoom() {
 function RevolutionCard({ rev }: { rev: Revolution }) {
   return (
     <div
-      className="relative overflow-hidden rounded-3xl border p-6 sm:p-8"
+      className="relative overflow-hidden rounded-[2rem] border p-8 sm:p-12 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.05)] bg-background/80 backdrop-blur-xl"
       style={{
-        borderColor: `${rev.accent}33`,
-        background: `linear-gradient(135deg, ${rev.accent}0d 0%, oklch(0.16 0.012 60) 100%)`,
+        borderColor: `${rev.accent}40`,
       }}
     >
-      <div className="absolute inset-x-0 top-0 h-px" style={{ background: `linear-gradient(90deg, transparent, ${rev.accent}, transparent)` }} />
+      <div className="absolute inset-x-0 top-0 h-1.5" style={{ background: `linear-gradient(90deg, transparent, ${rev.accent}, transparent)` }} />
       <div
-        className="absolute -right-10 -top-10 font-serif text-[12rem] font-bold leading-none opacity-[0.06]"
+        className="absolute -right-10 -top-10 font-serif text-[16rem] font-bold leading-none opacity-[0.03]"
         style={{ color: rev.accent }}
       >
         {rev.label}
       </div>
 
-      <div className="relative grid grid-cols-1 gap-6 md:grid-cols-[auto_1fr]">
+      <div className="relative grid grid-cols-1 gap-10 md:grid-cols-[auto_1fr]">
         {/* Left: icon + period */}
-        <div className="flex flex-row items-center gap-4 md:flex-col md:items-start">
+        <div className="flex flex-row items-center gap-6 md:flex-col md:items-start">
           <div
-            className="grid h-16 w-16 shrink-0 place-items-center rounded-2xl border"
+            className="grid h-24 w-24 shrink-0 place-items-center rounded-[1.5rem] border shadow-sm"
             style={{ borderColor: `${rev.accent}44`, background: `${rev.accent}14`, color: rev.accent }}
           >
-            <rev.icon className="h-8 w-8" />
+            <rev.icon className="h-12 w-12" />
           </div>
           <div>
-            <div className="font-serif text-3xl font-bold" style={{ color: rev.accent }}>{rev.label}</div>
-            <div className="mt-1 text-[0.7rem] uppercase tracking-[0.18em] text-foreground/50">
-              <Clock className="mr-1 inline h-3 w-3" />{rev.period}
+            <div className="font-serif text-5xl font-bold drop-shadow-sm" style={{ color: rev.accent }}>{rev.label}</div>
+            <div className="mt-2 text-[0.75rem] uppercase tracking-[0.2em] text-foreground/60 font-semibold">
+              <Clock className="mr-1.5 inline h-3.5 w-3.5" />{rev.period}
             </div>
-            <div className="mt-1 text-xs text-foreground/55">📍 {rev.location}</div>
+            <div className="mt-1.5 text-sm text-foreground/60 font-medium">📍 {rev.location}</div>
           </div>
         </div>
 
         {/* Right: content */}
-        <div>
-          <h3 className="font-serif text-xl font-bold leading-tight text-foreground sm:text-2xl">{rev.title}</h3>
-          <ul className="mt-4 space-y-2">
+        <div className="pt-2 md:pl-6 md:border-l border-foreground/5">
+          <h3 className="font-serif text-3xl font-bold leading-tight text-foreground sm:text-4xl">{rev.title}</h3>
+          <ul className="mt-6 space-y-4">
             {rev.bullets.map((b, i) => (
               <motion.li
                 key={i}
                 initial={{ opacity: 0, x: -8 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: i * 0.08, duration: 0.3 }}
-                className="flex items-start gap-2 text-sm leading-relaxed text-foreground/80"
+                className="flex items-start gap-3 text-lg leading-relaxed text-foreground/85 font-medium"
               >
                 <span
-                  className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full"
+                  className="mt-2 h-2 w-2 shrink-0 rounded-full shadow-sm"
                   style={{ background: rev.accent }}
                 />
                 <span>{b}</span>
@@ -731,11 +721,11 @@ function RevolutionCard({ rev }: { rev: Revolution }) {
             ))}
           </ul>
           {/* Tech tags */}
-          <div className="mt-4 flex flex-wrap gap-1.5">
+          <div className="mt-8 flex flex-wrap gap-2">
             {rev.tech.map((t) => (
               <span
                 key={t}
-                className="rounded-full border px-2.5 py-1 text-[0.65rem] uppercase tracking-[0.12em]"
+                className="rounded-full border px-4 py-1.5 text-[0.7rem] uppercase tracking-[0.15em] font-bold shadow-sm"
                 style={{ borderColor: `${rev.accent}44`, color: rev.accent, background: `${rev.accent}10` }}
               >
                 {t}
