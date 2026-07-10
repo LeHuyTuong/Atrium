@@ -118,14 +118,17 @@ export function PhotoWall() {
                     className={`group relative block overflow-hidden rounded-lg border border-foreground/10 text-left transition-all hover:border-foreground/30 hover:shadow-lg ${
                       img.featured ? "sm:col-span-2 xl:col-span-2" : ""
                     }`}
-                    style={{ background: img.gradient, minHeight: 140 }}
+                    style={img.imageUrl ? { backgroundImage: `url(${img.imageUrl})`, backgroundSize: 'cover', backgroundPosition: 'center', minHeight: 140 } : { background: img.gradient, minHeight: 140 }}
                   >
-                    <div className="absolute inset-0 grain opacity-[0.08] mix-blend-overlay" />
-                    <MotifIcon
-                      motif={img.motif}
-                      className="absolute right-3 top-3 h-7 w-7 text-foreground/25"
-                      strokeWidth={1.2}
-                    />
+                    {!img.imageUrl && <div className="absolute inset-0 grain opacity-[0.08] mix-blend-overlay" />}
+                    {img.imageUrl && <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />}
+                    {!img.imageUrl && (
+                      <MotifIcon
+                        motif={img.motif}
+                        className="absolute right-3 top-3 h-7 w-7 text-foreground/25"
+                        strokeWidth={1.2}
+                      />
+                    )}
                     {img.featured && (
                       <span className="absolute left-3 top-3 text-amber-300">
                         <Star className="h-4 w-4" fill="currentColor" />

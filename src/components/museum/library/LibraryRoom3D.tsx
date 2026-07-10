@@ -2,141 +2,147 @@
 
 import { Suspense, useRef } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { Sparkles, Environment } from "@react-three/drei";
+import { Sparkles, Environment, Float, MeshDistortMaterial } from "@react-three/drei";
 import * as THREE from "three";
 import { usePrefersReducedMotion } from "@/hooks/museum/use-prefers-reduced-motion";
 
-function Bookshelf({ x }: { x: number }) {
+function KnowledgeCore() {
+  const outerRingRef = useRef<THREE.Group>(null);
+  const innerRingRef = useRef<THREE.Group>(null);
+  const coreRef = useRef<THREE.Mesh>(null);
+  const reduced = usePrefersReducedMotion();
+
+  useFrame((state, delta) => {
+    if (!outerRingRef.current || !innerRingRef.current || !coreRef.current) return;
+    
+    if (!reduced) {
+      outerRingRef.current.rotation.x += delta * 0.15;
+      outerRingRef.current.rotation.y += delta * 0.2;
+      
+      innerRingRef.current.rotation.x -= delta * 0.25;
+      innerRingRef.current.rotation.z += delta * 0.15;
+      
+      coreRef.current.rotation.y += delta * 0.3;
+    }
+  });
+
   return (
-    <group position={[x, 0, -3.5]} rotation={[0, x > 0 ? -0.1 : 0.1, 0]}>
-      <mesh position={[0, 2, -0.3]}>
-        <boxGeometry args={[5, 5, 0.2]} />
-        <meshStandardMaterial color="#2a1810" roughness={0.9} />
-      </mesh>
-      {[0, 1, 2, 3, 4].map((shelf) => (
-        <group key={shelf} position={[0, 0.4 + shelf * 1.0, 0]}>
-          <mesh position={[0, -0.02, 0]} castShadow receiveShadow>
-            <boxGeometry args={[4.8, 0.04, 0.4]} />
-            <meshStandardMaterial color="#4a2f14" roughness={0.7} />
+    <group position={[0, 0, -1]}>
+      <Float speed={reduced ? 0 : 2} rotationIntensity={reduced ? 0 : 0.5} floatIntensity={reduced ? 0 : 2} floatingRange={[-0.2, 0.2]}>
+        
+        {/* The Core (Abstract Book / Energy) */}
+        <mesh ref={coreRef} castShadow>
+          <octahedronGeometry args={[1, 1]} />
+          <MeshDistortMaterial 
+            color="#ffe6a0" 
+            emissive="#e8a33a" 
+            emissiveIntensity={1.5}
+            roughness={0.2}
+            metalness={0.8}
+            distort={0.3} 
+            speed={reduced ? 0 : 2} 
+          />
+        </mesh>
+
+        {/* Inner Orbital Ring */}
+        <group ref={innerRingRef}>
+          <mesh castShadow receiveShadow>
+            <torusGeometry args={[1.8, 0.02, 16, 100]} />
+            <meshStandardMaterial color="#c29142" metalness={0.9} roughness={0.1} />
           </mesh>
-          {Array.from({ length: 14 }).map((_, i) => {
-            const w = 0.12 + Math.random() * 0.08;
-            const h = 0.5 + Math.random() * 0.35;
-            const colors = ["#8a3a1a", "#3a4a8a", "#5a2a3a", "#2a5a3a", "#6a4a1a", "#4a2a4a", "#8a6a2a"];
-            const c = colors[(i + shelf) % colors.length];
-            const xPos = -2.2 + i * 0.32;
-            return (
-              <mesh key={i} position={[xPos, h / 2, 0]} castShadow>
-                <boxGeometry args={[w, h, 0.22]} />
-                <meshStandardMaterial color={c} roughness={0.75} metalness={0.05} />
-              </mesh>
-            );
-          })}
+          <mesh position={[1.8, 0, 0]}>
+            <sphereGeometry args={[0.08, 16, 16]} />
+            <meshStandardMaterial color="#ffe6a0" emissive="#ffe6a0" emissiveIntensity={2} />
+          </mesh>
         </group>
-      ))}
-    </group>
-  );
-}
 
-function StudyDesk() {
-  return (
-    <group position={[0, -1.0, 0]}>
-      <mesh position={[0, 0.8, 0]} castShadow receiveShadow>
-        <boxGeometry args={[2.4, 0.08, 1.2]} />
-        <meshStandardMaterial color="#4a2f14" roughness={0.6} />
-      </mesh>
-      {[[-1.1, 0.4, -0.5], [1.1, 0.4, -0.5], [-1.1, 0.4, 0.5], [1.1, 0.4, 0.5]].map((pos, i) => (
-        <mesh key={i} position={pos as [number, number, number]} castShadow>
-          <boxGeometry args={[0.1, 0.8, 0.1]} />
-          <meshStandardMaterial color="#3a2410" roughness={0.7} />
-        </mesh>
-      ))}
-      <mesh position={[0, 0.86, 0]} rotation={[0, 0.1, 0]} castShadow>
-        <boxGeometry args={[0.8, 0.03, 0.55]} />
-        <meshStandardMaterial color="#e8d5a8" roughness={0.85} />
-      </mesh>
-      <mesh position={[-0.18, 0.875, 0]} rotation={[0, 0, 0.02]}>
-        <boxGeometry args={[0.34, 0.005, 0.5]} />
-        <meshStandardMaterial color="#f5ebd8" roughness={0.9} />
-      </mesh>
-      <mesh position={[0.18, 0.875, 0]} rotation={[0, 0, -0.02]}>
-        <boxGeometry args={[0.34, 0.005, 0.5]} />
-        <meshStandardMaterial color="#f5ebd8" roughness={0.9} />
-      </mesh>
-      <mesh position={[0.9, 0.86, -0.3]} castShadow>
-        <cylinderGeometry args={[0.03, 0.04, 0.5, 12]} />
-        <meshStandardMaterial color="#3a2410" metalness={0.6} roughness={0.4} />
-      </mesh>
-      <mesh position={[0.9, 1.18, -0.3]} castShadow>
-        <coneGeometry args={[0.18, 0.2, 16, 1, true]} />
-        <meshStandardMaterial color="#b8893f" metalness={0.4} roughness={0.4} side={THREE.DoubleSide} emissive="#ffd870" emissiveIntensity={0.4} />
-      </mesh>
-      <pointLight position={[0.9, 1.15, -0.3]} color="#ffd870" intensity={2.5} distance={3} />
-    </group>
-  );
-}
+        {/* Outer Orbital Ring */}
+        <group ref={outerRingRef}>
+          <mesh castShadow receiveShadow>
+            <torusGeometry args={[2.5, 0.015, 16, 100]} />
+            <meshStandardMaterial color="#8a6125" metalness={1} roughness={0.2} />
+          </mesh>
+          <mesh position={[0, 2.5, 0]}>
+            <octahedronGeometry args={[0.06, 0]} />
+            <meshStandardMaterial color="#ffbd59" emissive="#ffbd59" emissiveIntensity={1} />
+          </mesh>
+          <mesh position={[0, -2.5, 0]}>
+            <octahedronGeometry args={[0.06, 0]} />
+            <meshStandardMaterial color="#ffbd59" emissive="#ffbd59" emissiveIntensity={1} />
+          </mesh>
+        </group>
 
-function LibraryFloor() {
-  return (
-    <group position={[0, -1.4, 0]}>
-      <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
-        <planeGeometry args={[30, 30]} />
-        <meshStandardMaterial color="#2a1810" roughness={0.95} />
+      </Float>
+
+      {/* Subtle floor reflection/grounding */}
+      <mesh position={[0, -3.5, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
+        <planeGeometry args={[20, 20]} />
+        <meshStandardMaterial color="#1a110a" roughness={0.2} metalness={0.8} transparent opacity={0.6} />
       </mesh>
-      {Array.from({ length: 18 }).map((_, i) => (
-        <mesh key={i} position={[0, 0.001, (i - 9) * 1.0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
-          <planeGeometry args={[30, 0.03]} />
-          <meshStandardMaterial color="#3a2410" roughness={0.9} transparent opacity={0.5} />
-        </mesh>
-      ))}
     </group>
   );
 }
 
 function DustMotes() {
   const ref = useRef<THREE.Points>(null);
-  const count = 180;
-  const positions = useRef(new Float32Array(count * 3).map(() => (Math.random() - 0.5) * 18));
+  const count = 300;
+  const positions = useRef(new Float32Array(count * 3).map(() => (Math.random() - 0.5) * 15));
+  const reduced = usePrefersReducedMotion();
+  
   useFrame((_, delta) => {
-    if (!ref.current) return;
+    if (!ref.current || reduced) return;
     const arr = ref.current.geometry.attributes.position.array as Float32Array;
     for (let i = 0; i < count; i++) {
-      arr[i * 3 + 1] += delta * 0.12 * (0.5 + (i % 3) * 0.2);
-      arr[i * 3] += Math.sin((arr[i * 3 + 2] + arr[i * 3 + 1]) * 1.5) * delta * 0.03;
-      if (arr[i * 3 + 1] > 4) arr[i * 3 + 1] = -2;
+      arr[i * 3 + 1] += delta * 0.08 * (0.5 + (i % 3) * 0.2);
+      arr[i * 3] += Math.sin((arr[i * 3 + 2] + arr[i * 3 + 1]) * 1.5) * delta * 0.02;
+      if (arr[i * 3 + 1] > 5) arr[i * 3 + 1] = -5;
     }
     ref.current.geometry.attributes.position.needsUpdate = true;
-    ref.current.rotation.y += delta * 0.01;
+    ref.current.rotation.y += delta * 0.02;
   });
+  
   return (
     <points ref={ref}>
       <bufferGeometry>
         <bufferAttribute attach="attributes-position" args={[positions.current, 3]} />
       </bufferGeometry>
-      <pointsMaterial size={0.035} color="#ffd870" transparent opacity={0.55} sizeAttenuation depthWrite={false} />
+      <pointsMaterial size={0.04} color="#ffd870" transparent opacity={0.4} sizeAttenuation depthWrite={false} blending={THREE.AdditiveBlending} />
     </points>
   );
 }
 
 export function LibraryRoom3D() {
   const reduced = usePrefersReducedMotion();
+  
   return (
-    <Canvas shadows dpr={[1, 1.6]} camera={{ position: [0, 0.5, 6], fov: 50 }} gl={{ antialias: true, alpha: true }}>
-      <Suspense fallback={null}>
-        <ambientLight intensity={0.25} color="#ffd870" />
-        <hemisphereLight args={["#ffd870", "#2a160a", 0.35]} />
-        <spotLight position={[0, 5, 2]} angle={0.6} penumbra={0.9} intensity={3.5} color="#ffd870" castShadow shadow-mapSize={[1024, 1024]} />
-        <pointLight position={[-3, 1, 1]} intensity={0.6} color="#ff9a4a" distance={8} />
-        <pointLight position={[3, 1, 1]} intensity={0.6} color="#ff9a4a" distance={8} />
-        <Bookshelf x={-3.2} />
-        <Bookshelf x={3.2} />
-        <StudyDesk />
-        <LibraryFloor />
-        <DustMotes />
-        {!reduced && <Sparkles count={80} scale={[14, 5, 8]} size={2.5} speed={0.2} opacity={0.5} color="#ffd870" />}
-        <Environment preset="sunset" environmentIntensity={0.25} />
-        <fog attach="fog" args={["#1a1408", 6, 16]} />
-      </Suspense>
-    </Canvas>
+    <div className="absolute inset-0 bg-[#0a0604]"> {/* Dark moody background */}
+      <Canvas shadows dpr={[1, 1.6]} camera={{ position: [0, 0, 6.5], fov: 45 }} gl={{ antialias: true, alpha: true }}>
+        <Suspense fallback={null}>
+          <ambientLight intensity={0.1} color="#ffb067" />
+          
+          <spotLight 
+            position={[0, 6, 2]} 
+            angle={0.7} 
+            penumbra={1} 
+            intensity={4} 
+            color="#ffd870" 
+            castShadow 
+            shadow-mapSize={[1024, 1024]} 
+          />
+          
+          <pointLight position={[0, 0, 0]} intensity={1.5} color="#e8a33a" distance={8} />
+          
+          <pointLight position={[-4, -2, -2]} intensity={0.8} color="#b85c18" distance={10} />
+          <pointLight position={[4, 2, -2]} intensity={0.8} color="#b85c18" distance={10} />
+          
+          <KnowledgeCore />
+          <DustMotes />
+          {!reduced && <Sparkles count={60} scale={[8, 8, 8]} size={2} speed={0.1} opacity={0.2} color="#ffeaa8" />}
+          
+          <Environment preset="night" environmentIntensity={0.3} />
+          <fog attach="fog" args={["#0a0604", 4, 15]} />
+        </Suspense>
+      </Canvas>
+    </div>
   );
 }

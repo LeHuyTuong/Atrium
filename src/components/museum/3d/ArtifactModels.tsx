@@ -144,14 +144,29 @@ function SteamEngine({ accent, spinning }: ModelProps) {
   const groupRef = useRef<THREE.Group>(null);
   const flywheelRef = useRef<THREE.Group>(null);
   const beamRef = useRef<THREE.Group>(null);
+  const crankGroupRef = useRef<THREE.Group>(null);
+  const pistonRodRef = useRef<THREE.Group>(null);
   const pistonRef = useRef<THREE.Group>(null);
   const conrodRef = useRef<THREE.Mesh>(null);
   const steamRef = useRef<THREE.Points>(null);
-  const beamPivotRef = useRef<THREE.Mesh>(null);
+  const governorRef = useRef<THREE.Group>(null);
+  const planetRef = useRef<THREE.Mesh>(null);
 
   const castIronTex = useCastIronTex();
   const brassTex = useBrassTex();
   const copperTex = useCopperTex();
+
+  /* ---------- engine geometry constants ---------- */
+  const BEAM_PIVOT_X = 0;
+  const BEAM_PIVOT_Y = 0.88;
+  const BEAM_LEFT = -1.15;
+  const BEAM_RIGHT = 1.35;
+  const CRANK_X = 1.55;
+  const CRANK_Y = 0.05;
+  const CRANK_R = 0.18;
+  const STROKE_AMP = 0.25;
+  const CYLINDER_X = -1.2;
+  const CYLINDER_CENTER_Y = 0.45;
 
   useFrame((_, delta) => {
     if (!spinning) return;
@@ -161,44 +176,76 @@ function SteamEngine({ accent, spinning }: ModelProps) {
       t = flywheelRef.current.rotation.z;
     }
 
-    const pistonX = -0.95 + Math.cos(t) * 0.22;
-    const beamAngle = (pistonX + 0.95) * 0.35;
+    // Piston vertical position (up-down stroke)
+    const pistonY = CYLINDER_CENTER_Y + STROKE_AMP * Math.cos(t);
+
+    // Beam angle: piston pushes left end of beam up/down
+    // leftEndY = BEAM_PIVOT_Y + BEAM_LEFT * sin(beamAngle)
+    // since BEAM_LEFT is negative: leftEndY = 0.88 - 1.15 * sin(beamAngle)
+    // beamAngle = asin((BEAM_PIVOT_Y - leftEndY) / -BEAM_LEFT)
+    const rawSin = (BEAM_PIVOT_Y - pistonY) / -BEAM_LEFT;
+    const beamAngle = Math.asin(Math.max(-1, Math.min(1, rawSin)));
 
     if (beamRef.current) {
       beamRef.current.rotation.z = beamAngle;
     }
 
-    if (pistonRef.current) {
-      pistonRef.current.position.x = pistonX;
+    // Piston rod: crosshead (at local y=0.32) should meet beam left end
+    if (pistonRodRef.current) {
+      const leftEndY = BEAM_PIVOT_Y + BEAM_LEFT * Math.sin(beamAngle);
+      pistonRodRef.current.position.y = leftEndY - 0.32;
     }
 
-    const beamLen = 1.1;
-    const rightEndX = (beamPivotRef.current?.position.x ?? 0.2) + beamLen * Math.cos(beamAngle);
-    const rightEndY = (beamPivotRef.current?.position.y ?? 0.85) + beamLen * Math.sin(beamAngle);
-    const crankX = 1.95 + 0.22 * Math.cos(t);
-    const crankY = 0.25 + 0.22 * Math.sin(t);
+    // Piston itself inside the cylinder
+    if (pistonRef.current) {
+      pistonRef.current.position.y = pistonY;
+    }
 
+    // Right end of beam
+    const rightEndX = BEAM_PIVOT_X + BEAM_RIGHT * Math.cos(beamAngle);
+    const rightEndY = BEAM_PIVOT_Y + BEAM_RIGHT * Math.sin(beamAngle);
+
+    // Crank position — the crank arm rotates with the flywheel
+    const crankX = CRANK_X + CRANK_R * Math.sin(t);
+    const crankY = CRANK_Y + CRANK_R * Math.cos(t);
+
+    // Connecting rod from beam right end to crank
     if (conrodRef.current) {
       conrodRef.current.position.x = (rightEndX + crankX) / 2;
       conrodRef.current.position.y = (rightEndY + crankY) / 2;
       const dx = crankX - rightEndX;
       const dy = crankY - rightEndY;
       const len = Math.hypot(dx, dy);
-      conrodRef.current.scale.x = 1;
-      conrodRef.current.scale.y = len / 0.7;
+      conrodRef.current.scale.set(1, Math.max(0.1, len / 0.9), 1);
       conrodRef.current.rotation.z = Math.atan2(dy, dx);
     }
 
+    // Crank arm rotates with flywheel
+    if (crankGroupRef.current) {
+      crankGroupRef.current.rotation.z = t;
+    }
+
+    // Governor spins with flywheel speed
+    if (governorRef.current) {
+      governorRef.current.rotation.z = -t * 2.5;
+    }
+
+    // Planet gear rotates
+    if (planetRef.current) {
+      planetRef.current.rotation.z = -t * 2.2;
+    }
+
+    // Steam particles
     if (steamRef.current) {
-      const arr = steamRef.current.geometry.attributes.position.array as Float32Array;
-      for (let i = 0; i < arr.length; i += 3) {
-        arr[i + 1] += delta * (0.2 + Math.random() * 0.15);
-        arr[i] += Math.sin((arr[i + 2] + arr[i + 1]) * 2 + t) * delta * 0.04;
-        arr[i + 2] += Math.cos((arr[i] + arr[i + 1]) * 3) * delta * 0.02;
-        if (arr[i + 1] > 1.6) {
-          arr[i + 1] = 0.4 + Math.random() * 0.15;
-          arr[i] = 0.5 + (Math.random() - 0.5) * 0.5;
-          arr[i + 2] = (Math.random() - 0.5) * 0.6;
+      const pos = steamRef.current.geometry.attributes.position.array as Float32Array;
+      for (let i = 0; i < pos.length; i += 3) {
+        pos[i + 1] += delta * (0.12 + Math.random() * 0.08);
+        pos[i] += Math.sin(pos[i + 2] * 2 + t) * delta * 0.03;
+        pos[i + 2] += Math.cos(pos[i] * 3) * delta * 0.015;
+        if (pos[i + 1] > 1.5) {
+          pos[i] = CYLINDER_X + (Math.random() - 0.5) * 0.3;
+          pos[i + 1] = 0.65 + Math.random() * 0.1;
+          pos[i + 2] = (Math.random() - 0.5) * 0.4;
         }
       }
       steamRef.current.geometry.attributes.position.needsUpdate = true;
@@ -206,242 +253,468 @@ function SteamEngine({ accent, spinning }: ModelProps) {
   });
 
   const steamPositions = useMemo(() => {
-    const n = 60;
+    const n = 50;
     const arr = new Float32Array(n * 3);
     for (let i = 0; i < n; i++) {
-      arr[i * 3] = 0.5 + (Math.random() - 0.5) * 0.5;
-      arr[i * 3 + 1] = 0.4 + Math.random() * 1.2;
-      arr[i * 3 + 2] = (Math.random() - 0.5) * 0.6;
+      arr[i * 3] = CYLINDER_X + (Math.random() - 0.5) * 0.3;
+      arr[i * 3 + 1] = 0.65 + Math.random() * 0.7;
+      arr[i * 3 + 2] = (Math.random() - 0.5) * 0.4;
     }
     return arr;
   }, []);
 
-  const brass = { ...metal("#b8893f"), map: brassTex };
-  const darkBrass = { ...metal("#7a5a2e"), map: brassTex };
+  /* ---------- materials ---------- */
+  const brass = { ...metal("#c9922a"), map: brassTex };
+  const darkBrass = { ...metal("#a87822"), map: brassTex };
   const copper = { ...metal("#c9762e"), map: copperTex };
-  const iron = { ...metal("#3a2a1a"), map: castIronTex, roughness: 0.7 };
-  const steel = { ...metal("#9a9a9a"), roughness: 0.2, metalness: 0.95 };
-  const accentMat = { color: accent, emissive: accent, emissiveIntensity: 0.4, metalness: 0.85, roughness: 0.25 };
+  const iron = { ...metal("#b8893f"), map: castIronTex, roughness: 0.5 };
+  const steel = { ...metal("#e6c27a"), roughness: 0.2, metalness: 0.95 };
+  const woodBrown = { color: "#5a3a1a", roughness: 0.85, metalness: 0.0 };
+  const woodDark = { color: "#3a2410", roughness: 0.85, metalness: 0.0 };
 
-  const BEAM_HALF = 1.1;
-  const BEAM_PIVOT_X = 0.2;
-  const BEAM_PIVOT_Y = 0.85;
+  /*
+   * Watt beam engine — vertical layout (c. 1788)
+   *
+   *   [Governor]
+   *       |
+   * [Walking Beam ════◎═══════════]
+   *    |   (pivot at x=0, y=0.88)   \
+   *    |                              [Connecting rod]
+   * [Piston rod]                         |
+   *    |                              [Sun/Planet gear]
+   * [Cylinder]                        |
+   *    |                           [Flywheel]
+   * [Condenser]───[steam pipes]──┘
+   *  ==========[Base frame]==========
+   */
 
   return (
     <group ref={groupRef} rotation={[0, 0, 0.02]}>
-      <mesh position={[0, -1.0, 0]} receiveShadow castShadow>
-        <boxGeometry args={[4.4, 0.28, 1.6]} />
+      {/* ═══════════ BASE & A-FRAME ═══════════ */}
+      <mesh position={[0, -0.75, 0]} receiveShadow castShadow>
+        <boxGeometry args={[4.0, 0.2, 1.4]} />
         <meshStandardMaterial {...iron} />
       </mesh>
-      <mesh position={[0, -0.84, 0]}>
-        <boxGeometry args={[4.5, 0.06, 1.7]} />
+      <mesh position={[0, -0.63, 0]}>
+        <boxGeometry args={[4.1, 0.05, 1.5]} />
         <meshStandardMaterial {...{ ...metal("#5a4222"), map: castIronTex, roughness: 0.5 }} />
       </mesh>
-      {[-2.0, -0.7, 0.7, 2.0].map((x, i) => (
-        <mesh key={i} position={[x, -1.18, 0]} castShadow>
-          <boxGeometry args={[0.3, 0.18, 1.4]} />
+      {/* base feet */}
+      {[-1.8, -0.6, 0.6, 1.8].map((x, i) => (
+        <mesh key={i} position={[x, -0.88, 0]} castShadow>
+          <boxGeometry args={[0.3, 0.12, 1.2]} />
           <meshStandardMaterial {...iron} />
         </mesh>
       ))}
 
-      <group position={[-1.3, 0.0, 0]}>
-        <mesh rotation={[0, 0, Math.PI / 2]} castShadow>
-          <cylinderGeometry args={[0.62, 0.62, 1.8, 48]} />
-          <meshStandardMaterial {...{ ...metal("#8a6a2e"), map: castIronTex, roughness: 0.45 }} />
-        </mesh>
-        <mesh position={[-0.95, 0, 0]} rotation={[0, 0, Math.PI / 2]} castShadow>
-          <sphereGeometry args={[0.62, 32, 32, 0, Math.PI * 2, 0, Math.PI / 2]} />
-          <meshStandardMaterial {...{ ...metal("#9a7a3e"), map: brassTex, roughness: 0.4 }} />
-        </mesh>
-        <mesh position={[0.95, 0, 0]} rotation={[0, 0, -Math.PI / 2]} castShadow>
-          <sphereGeometry args={[0.62, 32, 32, 0, Math.PI * 2, 0, Math.PI / 2]} />
-          <meshStandardMaterial {...{ ...metal("#9a7a3e"), map: brassTex, roughness: 0.4 }} />
-        </mesh>
-        {[-0.6, 0, 0.6].map((y, i) => (
-          <mesh key={i} position={[y, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
-            <torusGeometry args={[0.64, 0.025, 8, 48]} />
-            <meshStandardMaterial {...{ ...metal("#caa05a"), map: brassTex, roughness: 0.35 }} />
-          </mesh>
-        ))}
-        {[-0.6, 0, 0.6].flatMap((y, ri) =>
-          Array.from({ length: 16 }).map((_, i) => {
-            const a = (i / 16) * Math.PI * 2;
-            return (
-              <mesh key={`${ri}-${i}`} position={[y, Math.cos(a) * 0.64, Math.sin(a) * 0.64]}>
-                <sphereGeometry args={[0.025, 8, 8]} />
-                <meshStandardMaterial {...{ ...metal("#e0c076"), map: brassTex, roughness: 0.3 }} />
-              </mesh>
-            );
-          })
-        )}
-
-        <mesh position={[0.1, 0.72, 0]} castShadow>
-          <cylinderGeometry args={[0.18, 0.22, 0.3, 24]} />
-          <meshStandardMaterial {...copper} />
-        </mesh>
-        <mesh position={[0.1, 0.9, 0]}>
-          <sphereGeometry args={[0.18, 24, 24, 0, Math.PI * 2, 0, Math.PI / 2]} />
-          <meshStandardMaterial {...copper} />
-        </mesh>
-        <mesh position={[-0.5, 0.9, 0]} castShadow>
-          <cylinderGeometry args={[0.1, 0.13, 0.5, 16]} />
-          <meshStandardMaterial {...darkBrass} />
-        </mesh>
-        <mesh position={[-0.5, 1.18, 0]}>
-          <cylinderGeometry args={[0.14, 0.13, 0.08, 16]} />
-          <meshStandardMaterial {...iron} />
-        </mesh>
-        <mesh position={[-0.95, 0.25, 0.45]} rotation={[0, Math.PI / 2, 0]}>
-          <cylinderGeometry args={[0.12, 0.12, 0.05, 24]} />
-          <meshStandardMaterial {...brass} />
-        </mesh>
-        <mesh position={[-0.98, 0.25, 0.45]} rotation={[0, Math.PI / 2, 0]}>
-          <cylinderGeometry args={[0.1, 0.1, 0.01, 24]} />
-          <meshStandardMaterial color="#f5e8c8" emissive={accent} emissiveIntensity={0.3} />
-        </mesh>
-        <mesh position={[0.7, 0.35, 0]} rotation={[0, 0, Math.PI / 4]}>
-          <cylinderGeometry args={[0.08, 0.08, 0.7, 16]} />
-          <meshStandardMaterial {...copper} />
-        </mesh>
-      </group>
-
-      <group ref={pistonRef} position={[-0.95, 0, 0]}>
-        <mesh position={[0, 0.0, 0]} castShadow>
-          <cylinderGeometry args={[0.28, 0.32, 0.9, 32]} />
-          <meshStandardMaterial {...{ ...metal("#6a4a22"), map: castIronTex, roughness: 0.5 }} />
-        </mesh>
-        <mesh position={[0, 0.48, 0]} castShadow>
-          <cylinderGeometry args={[0.30, 0.28, 0.12, 32]} />
-          <meshStandardMaterial {...brass} />
-        </mesh>
-        <mesh position={[0, -0.48, 0]} castShadow>
-          <cylinderGeometry args={[0.34, 0.32, 0.18, 32]} />
-          <meshStandardMaterial {...darkBrass} />
-        </mesh>
-        <mesh position={[0, -0.48, 0.33]}>
-          <boxGeometry args={[0.5, 0.16, 0.04]} />
-          <meshStandardMaterial {...brass} />
-        </mesh>
-        <mesh position={[0, 0.7, 0]} castShadow>
-          <cylinderGeometry args={[0.04, 0.04, 0.5, 16]} />
-          <meshStandardMaterial {...steel} />
-        </mesh>
-        <mesh position={[0, 0.95, 0]} castShadow>
-          <boxGeometry args={[0.18, 0.14, 0.22]} />
-          <meshStandardMaterial {...darkBrass} />
-        </mesh>
-        <mesh position={[0, 0.95, 0.18]}>
-          <boxGeometry args={[0.04, 0.5, 0.04]} />
-          <meshStandardMaterial {...steel} />
-        </mesh>
-        <mesh position={[0, 0.95, -0.18]}>
-          <boxGeometry args={[0.04, 0.5, 0.04]} />
-          <meshStandardMaterial {...steel} />
-        </mesh>
-
-        <mesh position={[0, 1.3, 0]}>
-          <cylinderGeometry args={[0.025, 0.025, 0.8, 8]} />
-          <meshStandardMaterial {...steel} />
-        </mesh>
-      </group>
-
-      <mesh position={[1.95, 0.55, 0]} castShadow>
-        <boxGeometry args={[0.2, 0.7, 0.9]} />
+      {/* A-frame: two diagonal legs from base to beam pivot */}
+      <mesh position={[-0.35, 0.1, 0]} rotation={[0, 0, 0.52]} castShadow>
+        <boxGeometry args={[0.12, 1.1, 0.35]} />
         <meshStandardMaterial {...iron} />
       </mesh>
-      <mesh position={[1.95, 0.35, 0]} rotation={[0, 0, Math.PI / 2]}>
-        <cylinderGeometry args={[0.16, 0.18, 0.14, 24]} />
-        <meshStandardMaterial {...brass} />
+      <mesh position={[0.35, 0.1, 0]} rotation={[0, 0, -0.52]} castShadow>
+        <boxGeometry args={[0.12, 1.1, 0.35]} />
+        <meshStandardMaterial {...iron} />
+      </mesh>
+      {/* A-frame cross braces */}
+      <mesh position={[-0.2, 0.3, 0]}>
+        <boxGeometry args={[0.5, 0.06, 0.14]} />
+        <meshStandardMaterial {...{ ...metal("#8a6a2e", accent, 0.2), map: brassTex, roughness: 0.35 }} />
+      </mesh>
+      <mesh position={[-0.25, 0.6, 0]}>
+        <boxGeometry args={[0.65, 0.06, 0.14]} />
+        <meshStandardMaterial {...{ ...metal("#8a6a2e", accent, 0.2), map: brassTex, roughness: 0.35 }} />
+      </mesh>
+      {/* A-frame top cap with bearing */}
+      <mesh position={[0, 0.8, 0]} castShadow>
+        <boxGeometry args={[0.35, 0.14, 0.32]} />
+        <meshStandardMaterial {...{ ...metal("#7a5a2e", accent, 0.25), map: brassTex, roughness: 0.35 }} />
       </mesh>
 
-      <group ref={flywheelRef} position={[1.95, 0.25, 0]} rotation={[0, 0, 0]}>
+      {/* ═══════════ CYLINDER (vertical) ═══════════ */}
+      <group position={[CYLINDER_X, 0, 0]}>
+        {/* Main cylinder body — iron jacket */}
+        <mesh position={[0, CYLINDER_CENTER_Y, 0]} castShadow>
+          <cylinderGeometry args={[0.34, 0.38, 0.7, 32]} />
+          <meshStandardMaterial {...{ ...metal("#6a4a22"), map: castIronTex, roughness: 0.5 }} />
+        </mesh>
+        {/* Insulation lagging (wooden staves look) */}
+        <mesh position={[0, CYLINDER_CENTER_Y, 0]}>
+          <cylinderGeometry args={[0.38, 0.42, 0.66, 24]} />
+          <meshStandardMaterial {...woodDark} />
+        </mesh>
+        {/* Cylinder bands — glowing accent rings */}
+        {[-0.28, 0, 0.28].map((y, i) => (
+          <mesh key={i} position={[0, CYLINDER_CENTER_Y + y, 0]}>
+            <torusGeometry args={[0.4, 0.025, 8, 24]} />
+            <meshStandardMaterial {...{ ...metal("#caa05a", accent, 0.35), map: brassTex, roughness: 0.3 }} />
+          </mesh>
+        ))}
+        {/* Bottom flange */}
+        <mesh position={[0, CYLINDER_CENTER_Y - 0.37, 0]} castShadow>
+          <cylinderGeometry args={[0.44, 0.46, 0.06, 24]} />
+          <meshStandardMaterial {...iron} />
+        </mesh>
+        {/* Top flange */}
+        <mesh position={[0, CYLINDER_CENTER_Y + 0.37, 0]} castShadow>
+          <cylinderGeometry args={[0.42, 0.4, 0.06, 24]} />
+          <meshStandardMaterial {...iron} />
+        </mesh>
+      </group>
+
+      {/* ═══════════ STEAM CHEST (valve gear on top of cylinder) ═══════════ */}
+      <group position={[CYLINDER_X, CYLINDER_CENTER_Y + 0.52, 0]}>
+        <mesh castShadow>
+          <boxGeometry args={[0.32, 0.12, 0.2]} />
+          <meshStandardMaterial {...{ ...metal("#b8893f", accent, 0.35), map: brassTex, roughness: 0.3 }} />
+        </mesh>
+        <mesh position={[0, 0.1, 0]}>
+          <boxGeometry args={[0.4, 0.08, 0.24]} />
+          <meshStandardMaterial {...{ ...metal("#caa05a", accent, 0.25), map: brassTex, roughness: 0.3 }} />
+        </mesh>
+        {/* Valve rod */}
+        <mesh position={[0, 0.2, 0]}>
+          <cylinderGeometry args={[0.015, 0.015, 0.06, 8]} />
+          <meshStandardMaterial {...steel} />
+        </mesh>
+        {/* Steam outlet pipe elbow */}
+        <mesh position={[0.15, 0.06, 0]} rotation={[0, 0, -0.4]}>
+          <cylinderGeometry args={[0.025, 0.025, 0.16, 8]} />
+          <meshStandardMaterial {...{ ...metal("#b8893f", accent, 0.3), map: brassTex, roughness: 0.3 }} />
+        </mesh>
+      </group>
+
+      {/* ═══════════ SEPARATE CONDENSER (Watt's key innovation) ═══════════ */}
+      <group position={[CYLINDER_X, -0.35, 0]}>
+        {/* Condenser vessel — copper cylinder with warm glow */}
+        <mesh position={[0.2, 0, 0]} castShadow>
+          <cylinderGeometry args={[0.2, 0.22, 0.35, 24]} />
+          <meshStandardMaterial {...{ ...metal("#c9762e", accent, 0.15), map: copperTex, roughness: 0.3 }} />
+        </mesh>
+        <mesh position={[0.2, 0.2, 0]}>
+          <cylinderGeometry args={[0.22, 0.2, 0.04, 24]} />
+          <meshStandardMaterial {...{ ...metal("#d4884a", accent, 0.2), map: copperTex, roughness: 0.3 }} />
+        </mesh>
+        {/* Cold water tank around condenser */}
+        <mesh position={[0.2, 0, 0.3]}>
+          <boxGeometry args={[0.3, 0.2, 0.02]} />
+          <meshStandardMaterial {...woodDark} />
+        </mesh>
+        {/* Steam pipe from cylinder to condenser */}
+        <mesh position={[-0.05, 0.12, 0]} rotation={[0, 0, -0.8]}>
+          <cylinderGeometry args={[0.022, 0.025, 0.28, 8]} />
+          <meshStandardMaterial {...{ ...metal("#9a7a3e", accent, 0.25), map: brassTex, roughness: 0.3 }} />
+        </mesh>
+        {/* Air pump beside condenser */}
+        <mesh position={[0.42, -0.02, 0]}>
+          <cylinderGeometry args={[0.07, 0.09, 0.28, 16]} />
+          <meshStandardMaterial {...iron} />
+        </mesh>
+        <mesh position={[0.42, 0.15, 0]}>
+          <cylinderGeometry args={[0.09, 0.07, 0.04, 16]} />
+          <meshStandardMaterial {...iron} />
+        </mesh>
+      </group>
+
+      {/* ═══════════ PISTON & ROD (vertical) ═══════════ */}
+      {/* Piston inside cylinder */}
+      <group ref={pistonRef} position={[CYLINDER_X, CYLINDER_CENTER_Y, 0]}>
+        <mesh castShadow>
+          <cylinderGeometry args={[0.28, 0.28, 0.08, 24]} />
+          <meshStandardMaterial {...{ ...metal("#b8893f", accent, 0.25), map: brassTex, roughness: 0.3 }} />
+        </mesh>
+        <mesh position={[0, 0.06, 0]}>
+          <cylinderGeometry args={[0.06, 0.04, 0.04, 12]} />
+          <meshStandardMaterial {...steel} />
+        </mesh>
+      </group>
+
+      {/* Piston rod — goes from piston up to beam */}
+      <group ref={pistonRodRef} position={[CYLINDER_X, 0.45, 0]}>
+        <mesh castShadow>
+          <cylinderGeometry args={[0.025, 0.035, 0.6, 12]} />
+          <meshStandardMaterial {...steel} />
+        </mesh>
+        {/* Crosshead at top of rod */}
+        <mesh position={[0, 0.32, 0]}>
+          <boxGeometry args={[0.14, 0.06, 0.18]} />
+          <meshStandardMaterial {...{ ...metal("#8a6a2e", accent, 0.3), map: brassTex, roughness: 0.3 }} />
+        </mesh>
+        {/* Pin joint at crosshead */}
+        <mesh position={[0, 0.32, 0.12]}>
+          <cylinderGeometry args={[0.015, 0.015, 0.04, 8]} />
+          <meshStandardMaterial {...steel} />
+        </mesh>
+      </group>
+
+      {/* ═══════════ PARALLEL MOTION LINKAGE (Watt's parallel motion) ═══════════ */}
+      <group position={[CYLINDER_X, 0.38, 0]}>
+        {/* Radius bar — from A-frame area to piston rod */}
+        <mesh position={[0.55, 0.32, 0]} rotation={[0, 0, -0.25]}>
+          <boxGeometry args={[0.55, 0.02, 0.02]} />
+          <meshStandardMaterial {...steel} />
+        </mesh>
+        {/* Another radius bar */}
+        <mesh position={[0.55, 0.36, 0.06]} rotation={[0, 0, -0.25]}>
+          <boxGeometry args={[0.55, 0.015, 0.015]} />
+          <meshStandardMaterial {...steel} />
+        </mesh>
+        {/* Small linking rod (parallel motion parallelogram) */}
+        <mesh position={[0.85, 0.5, 0]} rotation={[0, 0, 0.35]}>
+          <boxGeometry args={[0.3, 0.015, 0.015]} />
+          <meshStandardMaterial {...steel} />
+        </mesh>
+        {/* Vertical guide bar */}
+        <mesh position={[0, 0.2, 0.08]}>
+          <boxGeometry args={[0.008, 0.35, 0.008]} />
+          <meshStandardMaterial {...steel} />
+        </mesh>
+      </group>
+
+      {/* ═══════════ WALKING BEAM (massive wooden beam) ═══════════ */}
+      <group
+        ref={beamRef}
+        position={[BEAM_PIVOT_X, BEAM_PIVOT_Y, 0]}
+        rotation={[0, 0, 0]}
+      >
+        {/* Main beam body — wood with metal strapping */}
+        <mesh castShadow>
+          <boxGeometry args={[-BEAM_LEFT + BEAM_RIGHT, 0.12, 0.28]} />
+          <meshStandardMaterial {...woodBrown} />
+        </mesh>
+        {/* Beam center reinforcement */}
+        <mesh castShadow>
+          <boxGeometry args={[-BEAM_LEFT + BEAM_RIGHT, 0.14, 0.14]} />
+          <meshStandardMaterial {...woodDark} />
+        </mesh>
+        {/* Metal strapping on top — subtle glow */}
+        <mesh position={[0, 0.07, 0]}>
+          <boxGeometry args={[-BEAM_LEFT + BEAM_RIGHT, 0.02, 0.06]} />
+          <meshStandardMaterial {...{ ...metal("#8a6a2e", accent, 0.2), map: brassTex, roughness: 0.35 }} />
+        </mesh>
+        {/* Metal strapping on bottom — subtle glow */}
+        <mesh position={[0, -0.07, 0]}>
+          <boxGeometry args={[-BEAM_LEFT + BEAM_RIGHT, 0.02, 0.06]} />
+          <meshStandardMaterial {...{ ...metal("#8a6a2e", accent, 0.2), map: brassTex, roughness: 0.35 }} />
+        </mesh>
+        {/* Pivot bearing at center */}
+        <mesh castShadow>
+          <cylinderGeometry args={[0.06, 0.06, 0.35, 16]} />
+          <meshStandardMaterial {...{ ...metal("#b8893f", accent, 0.4), map: brassTex, roughness: 0.25 }} />
+        </mesh>
+        {/* Pivot axle */}
+        <mesh>
+          <cylinderGeometry args={[0.02, 0.02, 0.4, 8]} />
+          <meshStandardMaterial {...steel} />
+        </mesh>
+        {/* Left end — arch head (connecting to piston rod) */}
+        <mesh position={[BEAM_LEFT, 0.08, 0]}>
+          <boxGeometry args={[0.16, 0.08, 0.32]} />
+          <meshStandardMaterial {...{ ...metal("#9a7a3e", accent, 0.3), map: brassTex, roughness: 0.3 }} />
+        </mesh>
+        <mesh position={[BEAM_LEFT, 0.04, 0.2]}>
+          <cylinderGeometry args={[0.025, 0.025, 0.06, 8]} />
+          <meshStandardMaterial {...steel} />
+        </mesh>
+        {/* Right end — arch head (connecting to connecting rod) */}
+        <mesh position={[BEAM_RIGHT, 0.08, 0]}>
+          <boxGeometry args={[0.16, 0.08, 0.32]} />
+          <meshStandardMaterial {...{ ...metal("#9a7a3e", accent, 0.3), map: brassTex, roughness: 0.3 }} />
+        </mesh>
+        <mesh position={[BEAM_RIGHT, 0.04, 0.2]}>
+          <cylinderGeometry args={[0.025, 0.025, 0.06, 8]} />
+          <meshStandardMaterial {...steel} />
+        </mesh>
+        {/* Decorative bolts along beam with accent glow */}
+        {[-0.8, -0.3, 0.3, 0.8].map((x, i) => (
+          <mesh key={i} position={[x, 0, 0.15]}>
+            <cylinderGeometry args={[0.015, 0.015, 0.02, 8]} />
+            <meshStandardMaterial {...{ ...metal("#caa05a", accent, 0.5), map: brassTex, roughness: 0.25 }} />
+          </mesh>
+        ))}
+      </group>
+
+      {/* ═══════════ CONNECTING ROD (beam right end → crank) ═══════════ */}
+      <mesh ref={conrodRef} position={[1.1, 0.5, 0]}>
+        <boxGeometry args={[0.05, 0.9, 0.06]} />
+        <meshStandardMaterial {...steel} />
+      </mesh>
+
+      {/* ═══════════ CRANK & SUN-AND-PLANET GEAR ═══════════ */}
+      <group ref={crankGroupRef} position={[CRANK_X, CRANK_Y, 0]}>
+        {/* Crank arm with accent edge glow */}
+        <mesh position={[0, 0, 0]} rotation={[0, 0, 0]} castShadow>
+          <boxGeometry args={[0.06, CRANK_R * 2, 0.08]} />
+          <meshStandardMaterial {...{ ...metal("#3a2a1a", accent, 0.15), map: castIronTex, roughness: 0.5 }} />
+        </mesh>
+        {/* Crank pin */}
+        <mesh position={[0, CRANK_R, 0]}>
+          <cylinderGeometry args={[0.03, 0.03, 0.12, 8]} />
+          <meshStandardMaterial {...{ ...metal("#b8893f", accent, 0.5), map: brassTex, roughness: 0.25 }} />
+        </mesh>
+        {/* Sun gear (fixed on shaft) */}
+        <mesh>
+          <cylinderGeometry args={[0.12, 0.12, 0.12, 16]} />
+          <meshStandardMaterial {...{ ...metal("#b8893f", accent, 0.35), map: brassTex, roughness: 0.25 }} />
+        </mesh>
+        {/* Sun gear teeth (simplified as torus) */}
+        <mesh>
+          <torusGeometry args={[0.13, 0.025, 8, 24]} />
+          <meshStandardMaterial {...{ ...metal("#9a7a3e", accent, 0.3), map: brassTex, roughness: 0.3 }} />
+        </mesh>
+        {/* Planet gear (revolves around sun gear) */}
+        <mesh ref={planetRef} position={[0, 0.28, 0]}>
+          <cylinderGeometry args={[0.08, 0.08, 0.1, 16]} />
+          <meshStandardMaterial {...{ ...metal("#caa05a", accent, 0.35), map: brassTex, roughness: 0.25 }} />
+        </mesh>
+        {/* Planet gear arm */}
+        <mesh position={[0, 0.14, 0]}>
+          <boxGeometry args={[0.03, 0.28, 0.03]} />
+          <meshStandardMaterial {...steel} />
+        </mesh>
+      </group>
+
+      {/* ═══════════ FLYWHEEL ═══════════ */}
+      <group
+        ref={flywheelRef}
+        position={[CRANK_X + 0.25, CRANK_Y + 0.05, 0]}
+        rotation={[0, 0, 0]}
+      >
+        {/* Rim */}
         <mesh rotation={[0, 0, Math.PI / 2]} castShadow>
-          <torusGeometry args={[0.55, 0.07, 16, 64]} />
-          <meshStandardMaterial {...{ ...metal("#8a6a2e", accent, 0.15), map: castIronTex, roughness: 0.35 }} />
+          <torusGeometry args={[0.6, 0.06, 16, 48]} />
+          <meshStandardMaterial
+            {...{
+              ...metal("#7a5a2e", accent, 0.12),
+              map: castIronTex,
+              roughness: 0.35,
+            }}
+          />
         </mesh>
+        {/* Hub */}
         <mesh rotation={[0, 0, Math.PI / 2]}>
-          <cylinderGeometry args={[0.1, 0.1, 0.16, 24]} />
-          <meshStandardMaterial {...brass} />
+          <cylinderGeometry args={[0.1, 0.1, 0.2, 24]} />
+          <meshStandardMaterial {...{ ...metal("#8a6a2e", accent, 0.25), map: brassTex, roughness: 0.3 }} />
         </mesh>
-        {Array.from({ length: 6 }).map((_, i) => {
-          const a = (i / 6) * Math.PI * 2;
+        {/* 8 spokes with subtle accent glow */}
+        {Array.from({ length: 8 }).map((_, i) => {
+          const a = (i / 8) * Math.PI * 2;
           return (
-            <mesh key={i} position={[0, Math.cos(a) * 0.3, Math.sin(a) * 0.3]} rotation={[Math.cos(a), 0, 0]}>
-              <boxGeometry args={[0.14, 0.5, 0.04]} />
-              <meshStandardMaterial {...darkBrass} />
+            <mesh
+              key={i}
+              position={[
+                0,
+                Math.cos(a) * 0.35,
+                Math.sin(a) * 0.35,
+              ]}
+              rotation={[Math.cos(a), 0, 0]}
+            >
+              <boxGeometry args={[0.06, 0.5, 0.04]} />
+              <meshStandardMaterial {...{ ...metal("#4a3a2a", accent, 0.12), map: castIronTex, roughness: 0.5 }} />
             </mesh>
           );
         })}
-        <mesh position={[0.22, 0, 0]} rotation={[0, 0, Math.PI / 2]} castShadow>
-          <cylinderGeometry args={[0.05, 0.05, 0.22, 16]} />
+        {/* Outer accent ring */}
+        <mesh rotation={[0, 0, Math.PI / 2]}>
+          <torusGeometry args={[0.62, 0.015, 8, 48]} />
+          <meshStandardMaterial {...{ ...metal(accent, accent, 0.7), transparent: true, opacity: 0.7 }} />
+        </mesh>
+        {/* Shaft */}
+        <mesh position={[0, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
+          <cylinderGeometry args={[0.04, 0.04, 0.55, 12]} />
           <meshStandardMaterial {...steel} />
         </mesh>
       </group>
 
-      <mesh ref={beamPivotRef} position={[BEAM_PIVOT_X, BEAM_PIVOT_Y, 0]}>
-        <cylinderGeometry args={[0.06, 0.06, 0.4, 16]} />
-        <meshStandardMaterial {...steel} />
-      </mesh>
-
-      <group ref={beamRef} position={[BEAM_PIVOT_X, BEAM_PIVOT_Y, 0]} rotation={[0, 0, 0]}>
-        <mesh castShadow>
-          <boxGeometry args={[BEAM_HALF * 2, 0.07, 0.25]} />
-          <meshStandardMaterial {...darkBrass} />
-        </mesh>
-        <mesh position={[-BEAM_HALF + 0.08, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
-          <cylinderGeometry args={[0.03, 0.03, 0.32, 8]} />
+      {/* ═══════════ CENTRIFUGAL GOVERNOR (Watt's Speed Regulator) ═══════════ */}
+      <group ref={governorRef} position={[0.25, 1.1, 0]}>
+        {/* Spindle */}
+        <mesh position={[0, 0.15, 0]} castShadow>
+          <cylinderGeometry args={[0.02, 0.02, 0.3, 8]} />
           <meshStandardMaterial {...steel} />
         </mesh>
-        <mesh position={[BEAM_HALF - 0.08, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
-          <cylinderGeometry args={[0.03, 0.03, 0.32, 8]} />
-          <meshStandardMaterial {...steel} />
+        {/* Bevel gear at base */}
+        <mesh>
+          <torusGeometry args={[0.04, 0.015, 6, 12]} />
+          <meshStandardMaterial {...{ ...metal("#b8893f", accent, 0.4), map: brassTex, roughness: 0.25 }} />
         </mesh>
-        {[-BEAM_HALF, BEAM_HALF].map((x, i) => (
-          <mesh key={i} position={[x, -0.05, 0]}>
-            <cylinderGeometry args={[0.04, 0.04, 0.12, 12]} />
-            <meshStandardMaterial {...brass} />
-          </mesh>
-        ))}
-      </group>
-
-      <mesh ref={conrodRef} position={[1.2, 0.6, 0]}>
-        <boxGeometry args={[0.05, 0.7, 0.06]} />
-        <meshStandardMaterial {...steel} />
-      </mesh>
-
-      <group position={[1.4, 0.55, 0]}>
-        <mesh position={[0, 0.5, 0]} castShadow>
-          <cylinderGeometry args={[0.04, 0.04, 0.6, 12]} />
-          <meshStandardMaterial {...brass} />
-        </mesh>
-        <mesh position={[0, 0.82, 0]}>
-          <sphereGeometry args={[0.06, 16, 16]} />
-          <meshStandardMaterial {...brass} />
-        </mesh>
-        {[-1, 1].map((s, i) => (
-          <group key={i} position={[0, 0.8, 0]} rotation={[0, 0, s * 0.5]}>
-            <mesh position={[s * 0.22, -0.05, 0]}>
-              <cylinderGeometry args={[0.015, 0.015, 0.3, 8]} />
-              <meshStandardMaterial {...steel} />
+        {/* Two flyballs on articulated arms */}
+        {[-1, 1].map((side, i) => (
+          <group key={i} position={[0, 0.2, 0]} rotation={[0, 0, side * 0.5]}>
+            {/* Arm */}
+            <mesh position={[side * 0.12, -0.05, 0]}>
+              <cylinderGeometry args={[0.01, 0.01, 0.25, 6]} />
+              <meshStandardMaterial {...{ ...metal("#9a9a9a", accent, 0.15), roughness: 0.2, metalness: 0.95 }} />
             </mesh>
-            <mesh position={[s * 0.34, -0.18, 0]} castShadow>
-              <sphereGeometry args={[0.07, 16, 16]} />
-              <meshStandardMaterial {...brass} />
+            {/* Ball weight — glowing brass */}
+            <mesh position={[side * 0.22, -0.16, 0]} castShadow>
+              <sphereGeometry args={[0.06, 12, 12]} />
+              <meshStandardMaterial
+                {...{
+                  ...metal("#b8893f", accent, 0.5),
+                  map: brassTex,
+                  roughness: 0.25,
+                }}
+              />
+            </mesh>
+            {/* Collar link */}
+            <mesh position={[side * 0.08, -0.18, 0]}>
+              <cylinderGeometry args={[0.008, 0.008, 0.04, 6]} />
+              <meshStandardMaterial {...{ ...metal("#9a9a9a", accent, 0.12), roughness: 0.2, metalness: 0.95 }} />
             </mesh>
           </group>
         ))}
-        <mesh position={[0, 0.18, 0]}>
-          <cylinderGeometry args={[0.12, 0.14, 0.08, 16]} />
-          <meshStandardMaterial {...darkBrass} />
+        {/* Top knob */}
+        <mesh position={[0, 0.35, 0]}>
+          <sphereGeometry args={[0.03, 10, 10]} />
+          <meshStandardMaterial {...{ ...metal("#caa05a", accent, 0.4), map: brassTex, roughness: 0.25 }} />
+        </mesh>
+        {/* Throttle linkage rod going down */}
+        <mesh position={[0, -0.15, 0]}>
+          <cylinderGeometry args={[0.008, 0.008, 0.15, 6]} />
+          <meshStandardMaterial {...steel} />
         </mesh>
       </group>
 
+      {/* ═══════════ STEAM PIPES ═══════════ */}
+      {/* Pipe from cylinder top to condenser */}
+      <mesh position={[CYLINDER_X + 0.15, -0.05, 0]} rotation={[0, 0, -0.9]}>
+        <cylinderGeometry args={[0.02, 0.025, 0.5, 8]} />
+        <meshStandardMaterial {...{ ...metal("#8a6a2e", accent, 0.25), map: brassTex, roughness: 0.3 }} />
+      </mesh>
+      {/* Short pipe from steam chest side */}
+      <mesh position={[CYLINDER_X + 0.3, CYLINDER_CENTER_Y + 0.55, 0]} rotation={[0, 0, -0.3]}>
+        <cylinderGeometry args={[0.015, 0.015, 0.2, 8]} />
+        <meshStandardMaterial {...{ ...metal("#b8893f", accent, 0.3), map: brassTex, roughness: 0.3 }} />
+      </mesh>
+
+      {/* ═══════════ STEAM PARTICLES ═══════════ */}
       <points ref={steamRef}>
         <bufferGeometry>
-          <bufferAttribute attach="attributes-position" args={[steamPositions, 3]} />
+          <bufferAttribute
+            attach="attributes-position"
+            args={[steamPositions, 3]}
+          />
         </bufferGeometry>
-        <pointsMaterial size={0.12} color="#e8ddd0" transparent opacity={0.3} sizeAttenuation depthWrite={false} blending={THREE.AdditiveBlending} />
+        <pointsMaterial
+          size={0.12}
+          color="#f0e8d8"
+          transparent
+          opacity={0.3}
+          sizeAttenuation
+          depthWrite={false}
+          blending={THREE.AdditiveBlending}
+        />
       </points>
+
+      {/* ═══════════ AMBIENT ACCENT LIGHT ═══════════ */}
+      <pointLight
+        position={[-0.4, 0.6, 1.8]}
+        color={accent}
+        intensity={0.6}
+        distance={5}
+        decay={2}
+      />
     </group>
   );
 }
@@ -975,71 +1248,38 @@ function Assembly({ accent }: ModelProps) {
   );
 }
 
-function Dynamo({ accent }: ModelProps) {
+import Dynamo3D from "@/components/dynamo/Dynamo3D";
+
+function Dynamo({ accent, spinning }: ModelProps) {
+  const visibleAll = {
+    housing: true, magnets: true, armature: true, windings: true,
+    commutator: true, brushes: true, shaft: true, bearings: true, terminals: true
+  };
+  const labelsNone = {
+    housing: false, magnets: false, armature: false, windings: false,
+    commutator: false, brushes: false, shaft: false, bearings: false, terminals: false
+  };
+
   return (
-    <group>
-      <mesh position={[0, 0, 0]} rotation={[0, 0, Math.PI / 2]} castShadow>
-        <cylinderGeometry args={[0.6, 0.6, 1.2, 32]} />
-        <meshStandardMaterial {...metal("#6a4a22")} />
-      </mesh>
-      {[-0.4, -0.2, 0, 0.2, 0.4].map((y, i) => (
-        <mesh key={i} position={[0, y, 0]} rotation={[0, 0, Math.PI / 2]}>
-          <torusGeometry args={[0.62, 0.04, 8, 32]} />
-          <meshStandardMaterial {...metal("#caa05a")} />
-        </mesh>
-      ))}
-      <mesh position={[0, 0, 0]} rotation={[0, 0, Math.PI / 2]} castShadow>
-        <cylinderGeometry args={[0.3, 0.3, 1.3, 16]} />
-        <meshStandardMaterial {...metal(accent, accent, 0.5)} />
-      </mesh>
-      <mesh position={[0.7, 0, 0]}>
-        <boxGeometry args={[0.12, 0.3, 0.4]} />
-        <meshStandardMaterial {...matte("#3a2410")} />
-      </mesh>
-      <mesh position={[0.76, 0, 0]}>
-        <boxGeometry args={[0.04, 0.12, 0.12]} />
-        <meshStandardMaterial {...metal("#caa05a")} />
-      </mesh>
+    <group position={[0, -0.1, 0]} scale={0.2}>
+      <Dynamo3D
+        rotationSpeed={spinning ? 12 : 0}
+        isGenerating={!!spinning}
+        visible={visibleAll}
+        labels={labelsNone}
+        explode={0}
+      />
       <pointLight color={accent} intensity={1.2} distance={3} />
     </group>
   );
 }
 
+import { OttoEngineModel } from "@/components/otto-engine/OttoEngineModel";
+
 function OttoEngine({ accent }: ModelProps) {
   return (
-    <group>
-      <mesh position={[0, -0.2, 0]} castShadow>
-        <boxGeometry args={[1.2, 0.7, 0.7]} />
-        <meshStandardMaterial {...matte("#2a1810")} />
-      </mesh>
-      {[0.35, 0, -0.35].map((z, i) => (
-        <group key={i} position={[0, 0.35, z]}>
-          <mesh castShadow>
-            <cylinderGeometry args={[0.14, 0.14, 0.5, 16]} />
-            <meshStandardMaterial {...metal("#b8893f")} />
-          </mesh>
-          <mesh position={[0.4, 0, 0]} rotation={[0, 0, Math.PI / 2]} castShadow>
-            <cylinderGeometry args={[0.05, 0.05, 0.4, 12]} />
-            <meshStandardMaterial {...metal(accent, accent, 0.3)} />
-          </mesh>
-          <mesh position={[-0.42, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
-            <cylinderGeometry args={[0.04, 0.04, 0.2, 12]} />
-            <meshStandardMaterial {...metal("#b8893f")} />
-          </mesh>
-        </group>
-      ))}
-      <mesh position={[0.85, 0, 0]} rotation={[0, 0, Math.PI / 2]} castShadow>
-        <torusGeometry args={[0.35, 0.06, 12, 32]} />
-        <meshStandardMaterial {...metal("#c9a05a")} />
-      </mesh>
-      <mesh position={[0.85, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
-        <cylinderGeometry args={[0.08, 0.08, 0.16, 12]} />
-        <meshStandardMaterial {...metal("#8a6a2e")} />
-      </mesh>
-      <mesh position={[1.15, 0, 0]}>
-        <boxGeometry args={[0.04, 0.25, 0.04]} />
-        <meshStandardMaterial {...metal("#3a2410")} />
-      </mesh>
+    <group position={[0, -0.2, 0]} scale={0.7}>
+      <OttoEngineModel isSimMaster={false} />
     </group>
   );
 }

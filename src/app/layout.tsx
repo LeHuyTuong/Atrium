@@ -7,7 +7,7 @@ import { AIChat } from "@/components/ai/AIChat";
 
 const geistSans = Geist({
   variable: "--font-sans",
-  subsets: ["latin", "vietnamese"],
+  subsets: ["latin"],
 });
 
 const geistMono = Geist_Mono({

@@ -14,6 +14,7 @@ export interface HistoricalImage {
   gradient: string; // CSS gradient for procedural visual
   exhibitId?: string;
   featured?: boolean;
+  imageUrl?: string; // Optional actual image URL
 }
 
 function grad(a: string, b: string) {
@@ -32,6 +33,7 @@ export const HISTORICAL_IMAGES: HistoricalImage[] = [
     gradient: grad("#3a2410", "#1a0f0a"),
     exhibitId: "watt-steam",
     featured: true,
+    imageUrl: "/images/museum/watt-steam.jpg",
   },
   {
     id: "h1-2",
@@ -42,6 +44,7 @@ export const HISTORICAL_IMAGES: HistoricalImage[] = [
     motif: "loom",
     gradient: grad("#4a2f18", "#241409"),
     exhibitId: "spinning-jenny",
+    imageUrl: "/images/museum/spinning-jenny.jpg",
   },
   {
     id: "h1-3",
@@ -52,6 +55,7 @@ export const HISTORICAL_IMAGES: HistoricalImage[] = [
     motif: "cotton-gin",
     gradient: grad("#43261a", "#1d0f08"),
     exhibitId: "cotton-gin",
+    imageUrl: "/images/museum/cotton-gin.jpg",
   },
   {
     id: "h1-4",
@@ -62,6 +66,7 @@ export const HISTORICAL_IMAGES: HistoricalImage[] = [
     motif: "puddling",
     gradient: grad("#5a2a10", "#240f05"),
     exhibitId: "puddling-furnace",
+    imageUrl: "/images/museum/puddling-furnace.jpg",
   },
   {
     id: "h1-5",
@@ -72,6 +77,18 @@ export const HISTORICAL_IMAGES: HistoricalImage[] = [
     motif: "locomotive",
     gradient: grad("#3e2410", "#1a0f0a"),
     exhibitId: "rocket-locomotive",
+    imageUrl: "/images/museum/rocket-locomotive.jpg",
+  },
+  {
+    id: "h1-5b",
+    phase: "industry-1",
+    caption: "Khung cửi Jacquard tại Bảo tàng Khoa học.",
+    source: "Bảo tàng Khoa học London",
+    year: "1804",
+    motif: "loom",
+    gradient: grad("#3a2410", "#1a0f0a"),
+    exhibitId: "jacquard-loom",
+    imageUrl: "/images/museum/jacquard-loom.jpg",
   },
   {
     id: "h1-6",
@@ -82,6 +99,7 @@ export const HISTORICAL_IMAGES: HistoricalImage[] = [
     motif: "gas-lamp",
     gradient: grad("#5a3a14", "#241409"),
     exhibitId: "gas-lamp",
+    imageUrl: "/images/museum/gas-lamp.jpg",
   },
   {
     id: "h1-7",
@@ -92,6 +110,7 @@ export const HISTORICAL_IMAGES: HistoricalImage[] = [
     motif: "thames-shield",
     gradient: grad("#2a1f14", "#140c06"),
     exhibitId: "thames-tunnel",
+    imageUrl: "/images/museum/thames-tunnel.jpg",
   },
 
   // Industry 2.0 (7)
@@ -105,6 +124,7 @@ export const HISTORICAL_IMAGES: HistoricalImage[] = [
     gradient: grad("#5a4216", "#241a08"),
     exhibitId: "light-bulb",
     featured: true,
+    imageUrl: "/images/museum/edison_bulb_1879.jpg",
   },
   {
     id: "h2-2",
@@ -115,6 +135,7 @@ export const HISTORICAL_IMAGES: HistoricalImage[] = [
     motif: "dynamo",
     gradient: grad("#4a3a14", "#221a08"),
     exhibitId: "dynamo",
+    imageUrl: "/images/museum/siemens_dynamo_1866.jpg",
   },
   {
     id: "h2-3",
@@ -125,6 +146,7 @@ export const HISTORICAL_IMAGES: HistoricalImage[] = [
     motif: "assembly",
     gradient: grad("#4a3410", "#221608"),
     exhibitId: "model-t",
+    imageUrl: "/images/museum/ford_model_t_1908.jpg",
   },
   {
     id: "h2-4",
@@ -134,6 +156,7 @@ export const HISTORICAL_IMAGES: HistoricalImage[] = [
     year: "1876",
     motif: "otto",
     gradient: grad("#3a2810", "#1c1408"),
+    imageUrl: "/images/museum/otto_engine_1876.jpg",
     exhibitId: "otto-engine",
   },
   {
@@ -145,6 +168,18 @@ export const HISTORICAL_IMAGES: HistoricalImage[] = [
     motif: "marconi",
     gradient: grad("#3a3214", "#1c1808"),
     exhibitId: "marconi-radio",
+    imageUrl: "/images/museum/marconi_radio_1895.jpg",
+  },
+  {
+    id: "h2-5b",
+    phase: "industry-2",
+    caption: "Đồng hồ điện hóa học Edison, 1881.",
+    source: "Bảo tàng Quốc gia Lịch sử Mỹ",
+    year: "1881",
+    motif: "edison-meter",
+    gradient: grad("#4a3a14", "#221608"),
+    exhibitId: "edison-meter",
+    imageUrl: "/images/museum/edison_meter_1881.jpg",
   },
   {
     id: "h2-6",
@@ -155,6 +190,7 @@ export const HISTORICAL_IMAGES: HistoricalImage[] = [
     motif: "marconi",
     gradient: grad("#2a2a1a", "#141410"),
     exhibitId: "telstar",
+    imageUrl: "/images/museum/telstar_1962.jpg",
   },
   {
     id: "h2-7",
@@ -165,6 +201,7 @@ export const HISTORICAL_IMAGES: HistoricalImage[] = [
     motif: "transformer",
     gradient: grad("#4a3a14", "#221808"),
     exhibitId: "ac-transformer",
+    imageUrl: "/images/museum/ac_transformer_1885.jpg",
   },
 
   // Industry 3.0 (7)
@@ -178,6 +215,7 @@ export const HISTORICAL_IMAGES: HistoricalImage[] = [
     gradient: grad("#143a24", "#08180f"),
     exhibitId: "intel-4004",
     featured: true,
+    imageUrl: "/images/museum/intel-4004.jpg",
   },
   {
     id: "h3-2",
@@ -188,6 +226,7 @@ export const HISTORICAL_IMAGES: HistoricalImage[] = [
     motif: "network",
     gradient: grad("#103a2a", "#081812"),
     exhibitId: "arpanet",
+    imageUrl: "/images/museum/arpanet.png",
   },
   {
     id: "h3-3",
@@ -198,6 +237,7 @@ export const HISTORICAL_IMAGES: HistoricalImage[] = [
     motif: "www",
     gradient: grad("#103c2a", "#081812"),
     exhibitId: "www",
+    imageUrl: "/images/museum/www.png",
   },
   {
     id: "h3-4",
@@ -208,6 +248,7 @@ export const HISTORICAL_IMAGES: HistoricalImage[] = [
     motif: "upc",
     gradient: grad("#143a30", "#081a14"),
     exhibitId: "bar-code",
+    imageUrl: "/images/museum/bar-code.png",
   },
   {
     id: "h3-5",
@@ -218,6 +259,7 @@ export const HISTORICAL_IMAGES: HistoricalImage[] = [
     motif: "gps",
     gradient: grad("#10382a", "#081a14"),
     exhibitId: "gps",
+    imageUrl: "/images/museum/gps.jpg",
   },
   {
     id: "h3-6",
@@ -228,6 +270,7 @@ export const HISTORICAL_IMAGES: HistoricalImage[] = [
     motif: "phone",
     gradient: grad("#143a2a", "#08180f"),
     exhibitId: "cell-phone",
+    imageUrl: "/images/museum/cell-phone.jpg",
   },
   {
     id: "h3-7",
@@ -238,6 +281,18 @@ export const HISTORICAL_IMAGES: HistoricalImage[] = [
     motif: "monitor",
     gradient: grad("#143c2a", "#081a12"),
     exhibitId: "pc-monitor",
+    imageUrl: "/images/museum/pc-monitor.png",
+  },
+  {
+    id: "h3-8",
+    phase: "industry-3",
+    caption: "Mạng cáp Ethernet đầu tiên.",
+    source: "Xerox PARC",
+    year: "1973",
+    motif: "network",
+    gradient: grad("#143c2a", "#081a12"),
+    exhibitId: "ethernet",
+    imageUrl: "/images/museum/ethernet.png",
   },
 
   // Industry 4.0 (7)
@@ -251,6 +306,7 @@ export const HISTORICAL_IMAGES: HistoricalImage[] = [
     gradient: grad("#3a143a", "#180818"),
     exhibitId: "neural-net",
     featured: true,
+    imageUrl: "/images/museum/neural-net.jpg",
   },
   {
     id: "h4-2",
@@ -261,6 +317,7 @@ export const HISTORICAL_IMAGES: HistoricalImage[] = [
     motif: "printer",
     gradient: grad("#3a143a", "#180818"),
     exhibitId: "3d-printer",
+    imageUrl: "/images/museum/3d-printer.jpg",
   },
   {
     id: "h4-3",
@@ -271,6 +328,7 @@ export const HISTORICAL_IMAGES: HistoricalImage[] = [
     motif: "car",
     gradient: grad("#3a1a3a", "#180a18"),
     exhibitId: "tesla-autopilot",
+    imageUrl: "/images/museum/tesla-autopilot.jpg",
   },
   {
     id: "h4-4",
@@ -281,6 +339,7 @@ export const HISTORICAL_IMAGES: HistoricalImage[] = [
     motif: "cloud",
     gradient: grad("#3a143a", "#180818"),
     exhibitId: "cloud-aws",
+    imageUrl: "/images/museum/cloud-aws.png",
   },
   {
     id: "h4-5",
@@ -291,6 +350,7 @@ export const HISTORICAL_IMAGES: HistoricalImage[] = [
     motif: "smartphone",
     gradient: grad("#3a1a3a", "#180a18"),
     exhibitId: "smartphone",
+    imageUrl: "/images/museum/smartphone.png",
   },
   {
     id: "h4-6",
@@ -301,6 +361,7 @@ export const HISTORICAL_IMAGES: HistoricalImage[] = [
     motif: "rocket",
     gradient: grad("#3a1a3a", "#180a18"),
     exhibitId: "falcon-9",
+    imageUrl: "/images/museum/falcon-9.png",
   },
   {
     id: "h4-7",
@@ -311,6 +372,18 @@ export const HISTORICAL_IMAGES: HistoricalImage[] = [
     motif: "robot",
     gradient: grad("#3a143a", "#180818"),
     exhibitId: "humanoid-robot",
+    imageUrl: "/images/museum/humanoid-robot.jpg",
+  },
+  {
+    id: "h4-8",
+    phase: "industry-4",
+    caption: "Mô hình kiến trúc Transformer từ bài báo gốc.",
+    source: "Google Research",
+    year: "2017",
+    motif: "transformer",
+    gradient: grad("#3a143a", "#180818"),
+    exhibitId: "transformer-arch",
+    imageUrl: "/images/museum/transformer-arch.jpg",
   },
 ];
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useRef } from "react";
 import {
   Dialog,
   DialogContent,
@@ -9,160 +9,111 @@ import {
 } from "@/components/ui/dialog";
 import { Slider } from "@/components/ui/slider";
 import { Checkbox } from "@/components/ui/checkbox";
-import { FlaskConical, ExternalLink, ArrowLeft, RotateCcw, Info } from "lucide-react";
+import {
+  FlaskConical,
+  ExternalLink,
+  ArrowLeft,
+  RotateCcw,
+  Info,
+} from "lucide-react";
 import { Canvas } from "@react-three/fiber";
 import {
   OrbitControls,
   ContactShadows,
   Environment,
   Sparkles,
-  Float,
 } from "@react-three/drei";
 import * as THREE from "three";
 import { useMuseum } from "@/lib/store";
 import { usePrefersReducedMotion } from "@/hooks/museum/use-prefers-reduced-motion";
-import {
-  ExplodedSteamEngine,
-  STEAM_PARTS,
-  type SteamPartId,
-} from "@/components/museum/3d/SceneLabModels";
+import { useEngineStore } from "@/components/steam-engine/useEngineStore";
+import { EngineModel } from "@/components/steam-engine/EngineModel";
+import { PARTS } from "@/components/steam-engine/parts-data";
 
 const ACCENT = "#e89446";
 
-/* ---------- 3D stage (Canvas + lights + pedestal) ---------- */
+/* ------------------------------------------------------------------ */
+/*  SCENE LAB PARTS LIST                                               */
+/*  Mapped to ExplodeGroup IDs in EngineModel + PARTS in parts-data   */
+/* ------------------------------------------------------------------ */
+const SCENE_LAB_PARTS = PARTS.filter((p) =>
+  ["boiler", "steam-pipe", "cylinder", "beam", "conrod", "flywheel", "condenser", "governor"].includes(p.id)
+);
 
-function Pedestal() {
-  return (
-    <group position={[0, -1.05, 0]}>
-      <mesh receiveShadow>
-        <cylinderGeometry args={[1.1, 1.1, 0.08, 48]} />
-        <meshStandardMaterial color="#2a1c10" metalness={0.4} roughness={0.6} />
-      </mesh>
-      <mesh position={[0, -0.12, 0]}>
-        <cylinderGeometry args={[1.25, 1.35, 0.18, 48]} />
-        <meshStandardMaterial color="#1f1408" metalness={0.3} roughness={0.7} />
-      </mesh>
-      <mesh position={[0, -0.28, 0]}>
-        <cylinderGeometry args={[1.4, 1.45, 0.16, 48]} />
-        <meshStandardMaterial color="#170e06" metalness={0.2} roughness={0.8} />
-      </mesh>
-      <mesh position={[0, 0.05, 0]} rotation={[Math.PI / 2, 0, 0]}>
-        <ringGeometry args={[1.0, 1.12, 64]} />
-        <meshStandardMaterial
-          color={ACCENT}
-          emissive={ACCENT}
-          emissiveIntensity={1.2}
-          side={THREE.DoubleSide}
-          transparent
-          opacity={0.8}
-        />
-      </mesh>
-      <mesh position={[0, 0.05, 0]} rotation={[Math.PI / 2, 0, 0]}>
-        <ringGeometry args={[1.18, 1.24, 64]} />
-        <meshStandardMaterial
-          color={ACCENT}
-          emissive={ACCENT}
-          emissiveIntensity={0.6}
-          side={THREE.DoubleSide}
-          transparent
-          opacity={0.4}
-        />
-      </mesh>
-    </group>
-  );
-}
-
-function SpotlightCone() {
-  return (
-    <mesh position={[0, 3.2, 0]} rotation={[Math.PI, 0, 0]}>
-      <coneGeometry args={[2.0, 4.2, 32, 1, true]} />
-      <meshBasicMaterial
-        color={ACCENT}
-        transparent
-        opacity={0.06}
-        side={THREE.DoubleSide}
-        depthWrite={false}
-      />
-    </mesh>
-  );
-}
-
-function SceneLabCanvas({
-  explode,
-  highlightedPart,
-}: {
-  explode: number;
-  highlightedPart: SteamPartId | null;
-}) {
-  const reduced = usePrefersReducedMotion();
+/* ------------------------------------------------------------------ */
+/*  3-D CANVAS                                                         */
+/* ------------------------------------------------------------------ */
+function SceneLabCanvas3D({ reduced }: { reduced: boolean }) {
   return (
     <Canvas
       shadows
       dpr={[1, 1.8]}
-      camera={{ position: [0, 0.8, 6.2], fov: 42 }}
-      gl={{ antialias: true, alpha: true }}
+      camera={{ position: [6, 3.5, 9], fov: 42, near: 0.1, far: 120 }}
+      gl={{
+        antialias: true,
+        alpha: true,
+        toneMapping: THREE.ACESFilmicToneMapping,
+        toneMappingExposure: 1.3,
+      }}
     >
       <Suspense fallback={null}>
-        <ambientLight intensity={0.55} />
-        <hemisphereLight args={["#fff5d8", "#3a2410", 0.4]} />
-        <spotLight
-          position={[0, 6, 2]}
-          angle={0.5}
-          penumbra={0.8}
-          intensity={5}
-          color="#fff5d8"
+        {/* Lighting — matching the real SteamCanvas "day" preset */}
+        <color attach="background" args={["#0d0907"]} />
+        <hemisphereLight args={["#ffe9c4", "#3a2818", 0.7]} />
+        <ambientLight intensity={0.3} />
+        <directionalLight
+          position={[-6, 9, 5]}
+          intensity={3.0}
+          color="#ffd9a0"
           castShadow
           shadow-mapSize={[1024, 1024]}
-        />
-        <pointLight position={[-3, 1.5, -2]} intensity={1.2} color={ACCENT} />
-        <pointLight position={[3, -0.5, 2]} intensity={0.8} color="#ffcf80" />
-        <pointLight position={[0, 1, 4]} intensity={0.6} color="#fff5e0" />
-        <directionalLight position={[2, 4, 3]} intensity={0.6} color="#ffe9c0" />
-
-        <SpotlightCone />
-
-        <Float
-          speed={reduced ? 0 : 1.2}
-          rotationIntensity={reduced ? 0 : 0.18}
-          floatIntensity={reduced ? 0 : 0.4}
-          floatingRange={reduced ? [0, 0] : [-0.06, 0.06]}
+          shadow-bias={-0.0004}
         >
-          <ExplodedSteamEngine explode={explode} highlightedPart={highlightedPart} />
-        </Float>
+          <orthographicCamera attach="shadow-camera" args={[-14, 14, 14, -14, 0.1, 40]} />
+        </directionalLight>
+        <directionalLight position={[7, 4, 6]} intensity={1.2} color="#b9d4ff" />
+        <pointLight position={[0, 5, -5]} intensity={1.8} color="#ff8a3a" distance={22} />
+        {/* Boiler fire glow */}
+        <pointLight position={[-5.6, 1.2, 0.6]} intensity={1.6} color="#ff6a1a" distance={7} decay={1.5} />
+        {/* Cylinder warm glow */}
+        <pointLight position={[-2.4, 2.6, 0.9]} intensity={0.5} color="#ffb24a" distance={5} decay={1.8} />
 
-        <Pedestal />
+        {/* The real EngineModel — isSimMaster=false so physics tick runs only once */}
+        <EngineModel isSimMaster={false} />
 
         <ContactShadows
-          position={[0, -1.06, 0]}
-          opacity={0.55}
-          scale={7}
-          blur={2.4}
-          far={4}
-          color="#000"
+          position={[0, 0.015, 0]}
+          scale={20}
+          far={7}
+          blur={2.6}
+          opacity={0.5}
+          color="#000000"
+          resolution={512}
         />
 
         {!reduced && (
           <Sparkles
-            count={48}
-            scale={[6, 5, 6]}
+            count={36}
+            scale={[10, 7, 10]}
             size={2}
-            speed={0.3}
-            opacity={0.5}
+            speed={0.25}
+            opacity={0.35}
             color={ACCENT}
           />
         )}
 
-        <Environment preset="sunset" environmentIntensity={0.25} />
+        <Environment preset="sunset" environmentIntensity={0.2} />
 
         <OrbitControls
           enablePan={false}
           enableZoom
-          minDistance={3.2}
-          maxDistance={9}
-          minPolarAngle={Math.PI / 5}
-          maxPolarAngle={Math.PI / 1.9}
+          minDistance={3}
+          maxDistance={20}
+          minPolarAngle={0.15}
+          maxPolarAngle={Math.PI / 1.85}
           autoRotate={!reduced}
-          autoRotateSpeed={0.4}
+          autoRotateSpeed={0.35}
+          target={[0.3, 2.4, 0]}
           makeDefault
         />
       </Suspense>
@@ -170,21 +121,30 @@ function SceneLabCanvas({
   );
 }
 
-/* ---------- Checklist row ---------- */
-
+/* ------------------------------------------------------------------ */
+/*  CHECKLIST ROW                                                       */
+/* ------------------------------------------------------------------ */
 function PartRow({
   part,
   checked,
   onToggle,
 }: {
-  part: (typeof STEAM_PARTS)[number];
+  part: (typeof SCENE_LAB_PARTS)[number];
   checked: boolean;
   onToggle: () => void;
 }) {
   return (
-    <button
+    <div
       onClick={onToggle}
-      className="group flex w-full items-center gap-3 rounded-lg border border-foreground/8 bg-foreground/[0.02] p-3 text-left transition hover:border-foreground/20 hover:bg-foreground/[0.04]"
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onToggle();
+        }
+      }}
+      role="button"
+      tabIndex={0}
+      className="group flex w-full cursor-pointer items-center gap-3 rounded-lg border border-foreground/8 bg-foreground/[0.02] p-3 text-left transition hover:border-foreground/20 hover:bg-foreground/[0.04]"
       style={checked ? { borderColor: `${ACCENT}66`, background: `${ACCENT}12` } : undefined}
     >
       <Checkbox
@@ -198,46 +158,62 @@ function PartRow({
         <div className="flex items-center gap-2">
           <span
             className="h-1.5 w-1.5 shrink-0 rounded-full"
-            style={{ background: ACCENT, opacity: checked ? 1 : 0.4 }}
+            style={{ background: part.accent, opacity: checked ? 1 : 0.4 }}
           />
           <span
             className="truncate text-sm font-medium"
             style={{ color: checked ? ACCENT : "oklch(0.5 0.02 60 / 0.9)" }}
           >
-            {part.label}
+            {part.name}
           </span>
         </div>
-        <p className="mt-1 text-xs leading-relaxed text-foreground/55">{part.desc}</p>
+        <p className="mt-1 text-xs leading-relaxed text-foreground/55">{part.short}</p>
       </div>
-    </button>
+    </div>
   );
 }
 
-/* ---------- Main modal ---------- */
-
-export function SceneLabModal() {
+/* ------------------------------------------------------------------ */
+/* ------------------------------------------------------------------ */
+/*  WATT MODAL                                                          */
+/* ------------------------------------------------------------------ */
+export function SceneLabModalWatt() {
   const open = useMuseum((s) => s.sceneLabOpen);
   const setOpen = useMuseum((s) => s.setSceneLabOpen);
   const openExhibit = useMuseum((s) => s.openExhibit);
   const setStage = useMuseum((s) => s.setStage);
+  const reduced = usePrefersReducedMotion();
 
-  const [explode, setExplode] = useState(0);
-  const [highlightedPart, setHighlightedPart] = useState<SteamPartId | null>(null);
+  // Engine store — we drive explodedAmount and highlightPart directly
+  const explodedAmount = useEngineStore((s) => s.explodedAmount);
+  const setExplodedAmount = useEngineStore((s) => s.setExplodedAmount);
+  const highlightPart = useEngineStore((s) => s.highlightPart);
+  const setHighlightPart = useEngineStore((s) => s.setHighlightPart);
+  const setShowLabels = useEngineStore((s) => s.setShowLabels);
+
+  // Keep store showing labels while Scene Lab is open
+  const prevLabelsRef = useRef<"off" | "compact" | "full">("compact");
+  useEffect(() => {
+    if (open) {
+      prevLabelsRef.current = useEngineStore.getState().showLabels;
+      setShowLabels("compact");
+    } else {
+      setShowLabels(prevLabelsRef.current);
+    }
+  }, [open, setShowLabels]);
 
   const handleClose = () => {
     setOpen(false);
-    // reset state after exit animation
+    // Reset Scene Lab state on close
     window.setTimeout(() => {
-      setExplode(0);
-      setHighlightedPart(null);
+      useEngineStore.setState({ explodedAmount: 0, manualExplode: false, highlightPart: null });
     }, 250);
   };
 
   const openFullExhibit = () => {
     setOpen(false);
     window.setTimeout(() => {
-      setExplode(0);
-      setHighlightedPart(null);
+      useEngineStore.setState({ explodedAmount: 0, manualExplode: false, highlightPart: null });
       openExhibit("watt-steam");
     }, 200);
   };
@@ -245,24 +221,21 @@ export function SceneLabModal() {
   const backToRoom = () => {
     setOpen(false);
     window.setTimeout(() => {
-      setExplode(0);
-      setHighlightedPart(null);
+      useEngineStore.setState({ explodedAmount: 0, manualExplode: false, highlightPart: null });
       setStage("room");
     }, 200);
   };
 
   const resetAll = () => {
-    setExplode(0);
-    setHighlightedPart(null);
+    useEngineStore.setState({ explodedAmount: 0, manualExplode: false, highlightPart: null });
   };
 
   const subtitle =
-    explode > 0.3
+    explodedAmount > 0.3
       ? "Kéo thanh trượt để tháo rời các bộ phận"
       : "Nhấp vào mô hình 3D để xem câu chuyện đầy đủ";
 
   return (
-    <Dialog open={open} onOpenChange={(o) => !o && handleClose()}>
       <DialogContent className="!max-w-7xl gap-0 overflow-hidden rounded-2xl border-foreground/15 bg-card p-0 sm:max-w-7xl">
         <DialogTitle className="sr-only">3D Scene Lab · Động cơ hơi nước Watt</DialogTitle>
         <AnimatePresence>
@@ -271,7 +244,7 @@ export function SceneLabModal() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="grid max-h-[92vh] grid-cols-1 overflow-y-auto elegant-scroll lg:grid-cols-[1.4fr_1fr] lg:overflow-hidden"
+              className="grid max-h-[92vh] grid-cols-1 overflow-y-auto elegant-scroll lg:grid-cols-[1.8fr_1fr] lg:overflow-hidden"
             >
               {/* LEFT: 3D canvas */}
               <div className="relative border-b border-foreground/10 lg:border-b-0 lg:border-r">
@@ -279,16 +252,17 @@ export function SceneLabModal() {
                   className="relative h-[55vh] w-full lg:h-[88vh]"
                   aria-label="Phòng thí nghiệm 3D động cơ hơi nước Watt"
                 >
+                  {/* Dark background gradient */}
                   <div
                     className="absolute inset-0"
                     style={{
                       background:
-                        "radial-gradient(ellipse 90% 60% at 50% 28%, " +
+                        "radial-gradient(ellipse 80% 55% at 50% 25%, " +
                         ACCENT +
-                        "22 0%, transparent 55%), linear-gradient(180deg, #1a0f08 0%, #100804 100%)",
+                        "18 0%, transparent 55%), linear-gradient(180deg, #100a06 0%, #0a0603 100%)",
                     }}
                   />
-                  <SceneLabCanvas explode={explode} highlightedPart={highlightedPart} />
+                  <SceneLabCanvas3D reduced={reduced} />
                   <div className="pointer-events-none absolute inset-0 vignette-overlay" />
                   {/* top-left badge */}
                   <div className="pointer-events-none absolute left-4 top-4 flex items-center gap-2 rounded-full border border-amber-300/30 bg-black/55 px-3 py-1.5 backdrop-blur-md">
@@ -327,22 +301,22 @@ export function SceneLabModal() {
                   </button>
                 </div>
 
-                {/* slider */}
+                {/* explode slider */}
                 <div className="mt-6 rounded-xl border border-foreground/10 bg-foreground/[0.02] p-4">
                   <div className="mb-3 flex items-center justify-between text-xs">
                     <span className="uppercase tracking-[0.18em] text-foreground/50">
-                      Trạng thái lắp ráp
+                      Trạng thái tháo rời
                     </span>
                     <span
                       className="font-serif text-base font-bold"
                       style={{ color: ACCENT }}
                     >
-                      {Math.round(explode * 100)}%
+                      {Math.round(explodedAmount * 100)}%
                     </span>
                   </div>
                   <Slider
-                    value={[explode * 100]}
-                    onValueChange={(v) => setExplode(v[0] / 100)}
+                    value={[explodedAmount * 100]}
+                    onValueChange={(v) => setExplodedAmount(v[0] / 100)}
                     min={0}
                     max={100}
                     step={1}
@@ -362,23 +336,23 @@ export function SceneLabModal() {
                   <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" style={{ color: ACCENT }} />
                   <span>
                     Tích chọn một bộ phận để làm nổi bật — các bộ phận khác sẽ mờ đi.
-                    Kéo thanh trượt qua 30% để hiện nhãn tên từng phần.
+                    Kéo thanh trượt qua 30% để tháo rời các cụm bộ phận.
                   </span>
                 </div>
 
                 {/* parts checklist */}
                 <div className="mt-5">
                   <div className="mb-2 text-[0.62rem] uppercase tracking-[0.22em] text-foreground/50">
-                    Bộ phận ({STEAM_PARTS.length})
+                    Bộ phận ({SCENE_LAB_PARTS.length})
                   </div>
                   <div className="grid max-h-[42vh] grid-cols-1 gap-2 overflow-y-auto elegant-scroll pr-1 sm:grid-cols-2 lg:max-h-[40vh]">
-                    {STEAM_PARTS.map((p) => (
+                    {SCENE_LAB_PARTS.map((p) => (
                       <PartRow
                         key={p.id}
                         part={p}
-                        checked={highlightedPart === p.id}
+                        checked={highlightPart === p.id}
                         onToggle={() =>
-                          setHighlightedPart((cur) => (cur === p.id ? null : p.id))
+                          setHighlightPart(highlightPart === p.id ? null : p.id)
                         }
                       />
                     ))}
@@ -408,6 +382,31 @@ export function SceneLabModal() {
           )}
         </AnimatePresence>
       </DialogContent>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  MAIN WRAPPER                                                        */
+/* ------------------------------------------------------------------ */
+import { SceneLabModalOtto } from "./SceneLabModalOtto";
+import { SceneLabModalDynamo } from "./SceneLabModalDynamo";
+import { SceneLabModalPC } from "./SceneLabModalPC";
+
+export function SceneLabModal() {
+  const open = useMuseum((s) => s.sceneLabOpen);
+  const sceneLabExhibitId = useMuseum((s) => s.sceneLabExhibitId);
+  const setOpen = useMuseum((s) => s.setSceneLabOpen);
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={(o) => !o && handleClose()}>
+      {sceneLabExhibitId === "watt-steam" && <SceneLabModalWatt />}
+      {sceneLabExhibitId === "otto-engine" && <SceneLabModalOtto />}
+      {sceneLabExhibitId === "dynamo" && <SceneLabModalDynamo />}
+      {sceneLabExhibitId === "pc-monitor" && <SceneLabModalPC />}
     </Dialog>
   );
 }
