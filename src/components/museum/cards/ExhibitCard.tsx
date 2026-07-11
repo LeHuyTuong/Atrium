@@ -5,6 +5,7 @@ import { Check, Bookmark } from "lucide-react";
 import { Exhibit, phaseById } from "@/lib/museum-data";
 import { useMuseum } from "@/lib/store";
 import { MotifIcon } from "./MotifIcon";
+import { imageForExhibit } from "@/lib/historical-images";
 
 export function ExhibitCard({ exhibit, index }: { exhibit: Exhibit; index: number }) {
   const phase = phaseById(exhibit.phase)!;
@@ -12,6 +13,7 @@ export function ExhibitCard({ exhibit, index }: { exhibit: Exhibit; index: numbe
   const seen = useMuseum((s) => s.seenExhibits.includes(exhibit.id));
   const bookmarked = useMuseum((s) => s.bookmarks.includes(exhibit.id));
   const toggleBookmark = useMuseum((s) => s.toggleBookmark);
+  const img = imageForExhibit(exhibit.id);
 
   return (
     <motion.div
@@ -32,18 +34,27 @@ export function ExhibitCard({ exhibit, index }: { exhibit: Exhibit; index: numbe
       {/* visual preview */}
       <div
         className="relative flex h-32 items-center justify-center overflow-hidden sm:h-36"
-        style={{
+        style={img?.imageUrl ? {
+          backgroundImage: `url(${img.imageUrl})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        } : {
           background: `radial-gradient(ellipse 80% 70% at 50% 35%, ${phase.accent}22 0%, transparent 60%), linear-gradient(160deg, ${phase.accent}10 0%, #150c06 75%)`,
         }}
       >
-        <div className="absolute right-3 top-3 text-[0.55rem] uppercase tracking-[0.2em] text-foreground/40">
+        {img?.imageUrl && (
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent transition-opacity group-hover:opacity-70" />
+        )}
+        <div className="absolute right-3 top-3 text-[0.55rem] uppercase tracking-[0.2em] text-foreground/40 z-10">
           {exhibit.year}
         </div>
-        <MotifIcon
-          motif={exhibit.motif}
-          className="h-12 w-12 transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-3"
-          strokeWidth={1.2}
-        />
+        {!img?.imageUrl && (
+          <MotifIcon
+            motif={exhibit.motif}
+            className="h-12 w-12 transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-3"
+            strokeWidth={1.2}
+          />
+        )}
         <div
           className="absolute inset-x-0 bottom-0 h-16 opacity-50"
           style={{ background: `linear-gradient(180deg, transparent, ${phase.accent}10)` }}

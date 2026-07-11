@@ -37,6 +37,7 @@ import { audio as audioEngine } from "@/lib/audio";
 import { MotifIcon } from "@/components/museum/cards/MotifIcon";
 import { imageForExhibit, gradientForExhibit } from "@/lib/historical-images";
 import { PhasePill } from "@/components/museum/layout/brand";
+import SceneLoader from "@/components/pc-monitor/SceneLoader";
 
 const Artifact3DStage = dynamic(
   () => import("@/components/museum/3d/Artifact3DStage").then((m) => m.Artifact3DStage),
@@ -63,9 +64,6 @@ export function ExhibitModal() {
   const exhibit = openExhibitId ? exhibitById(openExhibitId) : undefined;
   const open = !!exhibit;
 
-  // Soft chime whenever a new exhibit opens (mount of ExhibitModalBody,
-  // which is keyed by exhibit.id so it remounts on prev/next navigation).
-  // Also plays the close thunk when the modal closes.
   const handleClose = () => {
     if (!audioEngine.muted) audioEngine.playClose();
     closeExhibit();
@@ -157,7 +155,7 @@ function ExhibitModalBody({
   const setSceneLabOpen = useMuseum((s) => s.setSceneLabOpen);
   const openSceneLab = () => {
     onClose();
-    setSceneLabOpen(true);
+    setSceneLabOpen(true, exhibitId);
   };
 
   const [narrating, setNarrating] = useState(false);
@@ -178,7 +176,7 @@ function ExhibitModalBody({
     }
     setAudio(null);
     setNarrating(false);
-  }, [exhibitId, audio]);
+  }, [exhibitId]);
 
   const toggleNarrate = async () => {
     if (narrating && audio) {
@@ -239,8 +237,8 @@ function ExhibitModalBody({
             onClick={toggleNarrate}
             className="absolute right-5 top-5 z-10 inline-flex items-center gap-2 rounded-full border bg-card/85 px-3 py-1.5 text-[0.7rem] font-medium backdrop-blur-md transition hover:bg-card"
             style={{
-              borderColor: narrating ? phase.accent : "oklch(0.5 0.02 60 / 0.22)",
-              color: narrating ? phase.accent : "oklch(0.5 0.02 60 / 0.88)",
+              borderColor: narrating ? phase.accent : "rgba(255,255,255,0.15)",
+              color: narrating ? phase.accent : "rgba(255,255,255,0.8)",
             }}
           >
             {narrLoading ? (
@@ -276,24 +274,73 @@ function ExhibitModalBody({
           <div className="px-4 pb-4 sm:px-5 sm:pb-5">
             <div
               className="relative flex h-28 items-end overflow-hidden rounded-lg border border-foreground/10 sm:h-32"
-              style={{ background: img.gradient }}
+              style={img.imageUrl ? { backgroundImage: `url(${img.imageUrl})`, backgroundSize: 'cover', backgroundPosition: 'center' } : { background: img.gradient }}
             >
-              <div className="absolute inset-0 grain opacity-[0.08] mix-blend-overlay" />
-              <MotifIcon motif={exhibit.motif} className="absolute right-3 top-3 h-8 w-8 text-foreground/20" strokeWidth={1} />
+              {!img.imageUrl && <div className="absolute inset-0 grain opacity-[0.08] mix-blend-overlay" />}
+              {img.imageUrl && <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />}
+              {!img.imageUrl && <MotifIcon motif={exhibit.motif} className="absolute right-3 top-3 h-8 w-8 text-foreground/20" strokeWidth={1} />}
               <div className="relative p-3">
-                <div className="text-[0.55rem] uppercase tracking-[0.18em] text-foreground/55">
+                <div className="text-[0.55rem] uppercase tracking-[0.18em] text-white/60">
                   Ảnh lịch sử · {img.year}
                 </div>
-                <div className="mt-0.5 text-xs font-medium text-foreground/85">
+                <div className="mt-0.5 text-xs font-medium text-white/85">
                   {img.caption}
                 </div>
-                <div className="mt-0.5 text-[0.6rem] italic text-foreground/45">
+                <div className="mt-0.5 text-[0.6rem] italic text-white/50">
                   Nguồn: {img.source}
                 </div>
               </div>
             </div>
           </div>
         )}
+
+        <div className="px-4 pb-4 sm:px-5 sm:pb-5 pt-0">
+          {/* connections */}
+          {connections.length > 0 && (
+            <div className="mt-0">
+              <div className="mb-2 text-[0.65rem] uppercase tracking-[0.18em] text-foreground/50">
+                Mạch liên kết ({connections.length})
+              </div>
+              <div className="flex flex-wrap gap-1.5">
+                {connections.map((c) => (
+                  <span
+                    key={c.id}
+                    className="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[0.65rem]"
+                    style={{ borderColor: `${c.color}44`, color: c.color, background: `${c.color}10` }}
+                  >
+                    <span className="h-1.5 w-1.5 rounded-full" style={{ background: c.color }} />
+                    {c.name}
+                  </span>
+                ))}
+              </div>
+              <button
+                onClick={onExploreConnections}
+                className="mt-2 inline-flex items-center gap-1 text-xs text-foreground/55 transition hover:text-foreground"
+              >
+                Khám phá mạng lưới <ArrowRight className="h-3 w-3" />
+              </button>
+            </div>
+          )}
+
+          {/* Scene Lab entry */}
+          {(exhibitId === "watt-steam" || exhibitId === "otto-engine" || exhibitId === "dynamo" || exhibitId === "pc-monitor") && (
+            <button
+              onClick={openSceneLab}
+              className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full border px-4 py-2.5 text-xs font-medium transition hover:gap-2.5"
+              style={{
+                borderColor: `${phase.accent}55`,
+                color: phase.accent,
+                background: `${phase.accent}10`,
+              }}
+            >
+              <FlaskConical className="h-3.5 w-3.5" />
+              Mở trong Scene Lab
+              <span className="ml-1 text-[0.6rem] uppercase tracking-[0.15em] opacity-70">
+                3D · Tháo rời bộ phận
+              </span>
+            </button>
+          )}
+        </div>
       </div>
 
       {/* RIGHT: narrative */}
@@ -350,52 +397,6 @@ function ExhibitModalBody({
           </p>
         </div>
 
-        {/* connections */}
-        {connections.length > 0 && (
-          <div className="mt-5">
-            <div className="mb-2 text-[0.65rem] uppercase tracking-[0.18em] text-foreground/50">
-              Mạch liên kết ({connections.length})
-            </div>
-            <div className="flex flex-wrap gap-1.5">
-              {connections.map((c) => (
-                <span
-                  key={c.id}
-                  className="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[0.65rem]"
-                  style={{ borderColor: `${c.color}44`, color: c.color, background: `${c.color}10` }}
-                >
-                  <span className="h-1.5 w-1.5 rounded-full" style={{ background: c.color }} />
-                  {c.name}
-                </span>
-              ))}
-            </div>
-            <button
-              onClick={onExploreConnections}
-              className="mt-2 inline-flex items-center gap-1 text-xs text-foreground/55 transition hover:text-foreground"
-            >
-              Khám phá mạng lưới <ArrowRight className="h-3 w-3" />
-            </button>
-          </div>
-        )}
-
-        {/* Scene Lab entry (watt-steam only) */}
-        {exhibitId === "watt-steam" && (
-          <button
-            onClick={openSceneLab}
-            className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-full border px-4 py-2.5 text-xs font-medium transition hover:gap-2.5"
-            style={{
-              borderColor: `${phase.accent}55`,
-              color: phase.accent,
-              background: `${phase.accent}10`,
-            }}
-          >
-            <FlaskConical className="h-3.5 w-3.5" />
-            Mở trong Scene Lab
-            <span className="ml-1 text-[0.6rem] uppercase tracking-[0.15em] opacity-70">
-              3D · Tháo rời bộ phận
-            </span>
-          </button>
-        )}
-
         {/* nav footer */}
         <div className="mt-auto flex items-center justify-between gap-2 pt-6">
           <button
@@ -414,7 +415,7 @@ function ExhibitModalBody({
             onClick={onNext}
             className="inline-flex items-center gap-1.5 rounded-full border border-foreground/15 px-3 py-2 text-xs text-foreground/65 transition hover:border-foreground/30 hover:text-foreground"
           >
-            Sau <ChevronRight className="h-4 w-4" />
+            Sau <ChevronRight className="h-3 w-3" />
           </button>
         </div>
       </div>

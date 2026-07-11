@@ -16,7 +16,6 @@ import { PHASES, TOTAL_EXHIBITS } from "@/lib/museum-data";
 import { useMuseum } from "@/lib/store";
 import { BrandMark, ProgressRing } from "./brand";
 import { ThemeToggle } from "./ThemeToggle";
-import { AudioToggle } from "./AudioToggle";
 
 function ToolButton({
   onClick,
@@ -119,9 +118,6 @@ export function VisitorHud() {
           <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400" />
           {mm}:{ss}
         </div>
-
-        {/* audio controls (mute + ambient) */}
-        <AudioToggle />
 
         {/* theme toggle */}
         <ThemeToggle compact />

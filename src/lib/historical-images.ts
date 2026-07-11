@@ -14,6 +14,7 @@ export interface HistoricalImage {
   gradient: string; // CSS gradient for procedural visual
   exhibitId?: string;
   featured?: boolean;
+  imageUrl?: string; // Optional actual image URL
 }
 
 function grad(a: string, b: string) {
@@ -31,6 +32,7 @@ export const HISTORICAL_IMAGES: HistoricalImage[] = [
     motif: "flying-shuttle",
     gradient: grad("#3a2410", "#1a0f0a"),
     exhibitId: "flying-shuttle",
+    imageUrl: "/images/museum/spinning-jenny.jpg",
   },
   {
     id: "h1-2",
@@ -42,6 +44,7 @@ export const HISTORICAL_IMAGES: HistoricalImage[] = [
     gradient: grad("#4a2f18", "#241409"),
     exhibitId: "watt-steam",
     featured: true,
+    imageUrl: "/images/museum/watt-steam.jpg",
   },
   {
     id: "h1-3",
@@ -62,6 +65,7 @@ export const HISTORICAL_IMAGES: HistoricalImage[] = [
     motif: "locomotive",
     gradient: grad("#3e2410", "#1a0f0a"),
     exhibitId: "rocket-locomotive",
+    imageUrl: "/images/museum/rocket-locomotive.jpg",
   },
 
   // Industry 2.0 (4)
@@ -74,6 +78,7 @@ export const HISTORICAL_IMAGES: HistoricalImage[] = [
     motif: "bessemer-converter",
     gradient: grad("#5a2a10", "#240f05"),
     exhibitId: "bessemer-converter",
+    imageUrl: "/images/museum/puddling-furnace.jpg",
   },
   {
     id: "h2-2",
@@ -85,6 +90,7 @@ export const HISTORICAL_IMAGES: HistoricalImage[] = [
     gradient: grad("#4c3f1a", "#211b09"),
     exhibitId: "dynamo",
     featured: true,
+    imageUrl: "/images/museum/siemens_dynamo_1866.jpg",
   },
   {
     id: "h2-3",
@@ -128,6 +134,7 @@ export const HISTORICAL_IMAGES: HistoricalImage[] = [
     gradient: grad("#1c2e4a", "#0a1424"),
     exhibitId: "intel-4004",
     featured: true,
+    imageUrl: "/images/museum/intel-4004.jpg",
   },
   {
     id: "h3-3",
@@ -161,6 +168,7 @@ export const HISTORICAL_IMAGES: HistoricalImage[] = [
     gradient: grad("#4a205a", "#21092b"),
     exhibitId: "atlas-robot",
     featured: true,
+    imageUrl: "/images/museum/humanoid-robot.jpg",
   },
   {
     id: "h4-2",
@@ -181,6 +189,7 @@ export const HISTORICAL_IMAGES: HistoricalImage[] = [
     motif: "iphone-4s",
     gradient: grad("#4a1a30", "#240815"),
     exhibitId: "iphone-4s",
+    imageUrl: "/images/museum/smartphone.png",
   },
 ];
 

@@ -3,10 +3,11 @@ import { Geist, Geist_Mono, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { Providers } from "./providers";
+import { AIChat } from "@/components/ai/AIChat";
 
 const geistSans = Geist({
   variable: "--font-sans",
-  subsets: ["latin", "vietnamese"],
+  subsets: ["latin"],
 });
 
 const geistMono = Geist_Mono({
@@ -60,12 +61,14 @@ export default function RootLayout({
         />
       </head>
       <body
+        suppressHydrationWarning
         className={`${geistSans.variable} ${geistMono.variable} ${playfair.variable} antialiased bg-background text-foreground min-h-screen`}
       >
         <Providers>
           {children}
         </Providers>
         <Toaster position="bottom-center" />
+        <AIChat />
       </body>
     </html>
   );

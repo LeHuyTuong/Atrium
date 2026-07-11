@@ -59,22 +59,22 @@
   /* Like a sunlit museum hall with warm parchment walls */
   --background: oklch(0.965 0.008 75);            /* warm cream paper */
   --foreground: oklch(0.22 0.018 55);              /* warm dark brown ink */
-  --card: oklch(0.99 0.006 75);                    /* near-white card on cream */
+  --card: oklch(0.93 0.01 72);                    /* visible cream card */
   --card-foreground: oklch(0.22 0.018 55);
-  --popover: oklch(0.99 0.006 75);
+  --popover: oklch(0.93 0.01 72);
   --popover-foreground: oklch(0.22 0.018 55);
   --primary: oklch(0.55 0.14 55);                  /* deeper gold/bronze for contrast on light */
   --primary-foreground: oklch(0.98 0.005 75);
-  --secondary: oklch(0.92 0.012 70);
-  --secondary-foreground: oklch(0.25 0.018 55);
-  --muted: oklch(0.93 0.01 70);
-  --muted-foreground: oklch(0.48 0.02 60);
-  --accent: oklch(0.90 0.014 65);
-  --accent-foreground: oklch(0.25 0.018 55);
+  --secondary: oklch(0.87 0.014 67);
+  --secondary-foreground: oklch(0.22 0.018 55);
+  --muted: oklch(0.88 0.012 68);
+  --muted-foreground: oklch(0.42 0.02 58);
+  --accent: oklch(0.85 0.018 62);
+  --accent-foreground: oklch(0.22 0.018 55);
   --destructive: oklch(0.55 0.22 25);
-  --border: oklch(0.82 0.014 65 / 70%);
-  --input: oklch(0.90 0.012 68);
-  --ring: oklch(0.55 0.14 55 / 50%);
+  --border: oklch(0.72 0.016 62 / 80%);
+  --input: oklch(0.85 0.014 65);
+  --ring: oklch(0.55 0.14 55 / 60%);
   --chart-1: #c9701f;
   --chart-2: #b88a1a;
   --chart-3: #2d9d52;
@@ -100,22 +100,22 @@
   /* ===== DARK MODE — warm brown museum at night (original) ===== */
   --background: oklch(0.16 0.012 60);          /* deep warm brown-black */
   --foreground: oklch(0.96 0.008 70);          /* warm off-white */
-  --card: oklch(0.205 0.014 60);               /* slightly lifted brown */
+  --card: oklch(0.25 0.016 60);               /* lifted brown card */
   --card-foreground: oklch(0.96 0.008 70);
-  --popover: oklch(0.19 0.014 60);
+  --popover: oklch(0.23 0.016 60);
   --popover-foreground: oklch(0.96 0.008 70);
   --primary: oklch(0.72 0.12 65);              /* warm gold primary */
   --primary-foreground: oklch(0.16 0.012 60);
-  --secondary: oklch(0.26 0.016 60);
+  --secondary: oklch(0.30 0.016 60);
   --secondary-foreground: oklch(0.96 0.008 70);
-  --muted: oklch(0.24 0.014 60);
-  --muted-foreground: oklch(0.72 0.012 65);
-  --accent: oklch(0.30 0.018 60);
+  --muted: oklch(0.28 0.016 60);
+  --muted-foreground: oklch(0.75 0.012 65);
+  --accent: oklch(0.34 0.018 60);
   --accent-foreground: oklch(0.96 0.008 70);
   --destructive: oklch(0.62 0.20 25);
-  --border: oklch(0.30 0.014 60 / 60%);
-  --input: oklch(0.26 0.014 60);
-  --ring: oklch(0.72 0.12 65 / 60%);
+  --border: oklch(0.40 0.016 60 / 70%);
+  --input: oklch(0.30 0.016 60);
+  --ring: oklch(0.72 0.12 65 / 70%);
   --chart-1: #e89446;
   --chart-2: #e8b53a;
   --chart-3: #4ade80;

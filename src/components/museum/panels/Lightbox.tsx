@@ -120,14 +120,17 @@ export function Lightbox() {
               {/* Large image */}
               <div
                 className="relative flex h-[60vh] max-h-[28rem] w-full items-center justify-center overflow-hidden"
-                style={{ background: current.gradient }}
+                style={current.imageUrl ? { backgroundImage: `url(${current.imageUrl})`, backgroundSize: 'cover', backgroundPosition: 'center' } : { background: current.gradient }}
               >
-                <div className="absolute inset-0 grain opacity-[0.08] mix-blend-overlay" />
-                <MotifIcon
-                  motif={current.motif}
-                  className="h-24 w-24 text-foreground/30"
-                  strokeWidth={1}
-                />
+                {!current.imageUrl && <div className="absolute inset-0 grain opacity-[0.08] mix-blend-overlay" />}
+                {current.imageUrl && <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/30" />}
+                {!current.imageUrl && (
+                  <MotifIcon
+                    motif={current.motif}
+                    className="h-24 w-24 text-foreground/30"
+                    strokeWidth={1}
+                  />
+                )}
 
                 {/* Prev / Next arrows */}
                 {siblings.length > 1 && (

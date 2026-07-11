@@ -33,21 +33,21 @@ export function Annotations({ parts, selected, onSelect }: Props) {
                 e.stopPropagation();
                 onSelect(p.id);
               }}
-              className="group flex items-center gap-1.5 whitespace-nowrap rounded-full border px-2 py-1 text-[10px] font-medium backdrop-blur-sm transition-all"
+              className="group grid h-6 w-6 place-items-center rounded-full border-2 backdrop-blur-sm transition-all hover:scale-125"
               style={{
-                background: isSel ? `${palette.annotation}22` : "rgba(28, 19, 11, 0.75)",
-                borderColor: isSel ? palette.annotation : `${palette.annotationDim}88`,
-                color: isSel ? palette.annotation : "#e8d5a8",
-                boxShadow: isSel ? `0 0 12px ${palette.annotation}66` : "none",
+                background: isSel ? `${palette.annotation}44` : "rgba(28, 19, 11, 0.5)",
+                borderColor: isSel ? palette.annotation : palette.annotation,
+                boxShadow: isSel
+                  ? `0 0 16px ${palette.annotation}88, 0 0 4px ${palette.annotation}44`
+                  : `0 0 8px ${palette.annotation}44`,
                 cursor: "pointer",
                 transform: "translateY(-50%)",
               }}
             >
               <span
-                className="h-1.5 w-1.5 rounded-full"
-                style={{ background: isSel ? palette.annotation : palette.annotationDim }}
+                className="h-2.5 w-2.5 rounded-full"
+                style={{ background: isSel ? "#fff" : palette.annotation }}
               />
-              {p.label}
             </button>
           </Html>
         );

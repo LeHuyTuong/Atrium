@@ -65,6 +65,7 @@ export interface MuseumState {
   onboardingOpen: boolean;
   onboardingCompleted: boolean;
   sceneLabOpen: boolean;
+  sceneLabExhibitId: string | null;
 
   // tour playback
   activeTour: ActiveTour | null;
@@ -106,7 +107,7 @@ export interface MuseumState {
   setMinimapOpen: (v: boolean) => void;
   setOnboardingOpen: (v: boolean) => void;
   completeOnboarding: () => void;
-  setSceneLabOpen: (v: boolean) => void;
+  setSceneLabOpen: (v: boolean, id?: string | null) => void;
   setLastAchievement: (id: string | null) => void;
 
   // knowledge library
@@ -170,6 +171,7 @@ export const useMuseum = create<MuseumState>()(
       onboardingOpen: false,
       onboardingCompleted: false,
       sceneLabOpen: false,
+      sceneLabExhibitId: null,
 
       // tour playback
       activeTour: null,
@@ -252,7 +254,7 @@ export const useMuseum = create<MuseumState>()(
       setMinimapOpen: (v) => set({ minimapOpen: v }),
       setOnboardingOpen: (v) => set({ onboardingOpen: v }),
       completeOnboarding: () => set({ onboardingCompleted: true, onboardingOpen: false }),
-      setSceneLabOpen: (v) => set({ sceneLabOpen: v }),
+      setSceneLabOpen: (v, id) => set({ sceneLabOpen: v, sceneLabExhibitId: v ? id ?? null : null }),
       setLastAchievement: (id) => set({ lastAchievement: id }),
 
       completeLesson: (lessonId) =>
