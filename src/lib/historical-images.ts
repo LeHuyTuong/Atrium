@@ -26,13 +26,13 @@ export const HISTORICAL_IMAGES: HistoricalImage[] = [
   {
     id: "h1-1",
     phase: "industry-1",
-    caption: "Bản vẽ thiết kế con thoi bay của John Kay.",
-    source: "Văn phòng Bằng sáng chế Vương quốc Anh",
+    caption: "Chi tiết cơ cấu con thoi bay (Flying Shuttle) dệt vải của John Kay.",
+    source: "Wikimedia Commons",
     year: "1733",
     motif: "flying-shuttle",
     gradient: grad("#3a2410", "#1a0f0a"),
     exhibitId: "flying-shuttle",
-    imageUrl: "/images/museum/spinning-jenny.jpg",
+    imageUrl: "/images/museum/flying-shuttle.jpg",
   },
   {
     id: "h1-2",

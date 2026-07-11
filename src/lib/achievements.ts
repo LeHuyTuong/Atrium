@@ -36,7 +36,7 @@ export const ACHIEVEMENTS: Achievement[] = [
   {
     id: "curious-mind",
     name: "Tâm hồn tò mò",
-    description: "Xem 8 hiện vật trong cùng một kỷ nguyên.",
+    description: "Xem tất cả hiện vật trong cùng một kỷ nguyên.",
     icon: "Eye",
     tier: "bronze",
     check: (s) => PHASES.some((p) => EXHIBITS.filter((e) => e.phase === p.id).every((e) => s.seenExhibits.has(e.id))),
@@ -60,18 +60,18 @@ export const ACHIEVEMENTS: Achievement[] = [
   {
     id: "scholar",
     name: "Học giả",
-    description: "Vượt qua 2 câu hỏi trắc nghiệm.",
+    description: "Vượt qua 3 câu hỏi trắc nghiệm.",
     icon: "GraduationCap",
     tier: "silver",
-    check: (s) => s.quizzesPassed >= 2,
+    check: (s) => s.quizzesPassed >= 3,
   },
   {
     id: "master-scholar",
     name: "Học giả xuất chúng",
-    description: "Vượt qua cả 4 câu hỏi trắc nghiệm.",
+    description: "Vượt qua cả 12 câu hỏi trắc nghiệm.",
     icon: "Award",
     tier: "gold",
-    check: (s) => s.quizzesPassed >= 4,
+    check: (s) => s.quizzesPassed >= 12,
   },
   {
     id: "weaver",
