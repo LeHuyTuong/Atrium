@@ -38,7 +38,7 @@ const STEPS: CoachStep[] = [
   {
     selector: '[data-onboarding="progress"]',
     title: "Vòng tròn tiến độ",
-    body: "Vòng tròn này theo dõi tiến độ — bạn sẽ xem 32 hiện vật trong cả bảo tàng.",
+    body: "Vòng tròn này theo dõi tiến độ — bạn sẽ xem 15 hiện vật trong cả bảo tàng.",
     cta: "Tiếp",
   },
   {

@@ -8,7 +8,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useMuseum } from "@/lib/store";
-import { EXHIBITS, PHASES } from "@/lib/museum-data";
+import { EXHIBITS, PHASES, TOTAL_EXHIBITS } from "@/lib/museum-data";
 
 export function AnalyticsDashboard() {
   const open = useMuseum((s) => s.analyticsOpen);
@@ -118,7 +118,7 @@ export function AnalyticsDashboard() {
             <div>
               <div className="text-sm font-semibold text-foreground">Hoàn thành bộ sưu tập</div>
               <div className="text-xs text-foreground/55">
-                Bạn đã xem {seenExhibits.length} trên 32 hiện vật.{" "}
+                Bạn đã xem {seenExhibits.length} trên {TOTAL_EXHIBITS} hiện vật.{" "}
                 {completionPct === 100
                   ? "Bạn đã đi khắp bảo tàng — xin chúc mừng!"
                   : `Còn ${EXHIBITS.length - seenExhibits.length} hiện vật để khám phá.`}

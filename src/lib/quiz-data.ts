@@ -1,5 +1,5 @@
 // Atrium — Dữ liệu câu hỏi trắc nghiệm
-// 3 câu hỏi/kỷ nguyên × 4 kỷ nguyên = 12 câu
+// 1 câu hỏi/kỷ nguyên × 4 kỷ nguyên = 4 câu
 
 import { PhaseId } from "./museum-data";
 
@@ -8,7 +8,7 @@ export interface QuizQuestion {
   phase: PhaseId;
   prompt: string;
   options: string[];
-  answer: number; // index đúng
+  answer: number; // index đúng (0-indexed)
   explanation: string;
   exhibitId: string; // hiện vật liên quan
 }
@@ -18,163 +18,63 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
   {
     id: "q1-1",
     phase: "industry-1",
-    prompt: "Động cơ hơi nước Watt cải tiến phiên bản Newcomen bằng cách thêm gì?",
+    prompt: "Động cơ hơi nước Watt cải tiến phiên bản Newcomen bằng cách thêm bộ phận quan trọng nào?",
     options: [
-      "Xi-lanh lớn hơn",
-      "Buồng ngưng tách biệt",
-      "Bánh đà nặng hơn",
-      "Nhiều piston",
+      "Xi-lanh có kích thước lớn hơn",
+      "Buồng ngưng hơi nước tách biệt",
+      "Bánh đà bằng sắt đúc nặng hơn",
+      "Piston kép truyền lực gián tiếp",
     ],
     answer: 1,
     explanation:
-      "Watt thêm buồng ngưng riêng để xi-lanh không phải thay đổi nhiệt độ liên tục, tăng hiệu suất gấp 4.",
+      "James Watt đã thêm một buồng ngưng hơi nước riêng biệt để giữ cho xi-lanh chính luôn nóng, giúp tiết kiệm tới 75% lượng than tiêu thụ và tăng hiệu suất lên gấp 4 lần.",
     exhibitId: "watt-steam",
-  },
-  {
-    id: "q1-2",
-    phase: "industry-1",
-    prompt: "Khung cửi Jacquard (1804) là tiền thân trực tiếp của công nghệ nào?",
-    options: ["Động cơ hơi nước", "Băng đục lỗ → máy tính", "Đường sắt", "Đèn gas"],
-    answer: 1,
-    explanation:
-      "Băng đục lỗ của Jacquard điều khiển hoa văn dệt — Babbage và Hollerith lấy ý tưởng cho máy tính đầu tiên.",
-    exhibitId: "jacquard-loom",
-  },
-  {
-    id: "q1-3",
-    phase: "industry-1",
-    prompt: "Đường hầm Thames (1843) của Brunel phát minh ra gì?",
-    options: [
-      "Xi-lanh hơi nước",
-      "Máy đào hầm (khiên hầm)",
-      "Đường sắt ngầm",
-      "Cầu treo",
-    ],
-    answer: 1,
-    explanation:
-      "Khiên hầm của Brunel bảo vệ công nhân khi đào — tổ tiên của mọi TBM ngày nay.",
-    exhibitId: "thames-tunnel",
   },
 
   // Industry 2.0
   {
     id: "q2-1",
     phase: "industry-2",
-    prompt: "Bóng đèn Edison (1879) dùng sợi đốt làm từ gì?",
-    options: ["Vonfram", "Tre cácbon hóa", "Bạch kim", "Sợi thép"],
-    answer: 1,
-    explanation:
-      "Sau hàng nghìn thí nghiệm, Edison chọn sợi tre cácbon hóa — bền 40 giờ, đủ rẻ để bán.",
-    exhibitId: "light-bulb",
-  },
-  {
-    id: "q2-2",
-    phase: "industry-2",
-    prompt: "Băng chuyền Ford (1913) giảm thời gian lắp một chiếc Model T xuống bao nhiêu?",
-    options: ["Từ 12 giờ xuống 90 phút", "Từ 5 giờ xuống 1 giờ", "Từ 20 giờ xuống 5 giờ", "Từ 8 giờ xuống 2 giờ"],
-    answer: 0,
-    explanation:
-      "Thời gian lắp giảm từ 12 giờ xuống 90 phút, giá giảm từ 850 xuống 260 USD — Model T chiếm 50% thị trường thế giới.",
-    exhibitId: "model-t",
-  },
-  {
-    id: "q2-3",
-    phase: "industry-2",
-    prompt: "Cuộc « chiến dòng điện » AC vs DC thắng bên nào và nhờ công nghệ gì?",
+    prompt: "Chuyến hành trình lái xe đường dài đầu tiên trong lịch sử bằng xe hơi chạy xăng (để chứng minh tính thực tế của Benz Patent-Motorwagen) do ai thực hiện?",
     options: [
-      "DC thắng nhờ pin rẻ",
-      "AC thắng nhờ máy biến áp truyền điện đi xa",
-      "Hòa — cả hai cùng tồn tại",
-      "DC thắng vì an toàn hơn",
+      "Karl Benz tự lái xe thử nghiệm",
+      "Bà Bertha Benz (vợ của Karl Benz)",
+      "Werner von Siemens",
+      "Henry Ford và các cộng sự",
     ],
     answer: 1,
     explanation:
-      "Máy biến áp (1885, Hungary) cho phép AC tăng điện áp truyền đi hàng trăm km — DC của Edison chỉ đi được vài km.",
-    exhibitId: "ac-transformer",
+      "Bà Bertha Benz đã thực hiện chuyến hành trình lái xe đường dài đầu tiên trong lịch sử (106 km) mà không báo cho chồng để chứng minh tính thực tế của chiếc xe ô tô Benz Patent-Motorwagen với công chúng.",
+    exhibitId: "motorwagen",
   },
 
   // Industry 3.0
   {
     id: "q3-1",
     phase: "industry-3",
-    prompt: "Vi xử lý Intel 4004 (1971) chứa bao nhiêu bóng bán dẫn?",
-    options: ["2.300", "23.000", "230.000", "2,3 triệu"],
+    prompt: "Vi xử lý Intel 4004 (1971) — bộ vi xử lý đơn chip thương mại đầu tiên trên thế giới — tích hợp bao nhiêu bóng bán dẫn?",
+    options: ["2.300 bóng bán dẫn", "23.000 bóng bán dẫn", "230.000 bóng bán dẫn", "2,3 triệu bóng bán dẫn"],
     answer: 0,
     explanation:
-      "2.300 bóng bán dẫn trên 12 mm² — toàn bộ CPU trong một con chip, khởi đầu kỷ nguyên vi xử lý.",
+      "Chỉ rộng 12 mm², Intel 4004 tích hợp 2.300 bóng bán dẫn, mang lại sức mạnh tính toán tương đương chiếc máy tính khổng lồ ENIAC chiếm cả căn phòng rộng trước đó.",
     exhibitId: "intel-4004",
-  },
-  {
-    id: "q3-2",
-    phase: "industry-3",
-    prompt: "Tin nhắn đầu tiên trên ARPANET (1969) là gì?",
-    options: ["Hello", "« lo » (nửa chữ login)", "ping", "test"],
-    answer: 1,
-    explanation:
-      "Charley Kline cố gửi « login » nhưng máy nhận sập sau « lo » — tin nhắn đầu tiên của internet chỉ có 2 chữ.",
-    exhibitId: "arpanet",
-  },
-  {
-    id: "q3-3",
-    phase: "industry-3",
-    prompt: "Tim Berners-Lee khi phát minh World Wide Web (1989) đã làm gì với bằng sáng chế?",
-    options: [
-      "Bán cho Microsoft giá cao",
-      "Giữ và thu phí bản quyền",
-      "Cấp miễn phí cho thế giới",
-      "Chỉ cấp cho các trường đại học",
-    ],
-    answer: 2,
-    explanation:
-      "Berners-Lee quyết định KHÔNG cấp bằng sáng chế — Web miễn phí cho mọi người, một trong những hành động hào phóng nhất lịch sử kỹ thuật.",
-    exhibitId: "www",
   },
 
   // Industry 4.0
   {
     id: "q4-1",
     phase: "industry-4",
-    prompt: "AlexNet (2012) là mạng nơ-ron sâu đã thắng cuộc thi nào với tỷ lệ giảm bao nhiêu?",
+    prompt: "Để thực hiện một cú lộn nhào ngược (backflip) hoàn hảo, hệ thống máy tính của robot hình người Boston Dynamics Atlas phải làm gì?",
     options: [
-      "ImageNet — lỗi giảm từ 26% xuống 15%",
-      "CIFAR — lỗi giảm từ 40% xuống 20%",
-      "MNIST — lỗi giảm từ 5% xuống 1%",
-      "COCO — lỗi giảm từ 50% xuống 30%",
-    ],
-    answer: 0,
-    explanation:
-      "AlexNet thắng ImageNet 2012, tỷ lệ lỗi giảm từ 26% xuống 15% — thức tỉnh AI sau « mùa đông ».",
-    exhibitId: "neural-net",
-  },
-  {
-    id: "q4-2",
-    phase: "industry-4",
-    prompt: "Falcon 9 (SpaceX) năm 2015 đã làm điều gì chưa từng có?",
-    options: [
-      "Đưa người lên ISS giá rẻ",
-      "Phóng 100 vệ tinh cùng lúc",
-      "Tầng tên lửa hạ cánh thẳng đứng để tái sử dụng",
-      "Đi đến Mặt Trăng và quay về",
+      "Chạy một chương trình phát lại video động tác có sẵn",
+      "Sử dụng điều khiển từ xa từ kỹ sư vận hành bên ngoài",
+      "Thực hiện hàng nghìn phép tính quỹ đạo thời gian thực để duy trì sự cân bằng động",
+      "Dựa vào các cảm biến cơ học vật lý thuần túy không cần tính toán",
     ],
     answer: 2,
     explanation:
-      "21/12/2015, tầng đầu Falcon 9 hạ cánh thẳng đứng — lần đầu tên lửa quỹ đạo « đi về », giảm chi phí phóng ×10.",
-    exhibitId: "falcon-9",
-  },
-  {
-    id: "q4-3",
-    phase: "industry-4",
-    prompt: "Kiến trúc Transformer (2017) bỏ điều gì và thay bằng gì?",
-    options: [
-      "Bỏ vòng lặp, thay bằng cơ chế « chú ý »",
-      "Bỏ nơ-ron, thay bằng bảng tra cứu",
-      "Bỏ softmax, thay bằng sigmoid",
-      "Bỏ huấn luyện, thay bằng quy tắc cứng",
-    ],
-    answer: 0,
-    explanation:
-      "Transformer bỏ vòng lặp RNN, dùng « attention » để mỗi từ nhìn tất cả từ khác cùng lúc — nền móng của GPT, Claude, Gemini.",
-    exhibitId: "transformer-arch",
+      "Mỗi cú lộn nhào ngược (backflip) của Atlas yêu cầu hệ thống máy tính trên bo mạch thực hiện hàng nghìn phép tính quỹ đạo thời gian thực để duy trì sự cân bằng động một cách hoàn hảo trong không gian.",
+    exhibitId: "atlas-robot",
   },
 ];
 

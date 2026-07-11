@@ -60,18 +60,18 @@ export const ACHIEVEMENTS: Achievement[] = [
   {
     id: "scholar",
     name: "Học giả",
-    description: "Vượt qua 3 câu hỏi trắc nghiệm.",
+    description: "Vượt qua 2 câu hỏi trắc nghiệm.",
     icon: "GraduationCap",
     tier: "silver",
-    check: (s) => s.quizzesPassed >= 3,
+    check: (s) => s.quizzesPassed >= 2,
   },
   {
     id: "master-scholar",
     name: "Học giả xuất chúng",
-    description: "Vượt qua cả 12 câu hỏi trắc nghiệm.",
+    description: "Vượt qua cả 4 câu hỏi trắc nghiệm.",
     icon: "Award",
     tier: "gold",
-    check: (s) => s.quizzesPassed >= 12,
+    check: (s) => s.quizzesPassed >= 4,
   },
   {
     id: "weaver",
@@ -84,7 +84,7 @@ export const ACHIEVEMENTS: Achievement[] = [
   {
     id: "completionist",
     name: "Hoàn tất bộ sưu tập",
-    description: "Mở tất cả 32 hiện vật trong bảo tàng.",
+    description: "Mở tất cả 15 hiện vật trong bảo tàng.",
     icon: "CheckCircle2",
     tier: "platinum",
     check: (s) => s.seenExhibits.size >= EXHIBITS.length,

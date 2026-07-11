@@ -25,7 +25,7 @@ const playfair = Playfair_Display({
 export const metadata: Metadata = {
   title: "Atrium · Bảo tàng Lịch sử Kỹ thuật số",
   description:
-    "Trải nghiệm bảo tàng 3D một trang — đi dạo trong bảo tàng ban đêm, từ hơi nước đến silicon. Bốn kỷ nguyên công nghiệp, 32 hiện vật, 9 mạch liên kết xuyên thời gian.",
+    "Trải nghiệm bảo tàng 3D một trang — đi dạo trong bảo tàng ban đêm, từ hơi nước đến silicon. Bốn kỷ nguyên công nghiệp, 15 hiện vật, 5 mạch liên kết xuyên thời gian.",
   keywords: [
     "Atrium",
     "Bảo tàng",

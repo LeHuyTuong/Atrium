@@ -7,11 +7,11 @@ import {
   DialogContent,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { EXHIBITS, CONNECTIONS, PHASES, exhibitById, phaseById, Connection } from "@/lib/museum-data";
+import { EXHIBITS, CONNECTIONS, PHASES, exhibitById, phaseById, Connection, TOTAL_EXHIBITS, TOTAL_CONNECTIONS } from "@/lib/museum-data";
 import { useMuseum } from "@/lib/store";
 import { MotifIcon } from "@/components/museum/cards/MotifIcon";
 
-const ROW_W = 8; // exhibits per phase row
+const ROW_W = 4; // exhibits per phase row
 const NODE_GAP_X = 90;
 const NODE_GAP_Y = 110;
 const PAD_X = 70;
@@ -29,10 +29,11 @@ export function ConnectionsWeb() {
 
   const positions = useMemo<Record<string, Pos>>(() => {
     const map: Record<string, Pos> = {};
-    EXHIBITS.forEach((e, i) => {
+    EXHIBITS.forEach((e) => {
       const phase = phaseById(e.phase)!;
       const row = PHASES.findIndex((p) => p.id === e.phase);
-      const col = i % ROW_W;
+      const phaseExhibits = EXHIBITS.filter((ex) => ex.phase === e.phase);
+      const col = phaseExhibits.findIndex((ex) => ex.id === e.id);
       map[e.id] = {
         x: PAD_X + col * NODE_GAP_X,
         y: PAD_Y + row * NODE_GAP_Y,
@@ -58,7 +59,7 @@ export function ConnectionsWeb() {
             Mạch liên kết xuyên thời gian
           </div>
           <span className="text-[0.65rem] text-foreground/45">
-            9 mạch · 32 hiện vật · bấm để nhấn mạnh
+            {TOTAL_CONNECTIONS} mạch · {TOTAL_EXHIBITS} hiện vật · bấm để nhấn mạnh
           </span>
         </div>
 

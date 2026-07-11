@@ -12,7 +12,7 @@ import {
   BarChart3,
   Route,
 } from "lucide-react";
-import { PHASES } from "@/lib/museum-data";
+import { PHASES, TOTAL_EXHIBITS } from "@/lib/museum-data";
 import { useMuseum } from "@/lib/store";
 import { BrandMark, ProgressRing } from "./brand";
 import { ThemeToggle } from "./ThemeToggle";
@@ -103,10 +103,10 @@ export function VisitorHud() {
 
         {/* progress */}
         <div data-onboarding="progress" className="flex items-center gap-2 rounded-full border border-foreground/12 bg-foreground/[0.03] px-2.5 py-1.5">
-          <ProgressRing value={seenExhibits.length} max={32} accent="#e89446" size={22} />
+          <ProgressRing value={seenExhibits.length} max={TOTAL_EXHIBITS} accent="#e89446" size={22} />
           <span className="text-xs font-medium text-foreground/75">
             <span className="font-bold text-foreground">{seenExhibits.length}</span>
-            <span className="text-foreground/40">/32</span>
+            <span className="text-foreground/40">/{TOTAL_EXHIBITS}</span>
           </span>
         </div>
 
