@@ -37,11 +37,11 @@ const GLB_CONFIGS: Record<Motif, ModelConfig> = {
   },
   "bessemer-converter": {
     url: "/models/2/bessemer+converter.glb",
-    scale: 0.5,
+    scale: 1.0,
   },
   "dynamo": {
     url: "/models/2/dynamo_Siemens.glb",
-    scale: 0.6,
+    scale: 1.2,
   },
   "motorwagen": {
     url: "/models/2/motorwagen_von_carl_benz.glb",
@@ -54,7 +54,7 @@ const GLB_CONFIGS: Record<Motif, ModelConfig> = {
   },
   "unimate-robot": {
     url: "/models/3/First+Unimate+Robot.glb",
-    scale: 0.65,
+    scale: 1.3,
   },
   "intel-4004": {
     url: "/models/3/Microprocessor_Intel+4004.glb",
@@ -70,7 +70,7 @@ const GLB_CONFIGS: Record<Motif, ModelConfig> = {
   },
   "atlas-robot": {
     url: "/models/4/Robot+_Atlas.glb",
-    scale: 0.65,
+    scale: 1.3,
   },
   "amazon-echo": {
     url: "/models/4/amazon_echo.glb",
@@ -78,7 +78,7 @@ const GLB_CONFIGS: Record<Motif, ModelConfig> = {
   },
   "iphone-4s": {
     url: "/models/4/iphone_4s.glb",
-    scale: 0.95,
+    scale: 4.5,
     rotation: [Math.PI / 6, Math.PI / 4, 0],
   },
 };
@@ -90,7 +90,7 @@ Object.values(GLB_CONFIGS).forEach((config) => {
 
 function GLBLoader({ motif, spinning }: { motif: Motif; spinning?: boolean }) {
   const group = useRef<any>(null);
-  
+
   // Safe default url in case motif is not in GLB_CONFIGS
   const config = GLB_CONFIGS[motif] || { url: "/models/1/flying_shuttle_johnkay.glb" };
 

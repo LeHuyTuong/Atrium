@@ -45,7 +45,7 @@ export function ExhibitCard({ exhibit, index }: { exhibit: Exhibit; index: numbe
         {img?.imageUrl && (
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent transition-opacity group-hover:opacity-70" />
         )}
-        <div className="absolute right-3 top-3 text-[0.55rem] uppercase tracking-[0.2em] text-foreground/40 z-10">
+        <div className="absolute right-12 top-4 text-[0.55rem] uppercase tracking-[0.2em] text-foreground/50 z-10">
           {exhibit.year}
         </div>
         {!img?.imageUrl && (
@@ -110,7 +110,6 @@ export function ExhibitCard({ exhibit, index }: { exhibit: Exhibit; index: numbe
         }}
         className="absolute right-3 top-3 z-10 hidden h-7 w-7 place-items-center rounded-full border border-foreground/10 bg-background/60 backdrop-blur-sm transition hover:border-foreground/30 sm:grid"
         aria-label="Đánh dấu yêu thích"
-        style={{ top: "auto", bottom: "auto", right: "0.75rem", top: "3.4rem" }}
       >
         <Bookmark className="h-3.5 w-3.5" style={{ color: bookmarked ? phase.accent : "currentColor", fill: bookmarked ? phase.accent : "transparent" }} />
       </button>
