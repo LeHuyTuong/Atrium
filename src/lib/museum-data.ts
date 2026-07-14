@@ -1,5 +1,5 @@
 // Atrium — Dữ liệu bảo tàng
-// 4 kỷ nguyên × (3 hoặc 4) hiện vật = 15 hiện vật + 5 mạch liên kết xuyên thời gian
+// 4 kỷ nguyên × (3 hoặc 4) hiện vật = 17 hiện vật + 5 mạch liên kết xuyên thời gian
 
 export type PhaseId = "industry-1" | "industry-2" | "industry-3" | "industry-4";
 
@@ -10,12 +10,14 @@ export type Motif =
   | "locomotive"
   | "bessemer-converter"
   | "dynamo"
+  | "edison-phonograph"
   | "motorwagen"
   | "wright-flyer"
   | "unimate-robot"
   | "intel-4004"
   | "modicon-plc"
   | "altair-8800"
+  | "motorola-dynatac"
   | "atlas-robot"
   | "amazon-echo"
   | "iphone-4s";
@@ -71,7 +73,7 @@ export const PHASES: Phase[] = [
     label: "2.0",
     name: "Công nghiệp 2.0",
     era: "Kỷ nguyên Điện & Sản xuất hàng loạt",
-    period: "1870–1970",
+    period: "1870–1914",
     accent: "#e8b53a",
     accentVar: "--color-phase-2",
     intro:
@@ -85,7 +87,7 @@ export const PHASES: Phase[] = [
     label: "3.0",
     name: "Công nghiệp 3.0",
     era: "Kỷ nguyên Điện tử & Vi xử lý",
-    period: "1970–2010",
+    period: "1969–2010",
     accent: "#4ade80",
     accentVar: "--color-phase-3",
     intro:
@@ -99,7 +101,7 @@ export const PHASES: Phase[] = [
     label: "4.0",
     name: "Công nghiệp 4.0",
     era: "Kỷ nguyên Thông minh & Kết nối",
-    period: "2010–nay",
+    period: "2011–nay",
     accent: "#e879f9",
     accentVar: "--color-phase-4",
     intro:
@@ -291,6 +293,28 @@ export const EXHIBITS: Exhibit[] = [
     ],
     tags: ["giao thông", "hàng không", "động cơ"],
   },
+  {
+    id: "edison-phonograph",
+    phase: "industry-2",
+    name: "Máy hát ống thiếc Edison",
+    year: "1877",
+    inventor: "Thomas Edison",
+    origin: "Menlo Park, New Jersey, Hoa Kỳ",
+    motif: "edison-phonograph",
+    tagline: "Thiết bị đầu tiên ghi và phát lại âm thanh.",
+    story:
+      "Tháng 12 năm 1877, Thomas Edison giới thiệu máy hát ống thiếc (Tinfoil Phonograph). Thiết bị ghi lại các chấn động âm thanh dưới dạng các vết lõm trên một lá thiếc bọc quanh một ống hình trụ có rãnh xoắn quay bằng tay. Khi quay ống trụ ngược lại dưới kim đọc thứ hai, âm thanh được phát lại thông qua loa kèn.",
+    whyItMatters:
+      "Trước Edison, âm thanh chỉ là thứ thoáng qua. Phonograph là thiết bị đầu tiên có thể ghi và phát lại giọng nói con người, đặt nền móng cho ngành công nghiệp âm nhạc, ghi âm thương mại và viễn thông hiện đại.",
+    didYouKnow:
+      "Từ đầu tiên được Edison ghi âm thử nghiệm thành công là bài đồng dao 'Mary Had a Little Lamb'. Ông đã vô cùng kinh ngạc khi thấy thiết bị phát lại chính xác giọng nói của mình.",
+    metrics: [
+      { label: "Năm công bố", value: "1877" },
+      { label: "Vật liệu ghi", value: "Lá thiếc (Tinfoil)" },
+      { label: "Vận hành", value: "Quay tay (Hand-crank)" },
+    ],
+    tags: ["âm thanh", "truyền thông", "đại chúng"],
+  },
 
   // ===================== INDUSTRY 3.0 =====================
   {
@@ -381,6 +405,28 @@ export const EXHIBITS: Exhibit[] = [
       { label: "RAM", value: "256 bytes" },
     ],
     tags: ["máy tính", "kỹ thuật số", "phần mềm"],
+  },
+  {
+    id: "motorola-dynatac",
+    phase: "industry-3",
+    name: "Điện thoại Motorola DynaTAC 8000x",
+    year: "1973",
+    inventor: "Martin Cooper, Rudolph Krolopp, Donald Linder",
+    origin: "Motorola Inc., Libertyville, Illinois, Hoa Kỳ",
+    motif: "motorola-dynatac",
+    tagline: "Chiếc điện thoại di động cầm tay đầu tiên thế giới.",
+    story:
+      "Ngày 3/4/1973, Martin Cooper - kỹ sư trưởng của Motorola - đã thực hiện cuộc gọi di động đầu tiên lịch sử trên đường phố Manhattan, New York bằng thiết bị thử nghiệm DynaTAC. Ông gọi cho Joel Engel, đối thủ tại Bell Labs, và tuyên bố: 'Joel, tôi đang gọi cho ông từ một chiếc điện thoại di động thực sự'. Trải qua 10 năm nghiên cứu cùng khoản đầu tư 100 triệu USD, Motorola mới chính thức thương mại hóa thiết bị này vào năm 1983.",
+    whyItMatters:
+      "DynaTAC 8000x giải phóng con người khỏi chiếc điện thoại cố định và dây nối vật lý. Phát minh này đặt nền móng toàn diện cho hạ tầng viễn thông di động băng thông rộng và kỷ nguyên kết nối không dây hiện đại.",
+    didYouKnow:
+      "Thiết bị nặng hơn 1,1 kg và thường được gọi là 'Cục gạch' (The Brick). Nó cần 10 tiếng để sạc đầy nhưng chỉ có thể đàm thoại trong 35 phút. Martin Cooper từng đùa rằng: 'Thời lượng pin không thành vấn đề, vì bạn không thể cầm chiếc điện thoại nặng như thế suốt 35 phút!'",
+    metrics: [
+      { label: "Trọng lượng", value: "1.15 kg" },
+      { label: "Thời gian sạc", value: "10 giờ" },
+      { label: "Thời gian gọi", value: "35 phút" },
+    ],
+    tags: ["di động", "viễn thông", "kết nối"],
   },
 
   // ===================== INDUSTRY 4.0 =====================
@@ -478,7 +524,7 @@ export const CONNECTIONS: Connection[] = [
     description:
       "Các phương tiện vận chuyển và kết nối liên tục rút ngắn khoảng cách địa lý — từ tàu thủy, đầu máy xe lửa, máy bay cho đến chiếc điện thoại thông minh.",
     color: "#e8b53a",
-    exhibitIds: ["steamboat-fulton", "rocket-locomotive", "wright-flyer", "iphone-4s"],
+    exhibitIds: ["steamboat-fulton", "rocket-locomotive", "wright-flyer", "motorola-dynatac", "iphone-4s"],
   },
   {
     id: "labor-automation",
@@ -502,7 +548,7 @@ export const CONNECTIONS: Connection[] = [
     description:
       "Dòng điện thắp sáng và kích hoạt thiết bị, làm nền móng cho các hệ thống máy tính có khả năng giao tiếp ngôn ngữ tự nhiên.",
     color: "#00d4aa",
-    exhibitIds: ["dynamo", "altair-8800", "amazon-echo", "iphone-4s"],
+    exhibitIds: ["dynamo", "edison-phonograph", "altair-8800", "amazon-echo", "iphone-4s"],
   },
 ];
 

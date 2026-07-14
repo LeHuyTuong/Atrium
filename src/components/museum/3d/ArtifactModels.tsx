@@ -43,6 +43,10 @@ const GLB_CONFIGS: Record<Motif, ModelConfig> = {
     url: "/models/2/dynamo_Siemens.glb",
     scale: 1.2,
   },
+  "edison-phonograph": {
+    url: "/models/2/Phonograph_edison_1877.glb",
+    scale: 1.0,
+  },
   "motorwagen": {
     url: "/models/2/motorwagen_von_carl_benz.glb",
     scale: 0.55,
@@ -67,6 +71,10 @@ const GLB_CONFIGS: Record<Motif, ModelConfig> = {
   "altair-8800": {
     url: "/models/3/altair8800computer.glb",
     scale: 0.75,
+  },
+  "motorola-dynatac": {
+    url: "/models/3/motorola_dynatac_8000x.glb",
+    scale: 0.85,
   },
   "atlas-robot": {
     url: "/models/4/Robot+_Atlas.glb",

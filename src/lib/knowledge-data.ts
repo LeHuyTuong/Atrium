@@ -115,14 +115,14 @@ export const CHAPTERS: Chapter[] = [
             keywords: ["hơi nước", "cơ giới hóa", "ngành dệt", "1760–1840"],
           },
           {
-            heading: "Cách mạng công nghiệp lần thứ hai (1870–1970)",
+            heading: "Cách mạng công nghiệp lần thứ hai (1870–1914)",
             body: "Đặc trưng bởi điện năng và sản xuất hàng loạt. Dây chuyền lắp ráp của Ford, động cơ đốt trong, vô tuyến, hóa chất. Mỹ và Đức vượt qua Anh, trở thành cường quốc công nghiệp.",
-            keywords: ["điện năng", "sản xuất hàng loạt", "dây chuyền lắp ráp", "1870–1970"],
+            keywords: ["điện năng", "sản xuất hàng loạt", "dây chuyền lắp ráp", "1870–1914"],
           },
           {
-            heading: "Cách mạng công nghiệp lần thứ ba (1970–2010)",
+            heading: "Cách mạng công nghiệp lần thứ ba (1969–2010)",
             body: "Đặc trưng bởi điện tử, máy tính và tự động hóa. Vi xử lý, internet, điện thoại di động. Trí tuệ bắt đầu được nhân bản thành hàng triệu bản sao qua silicon.",
-            keywords: ["điện tử", "máy tính", "tự động hóa", "1970–2010"],
+            keywords: ["điện tử", "máy tính", "tự động hóa", "1969–2010"],
           },
           {
             heading: "Cách mạng công nghiệp lần thứ tư (2011–nay)",

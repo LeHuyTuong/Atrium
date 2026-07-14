@@ -1,5 +1,5 @@
 // Atrium — Ảnh lịch sử (dữ liệu ký họa, dùng cho Photo Wall)
-// 15 ảnh tương ứng với 15 hiện vật. Dùng biểu diễn ký họa atmospheric
+// 17 ảnh tương ứng với 17 hiện vật. Dùng biểu diễn ký họa atmospheric
 // (gradient + motif) kèm caption + nguồn tiếng Việt.
 
 import { PhaseId, Motif } from "./museum-data";
@@ -115,6 +115,17 @@ export const HISTORICAL_IMAGES: HistoricalImage[] = [
     exhibitId: "wright-flyer",
     imageUrl: "/images/museum/wright-flyer.jpg",
   },
+  {
+    id: "h2-5",
+    phase: "industry-2",
+    caption: "Mẫu máy hát ống thiếc Cylinder Tinfoil Phonograph đầu tiên của Thomas Edison năm 1877.",
+    source: "Thomas Edison National Historical Park / NPS",
+    year: "1877",
+    motif: "edison-phonograph",
+    gradient: grad("#3a242c", "#1d0f12"),
+    exhibitId: "edison-phonograph",
+    imageUrl: "/images/museum/edison-phonograph.jpg",
+  },
 
   // Industry 3.0 (4)
   {
@@ -161,6 +172,17 @@ export const HISTORICAL_IMAGES: HistoricalImage[] = [
     gradient: grad("#2a2b3d", "#12131c"),
     exhibitId: "altair-8800",
     imageUrl: "/images/museum/altair-8800.jpg",
+  },
+  {
+    id: "h3-5",
+    phase: "industry-3",
+    caption: "Chiếc điện thoại di động cầm tay thương mại đầu tiên thế giới Motorola DynaTAC 8000x giới thiệu năm 1983.",
+    source: "Cooper Hewitt, Smithsonian Design Museum",
+    year: "1983",
+    motif: "motorola-dynatac",
+    gradient: grad("#1c3a3e", "#091c1f"),
+    exhibitId: "motorola-dynatac",
+    imageUrl: "/images/museum/motorola-dynatac.jpg",
   },
 
   // Industry 4.0 (3)

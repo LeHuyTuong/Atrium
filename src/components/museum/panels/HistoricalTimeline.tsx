@@ -118,7 +118,7 @@ export function HistoricalTimeline() {
 
           {/* year axis */}
           <div className="ml-2 mt-2 flex justify-between border-t border-foreground/10 pt-2 text-[0.6rem] text-foreground/40">
-            {[1760, 1840, 1870, 1970, 2010, 2025].map((y) => (
+            {[1760, 1840, 1870, 1914, 1969, 2011, 2026].map((y) => (
               <span key={y}>{y}</span>
             ))}
           </div>

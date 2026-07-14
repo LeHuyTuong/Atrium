@@ -56,10 +56,10 @@ export function MuseumMap() {
 
           <div className="mt-10 grid w-full max-w-6xl gap-4 sm:gap-5 md:grid-cols-2">
             {PHASES.map((p, i) => {
-              const phaseExhibits = 8;
+              const phaseExhibits = EXHIBIT_IDS_BY_PHASE[p.id]?.length || 0;
               const entered = phasesEntered.includes(p.id);
               const realSeen = seenExhibits.filter((id) =>
-                EXHIBIT_IDS_BY_PHASE[p.id].includes(id)
+                EXHIBIT_IDS_BY_PHASE[p.id]?.includes(id)
               ).length;
               const enterRoom = () => {
                 enterPhase(p.id);

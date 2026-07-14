@@ -25,6 +25,7 @@ const SEED_TOURS = [
     exhibitIds: [
       "bessemer-converter",
       "dynamo",
+      "edison-phonograph",
       "motorwagen",
       "wright-flyer",
     ],
@@ -41,6 +42,7 @@ const SEED_TOURS = [
       "modicon-plc",
       "unimate-robot",
       "altair-8800",
+      "motorola-dynatac",
       "atlas-robot",
       "amazon-echo",
       "iphone-4s",

@@ -84,7 +84,7 @@ export const ACHIEVEMENTS: Achievement[] = [
   {
     id: "completionist",
     name: "Hoàn tất bộ sưu tập",
-    description: "Mở tất cả 15 hiện vật trong bảo tàng.",
+    description: "Mở tất cả hiện vật trong bảo tàng.",
     icon: "CheckCircle2",
     tier: "platinum",
     check: (s) => s.seenExhibits.size >= EXHIBITS.length,

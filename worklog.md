@@ -867,3 +867,68 @@ Stage Summary:
 - LibraryHistoryRoom unchanged (already matches spec verbatim from Task 20).
 - All other library files (LessonViewer, QuizArena, InteractiveRenderer, knowledge-data.ts, knowledge-quiz.ts) still exist but no longer linked from main library flow — they're dormant code.
 - Flow: Portal → Library entrance (3D) → Library main (single card) → History room (full CMCN content).
+
+---
+Task ID: 23
+Agent: main (user request - add Edison's Phonograph)
+Task: Thêm hiện vật Phonograph của Edison vào CMCN 2.0 (Công nghiệp 2.0).
+
+Work Log:
+- Đã tải xuống ảnh thực tế chất lượng cao cho edison-phonograph và lưu vào `public/images/museum/edison-phonograph.jpg` bằng curl.
+- Đã thêm `"edison-phonograph"` vào Motif union type trong `src/lib/museum-data.ts`.
+- Đã thêm dữ liệu chi tiết hiện vật `edison-phonograph` vào mảng `EXHIBITS` trong `src/lib/museum-data.ts` với thông tin lịch sử chính xác bằng tiếng Việt.
+- Đã liên kết `"edison-phonograph"` vào chuỗi liên kết xuyên thời gian `"intelligent-voice"` (Giao tiếp thông minh) trong `src/lib/museum-data.ts` (giữa `dynamo` và `altair-8800`).
+- Đã thêm cấu hình 3D model `edison-phonograph` trong `src/components/museum/3d/ArtifactModels.tsx` để sử dụng file model `public/models/2/Phonograph_edison_1877.glb` có sẵn.
+- Đã thêm thông tin ảnh lịch sử trong `src/lib/historical-images.ts` với ID `h2-5` và liên kết với hiện vật `edison-phonograph`.
+- Đã cập nhật mô tả huy hiệu `completionist` trong `src/lib/achievements.ts` thành dạng động/trung tính ("Mở tất cả hiện vật trong bảo tàng.") để tự động tương thích với số lượng hiện vật mới (16 hiện vật thay vì cứng 15).
+- Đã thêm hiện vật `"edison-phonograph"` vào tour mẫu `"cuoc-cach-mang-dien"` trong `src/app/api/tours/seed/route.ts` để tối ưu trải nghiệm người dùng.
+- Next.js dev server tự động hot-reload thành công, kiểm tra biên dịch không có lỗi (0 errors).
+
+Stage Summary:
+- Đã tích hợp hoàn hảo máy hát Edison Phonograph (1877) vào Công nghiệp 2.0.
+- Số lượng hiện vật trong bảo tàng tăng từ 15 lên 16 hiện vật.
+
+---
+Task ID: 24
+Agent: main (user request - add Motorola DynaTAC phone)
+Task: Thêm hiện vật Điện thoại Motorola DynaTAC 8000x vào CMCN 3.0 (Công nghiệp 3.0).
+
+Work Log:
+- Đã tải xuống ảnh thực tế chất lượng cao từ Cooper Hewitt cho chiếc điện thoại di động đầu tiên của Motorola và lưu vào `public/images/museum/motorola-dynatac.jpg` bằng curl.
+- Đã thêm `"motorola-dynatac"` vào Motif union type trong `src/lib/museum-data.ts`.
+- Đã thêm dữ liệu chi tiết hiện vật `motorola-dynatac` vào mảng `EXHIBITS` trong `src/lib/museum-data.ts` với thông tin lịch sử chính xác bằng tiếng Việt (năm 1973 là năm Martin Cooper thực hiện cuộc gọi đầu tiên).
+- Đã liên kết `"motorola-dynatac"` vào chuỗi liên kết xuyên thời gian `"shrinking-world"` (Thu hẹp khoảng cách) trong `src/lib/museum-data.ts` (giữa `wright-flyer` và `iphone-4s`).
+- Đã thêm cấu hình 3D model `motorola-dynatac` trong `src/components/museum/3d/ArtifactModels.tsx` để sử dụng file model `public/models/3/motorola_dynatac_8000x.glb` có sẵn.
+- Đã thêm thông tin ảnh lịch sử trong `src/lib/historical-images.ts` with ID `h3-5` và liên kết với hiện vật `motorola-dynatac`.
+- Đã thêm hiện vật `"motorola-dynatac"` vào tour mẫu `"ky-nguyen-so-va-ai"` trong `src/app/api/tours/seed/route.ts` để tối ưu trải nghiệm người dùng.
+- Next.js dev server tự động hot-reload thành công, kiểm tra biên dịch không có lỗi (0 errors).
+
+Stage Summary:
+- Đã tích hợp hoàn hảo điện thoại di động đầu tiên Motorola DynaTAC 8000x vào Công nghiệp 3.0.
+- Số lượng hiện vật trong bảo tàng tăng lên thành 17 hiện vật.
+
+---
+Task ID: 25
+Agent: main (user request - correct IR periods and counts in UI)
+Task: Nghiên cứu chỉnh sửa các mốc thời gian CMCN cho chính xác và làm động các chỉ số đếm hiện vật (như hiển thị X/8).
+
+Work Log:
+- Đã nghiên cứu các nguồn uy tín và điều chỉnh các mốc thời gian cách mạng công nghiệp:
+  - CMCN 2.0: Từ `1870–1970` sang `1870–1914` (nửa cuối thế kỷ XIX đến đầu thế kỷ XX, trước Thế chiến I).
+  - CMCN 3.0: Từ `1970–2010` sang `1969–2010` (bắt đầu từ ARPANET và bộ lập trình PLC Modicon 084 năm 1969).
+  - CMCN 4.0: Từ `2010–nay` sang `2011–nay` (Hannover Messe 2011 nơi thuật ngữ được khai sinh).
+- Đã cập nhật các mốc thời gian này đồng bộ tại:
+  - Dữ liệu các phòng `PHASES` tại `src/lib/museum-data.ts`.
+  - Dữ liệu tri thức thư viện tại `src/lib/knowledge-data.ts`.
+  - Trục thời gian biểu diễn tại `src/components/museum/panels/HistoricalTimeline.tsx`.
+- Khắc phục lỗi hiển thị chỉ số đếm cứng `/8` hiện vật ở các phòng trưng bày bằng cách làm động hoàn toàn dựa trên dữ liệu thực tế (`exhibits.length`):
+  - Cập nhật biến `phaseExhibits` trong `src/components/museum/layout/MuseumMap.tsx` lấy động từ `EXHIBIT_IDS_BY_PHASE`.
+  - Cập nhật giá trị `max` của `ProgressRing`, tiêu đề bộ sưu tập "Bộ sưu tập · X/Y đã xem" và số lượng "Y hiện vật" trong `src/components/museum/layout/PhaseRoom.tsx` dựa theo danh sách hiện vật thực tế của phòng đó.
+- Next.js dev server tự động hot-reload và build thành công với 0 lỗi (0 errors).
+
+Stage Summary:
+- Các mốc thời gian CMCN đã đồng bộ và chính xác lịch sử.
+- Giao diện phòng trưng bày hiển thị chính xác số lượng hiện vật thực tế thay vì cứng nhắc số 8.
+
+
+
