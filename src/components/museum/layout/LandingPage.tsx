@@ -3,7 +3,7 @@
 import dynamic from "next/dynamic";
 import { motion } from "framer-motion";
 import { ArrowRight, Sparkles, Clock, Map as MapIcon } from "lucide-react";
-import { PHASES } from "@/lib/museum-data";
+import { PHASES, TOTAL_EXHIBITS } from "@/lib/museum-data";
 import { useMuseum } from "@/lib/store";
 import { BrandMark, PhaseNumeral } from "./brand";
 import { ThemeToggle } from "./ThemeToggle";
@@ -43,7 +43,7 @@ export function LandingPage() {
                 <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400" />
                 Mở cửa · Luôn mở
               </span>
-              <span>4 kỷ nguyên · 32 hiện vật</span>
+              <span>4 kỷ nguyên · {TOTAL_EXHIBITS} hiện vật</span>
             </div>
             <ThemeToggle />
           </div>

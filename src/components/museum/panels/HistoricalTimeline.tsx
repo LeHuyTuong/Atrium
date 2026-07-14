@@ -7,7 +7,7 @@ import {
   DialogContent,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { EXHIBITS, PHASES, phaseById } from "@/lib/museum-data";
+import { EXHIBITS, PHASES, phaseById, TOTAL_EXHIBITS } from "@/lib/museum-data";
 import { useMuseum } from "@/lib/store";
 import { MotifIcon } from "@/components/museum/cards/MotifIcon";
 
@@ -36,7 +36,7 @@ export function HistoricalTimeline() {
             <TimelineIcon className="h-4 w-4" style={{ color: "#00d4aa" }} />
             Dòng thời gian · 1760 → nay
           </div>
-          <span className="text-[0.65rem] text-foreground/45">32 hiện vật theo năm</span>
+          <span className="text-[0.65rem] text-foreground/45">{TOTAL_EXHIBITS} hiện vật theo năm</span>
         </div>
 
         <div className="max-h-[70vh] overflow-auto elegant-scroll p-5">
@@ -118,7 +118,7 @@ export function HistoricalTimeline() {
 
           {/* year axis */}
           <div className="ml-2 mt-2 flex justify-between border-t border-foreground/10 pt-2 text-[0.6rem] text-foreground/40">
-            {[1760, 1840, 1870, 1970, 2010, 2025].map((y) => (
+            {[1760, 1840, 1870, 1914, 1969, 2011, 2026].map((y) => (
               <span key={y}>{y}</span>
             ))}
           </div>

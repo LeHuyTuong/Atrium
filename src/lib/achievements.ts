@@ -36,7 +36,7 @@ export const ACHIEVEMENTS: Achievement[] = [
   {
     id: "curious-mind",
     name: "Tâm hồn tò mò",
-    description: "Xem 8 hiện vật trong cùng một kỷ nguyên.",
+    description: "Xem tất cả hiện vật trong cùng một kỷ nguyên.",
     icon: "Eye",
     tier: "bronze",
     check: (s) => PHASES.some((p) => EXHIBITS.filter((e) => e.phase === p.id).every((e) => s.seenExhibits.has(e.id))),
@@ -84,7 +84,7 @@ export const ACHIEVEMENTS: Achievement[] = [
   {
     id: "completionist",
     name: "Hoàn tất bộ sưu tập",
-    description: "Mở tất cả 32 hiện vật trong bảo tàng.",
+    description: "Mở tất cả hiện vật trong bảo tàng.",
     icon: "CheckCircle2",
     tier: "platinum",
     check: (s) => s.seenExhibits.size >= EXHIBITS.length,

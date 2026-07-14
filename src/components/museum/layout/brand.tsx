@@ -1,6 +1,6 @@
 "use client";
 
-import { PHASES } from "@/lib/museum-data";
+import { PHASES, TOTAL_EXHIBITS, TOTAL_CONNECTIONS } from "@/lib/museum-data";
 import { useMuseum } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
@@ -100,7 +100,7 @@ export function StickyFooter() {
           <span className="hidden sm:inline">· Bảo tàng Lịch sử Kỹ thuật số</span>
         </div>
         <div className="flex items-center gap-3">
-          <span className="hidden md:inline">4 kỷ nguyên · 32 hiện vật · 9 mạch liên kết</span>
+          <span className="hidden md:inline">4 kỷ nguyên · {TOTAL_EXHIBITS} hiện vật · {TOTAL_CONNECTIONS} mạch liên kết</span>
           <span className="h-1 w-1 rounded-full bg-foreground/30" />
           <span>Mở cửa · Luôn mở</span>
         </div>

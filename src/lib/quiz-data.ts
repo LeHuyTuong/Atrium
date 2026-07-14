@@ -1,5 +1,5 @@
 // Atrium — Dữ liệu câu hỏi trắc nghiệm
-// 3 câu hỏi/kỷ nguyên × 4 kỷ nguyên = 12 câu
+// 3 câu hỏi/kỷ nguyên × 4 kỷ nguyên = 12 câu hỏi
 
 import { PhaseId } from "./museum-data";
 
@@ -8,173 +8,198 @@ export interface QuizQuestion {
   phase: PhaseId;
   prompt: string;
   options: string[];
-  answer: number; // index đúng
+  answer: number; // index đúng (0-indexed)
   explanation: string;
   exhibitId: string; // hiện vật liên quan
 }
 
 export const QUIZ_QUESTIONS: QuizQuestion[] = [
-  // Industry 1.0
+  // ==================== INDUSTRY 1.0 ====================
   {
     id: "q1-1",
     phase: "industry-1",
-    prompt: "Động cơ hơi nước Watt cải tiến phiên bản Newcomen bằng cách thêm gì?",
+    prompt: "Động cơ hơi nước cải tiến của James Watt (1769) giảm tiêu thụ than bằng cách thêm bộ phận đột phá nào?",
     options: [
-      "Xi-lanh lớn hơn",
-      "Buồng ngưng tách biệt",
-      "Bánh đà nặng hơn",
-      "Nhiều piston",
+      "Xi-lanh có kích thước lớn hơn gấp đôi",
+      "Bộ ngưng tụ hơi nước riêng biệt (Separate Condenser)",
+      "Bánh đà đúc bằng sắt nặng hơn",
+      "Piston kép hoạt động hai chiều"
     ],
     answer: 1,
     explanation:
-      "Watt thêm buồng ngưng riêng để xi-lanh không phải thay đổi nhiệt độ liên tục, tăng hiệu suất gấp 4.",
+      "James Watt đã phát minh ra bộ ngưng tụ hơi nước riêng biệt để giữ cho xi-lanh chính luôn nóng, giúp tiết kiệm tới 75% lượng than tiêu thụ và nâng hiệu suất nhiệt lên vượt bậc.",
     exhibitId: "watt-steam",
   },
   {
     id: "q1-2",
     phase: "industry-1",
-    prompt: "Khung cửi Jacquard (1804) là tiền thân trực tiếp của công nghệ nào?",
-    options: ["Động cơ hơi nước", "Băng đục lỗ → máy tính", "Đường sắt", "Đèn gas"],
+    prompt: "Con thoi bay (Flying Shuttle) do John Kay phát minh vào năm 1733 đã mang lại cải tiến gì cho ngành dệt?",
+    options: [
+      "Tự động hóa hoàn toàn quá trình xe sợi",
+      "Cho phép dệt vải khổ rộng nhanh hơn gấp đôi chỉ với một thợ dệt",
+      "Thay thế toàn bộ sợi bông bằng sợi len tổng hợp",
+      "Sử dụng động cơ điện để vận hành con thoi dệt"
+    ],
     answer: 1,
     explanation:
-      "Băng đục lỗ của Jacquard điều khiển hoa văn dệt — Babbage và Hollerith lấy ý tưởng cho máy tính đầu tiên.",
-    exhibitId: "jacquard-loom",
+      "Con thoi bay giúp người thợ dệt có thể dệt các tấm vải rộng một cách nhanh chóng bằng một tay, giải phóng sức lao động của người thợ phụ và tăng năng suất ngành dệt gấp hai lần.",
+    exhibitId: "flying-shuttle",
   },
   {
     id: "q1-3",
     phase: "industry-1",
-    prompt: "Đường hầm Thames (1843) của Brunel phát minh ra gì?",
+    prompt: "Đầu máy hơi nước Stephenson Rocket (1829) giành chiến thắng tại cuộc thi Rainhill nhờ cải tiến nồi hơi nào?",
     options: [
-      "Xi-lanh hơi nước",
-      "Máy đào hầm (khiên hầm)",
-      "Đường sắt ngầm",
-      "Cầu treo",
+      "Sử dụng bình gas nén chịu áp lực cao",
+      "Thiết kế nồi hơi nhiều ống lửa (Multi-tubular boiler)",
+      "Động cơ đốt trong truyền động gián tiếp",
+      "Hệ thống trục khuỷu lệch tâm hành tinh"
     ],
     answer: 1,
     explanation:
-      "Khiên hầm của Brunel bảo vệ công nhân khi đào — tổ tiên của mọi TBM ngày nay.",
-    exhibitId: "thames-tunnel",
+      "Stephenson Rocket sử dụng nồi hơi nhiều ống đồng nhỏ chạy qua bình chứa nước để tăng diện tích truyền nhiệt, giúp sinh hơi nước nhanh hơn và tạo lực đẩy lớn hơn rất nhiều.",
+    exhibitId: "rocket-locomotive",
   },
 
-  // Industry 2.0
+  // ==================== INDUSTRY 2.0 ====================
   {
     id: "q2-1",
     phase: "industry-2",
-    prompt: "Bóng đèn Edison (1879) dùng sợi đốt làm từ gì?",
-    options: ["Vonfram", "Tre cácbon hóa", "Bạch kim", "Sợi thép"],
+    prompt: "Ai đã thực hiện chuyến hành trình lái xe đường dài đầu tiên trong lịch sử bằng xe xăng Benz Patent-Motorwagen vào năm 1888?",
+    options: [
+      "Karl Benz tự mình lái xe thử nghiệm",
+      "Bà Bertha Benz (vợ của nhà sáng chế Karl Benz)",
+      "Werner von Siemens",
+      "Henry Ford"
+    ],
     answer: 1,
     explanation:
-      "Sau hàng nghìn thí nghiệm, Edison chọn sợi tre cácbon hóa — bền 40 giờ, đủ rẻ để bán.",
-    exhibitId: "light-bulb",
+      "Bà Bertha Benz cùng hai con trai đã thực hiện chuyến hành trình dài 106 km để chứng minh tính khả thi, tin cậy và bền bỉ của chiếc xe hơi chạy xăng đầu tiên với công chúng.",
+    exhibitId: "motorwagen",
   },
   {
     id: "q2-2",
     phase: "industry-2",
-    prompt: "Băng chuyền Ford (1913) giảm thời gian lắp một chiếc Model T xuống bao nhiêu?",
-    options: ["Từ 12 giờ xuống 90 phút", "Từ 5 giờ xuống 1 giờ", "Từ 20 giờ xuống 5 giờ", "Từ 8 giờ xuống 2 giờ"],
-    answer: 0,
+    prompt: "Ý tưởng cốt lõi của lò luyện Bessemer (1856) để sản xuất thép hàng loạt là gì?",
+    options: [
+      "Đốt thêm lượng than củi lớn hơn trong lò kín",
+      "Thổi luồng không khí qua gang lỏng để đốt cháy tạp chất carbon",
+      "Sử dụng dòng điện cường độ cao để nung chảy sắt",
+      "Trộn lẫn quặng sắt với hợp kim đồng niken"
+    ],
+    answer: 1,
     explanation:
-      "Thời gian lắp giảm từ 12 giờ xuống 90 phút, giá giảm từ 850 xuống 260 USD — Model T chiếm 50% thị trường thế giới.",
-    exhibitId: "model-t",
+      "Lò chuyển Bessemer thổi khí oxy qua gang nóng chảy, quá trình oxy hóa tự nhiên sinh nhiệt cực cao đốt cháy lượng carbon dư thừa mà không cần dùng chất đốt ngoài, rút ngắn thời gian luyện thép.",
+    exhibitId: "bessemer-converter",
   },
   {
     id: "q2-3",
     phase: "industry-2",
-    prompt: "Cuộc « chiến dòng điện » AC vs DC thắng bên nào và nhờ công nghệ gì?",
+    prompt: "Chuyến bay lịch sử đầu tiên có điều khiển của chiếc máy bay Wright Flyer (1903) tại Kitty Hawk kéo dài bao lâu?",
     options: [
-      "DC thắng nhờ pin rẻ",
-      "AC thắng nhờ máy biến áp truyền điện đi xa",
-      "Hòa — cả hai cùng tồn tại",
-      "DC thắng vì an toàn hơn",
+      "Đúng 12 giây",
+      "Đúng 12 phút",
+      "Khoảng 1,2 giờ",
+      "Hơn 12 giờ liên tục"
     ],
-    answer: 1,
+    answer: 0,
     explanation:
-      "Máy biến áp (1885, Hungary) cho phép AC tăng điện áp truyền đi hàng trăm km — DC của Edison chỉ đi được vài km.",
-    exhibitId: "ac-transformer",
+      "Vào ngày 17 tháng 12 năm 1903, Orville Wright đã điều khiển chiếc máy bay Wright Flyer cất cánh tự lực và bay l lửng trên không trong đúng 12 giây, mở ra kỷ nguyên hàng không nhân loại.",
+    exhibitId: "wright-flyer",
   },
 
-  // Industry 3.0
+  // ==================== INDUSTRY 3.0 ====================
   {
     id: "q3-1",
     phase: "industry-3",
-    prompt: "Vi xử lý Intel 4004 (1971) chứa bao nhiêu bóng bán dẫn?",
-    options: ["2.300", "23.000", "230.000", "2,3 triệu"],
+    prompt: "Vi xử lý thương mại đơn chip đầu tiên trên thế giới — Intel 4004 (1971) — tích hợp bao nhiêu bóng bán dẫn?",
+    options: [
+      "Tích hợp 2.300 bóng bán dẫn",
+      "Tích hợp 23.000 bóng bán dẫn",
+      "Tích hợp 230.000 bóng bán dẫn",
+      "Tích hợp 2,3 triệu bóng bán dẫn"
+    ],
     answer: 0,
     explanation:
-      "2.300 bóng bán dẫn trên 12 mm² — toàn bộ CPU trong một con chip, khởi đầu kỷ nguyên vi xử lý.",
+      "Intel 4004 tích hợp 2.300 bóng bán dẫn trên một tấm silicon siêu nhỏ rộng 12 mm², mang lại sức mạnh tính toán tương đương chiếc máy tính khổng lồ ENIAC nặng 27 tấn trước đó.",
     exhibitId: "intel-4004",
   },
   {
     id: "q3-2",
     phase: "industry-3",
-    prompt: "Tin nhắn đầu tiên trên ARPANET (1969) là gì?",
-    options: ["Hello", "« lo » (nửa chữ login)", "ping", "test"],
+    prompt: "Cánh tay robot công nghiệp Unimate đầu tiên (1961) được triển khai tại nhà máy General Motors nhằm mục đích gì?",
+    options: [
+      "Lắp ráp vi mạch và bảng mạch điện tử",
+      "Gắp các thanh đúc kim loại nóng đỏ và hàn điểm khung vỏ xe hơi",
+      "Sơn phủ nano và đánh bóng kính chắn gió",
+      "Vận chuyển hàng thành phẩm lên container tự động"
+    ],
     answer: 1,
     explanation:
-      "Charley Kline cố gửi « login » nhưng máy nhận sập sau « lo » — tin nhắn đầu tiên của internet chỉ có 2 chữ.",
-    exhibitId: "arpanet",
+      "Unimate được giao thực hiện công việc nặng nhọc và nguy hiểm: gắp các chi tiết hợp kim đúc nóng đỏ và tiến hành hàn điểm trên thân vỏ ô tô nhằm bảo vệ an toàn cho công nhân.",
+    exhibitId: "unimate-robot",
   },
   {
     id: "q3-3",
     phase: "industry-3",
-    prompt: "Tim Berners-Lee khi phát minh World Wide Web (1989) đã làm gì với bằng sáng chế?",
+    prompt: "Bộ lập trình PLC Modicon 084 (1969) ra đời đã giúp thay thế hệ thống điều khiển công nghiệp nào?",
     options: [
-      "Bán cho Microsoft giá cao",
-      "Giữ và thu phí bản quyền",
-      "Cấp miễn phí cho thế giới",
-      "Chỉ cấp cho các trường đại học",
+      "Hệ thống đòn bẩy và xích truyền lực cơ học",
+      "Hệ thống tủ điện rơ-le và dây nối vật lý phức tạp",
+      "Hệ thống máy tính mainframe cồng kềnh",
+      "Động cơ hơi nước truyền động trục khuỷu"
     ],
-    answer: 2,
+    answer: 1,
     explanation:
-      "Berners-Lee quyết định KHÔNG cấp bằng sáng chế — Web miễn phí cho mọi người, một trong những hành động hào phóng nhất lịch sử kỹ thuật.",
-    exhibitId: "www",
+      "PLC Modicon 084 thay thế hàng nghìn rơ-le cơ học bằng phần mềm điều khiển lưu trong bộ nhớ máy, cho phép lập trình lại dễ dàng và giúp dây chuyền tự động hóa linh hoạt vượt bậc.",
+    exhibitId: "modicon-plc",
   },
 
-  // Industry 4.0
+  // ==================== INDUSTRY 4.0 ====================
   {
     id: "q4-1",
     phase: "industry-4",
-    prompt: "AlexNet (2012) là mạng nơ-ron sâu đã thắng cuộc thi nào với tỷ lệ giảm bao nhiêu?",
+    prompt: "Để thực hiện một cú lộn nhào ngược (backflip) thăng bằng, hệ thống máy tính của robot hình người Atlas phải làm gì?",
     options: [
-      "ImageNet — lỗi giảm từ 26% xuống 15%",
-      "CIFAR — lỗi giảm từ 40% xuống 20%",
-      "MNIST — lỗi giảm từ 5% xuống 1%",
-      "COCO — lỗi giảm từ 50% xuống 30%",
+      "Chạy một đoạn băng video động tác lập trình sẵn tĩnh",
+      "Thực hiện hàng nghìn phép tính quỹ đạo cân bằng động trong thời gian thực",
+      "Dùng hệ thống dây cáp chịu lực ẩn treo từ trên trần",
+      "Dựa hoàn toàn vào các bánh răng hồi chuyển vật lý tự cân bằng"
     ],
-    answer: 0,
+    answer: 1,
     explanation:
-      "AlexNet thắng ImageNet 2012, tỷ lệ lỗi giảm từ 26% xuống 15% — thức tỉnh AI sau « mùa đông ».",
-    exhibitId: "neural-net",
+      "Robot Atlas sử dụng hệ thống máy tính thời gian thực tích hợp trên bo mạch để tính toán phân bổ lực, mô-men xoắn tại các khớp thủy lực hàng nghìn lần mỗi giây nhằm giữ cân bằng động.",
+    exhibitId: "atlas-robot",
   },
   {
     id: "q4-2",
     phase: "industry-4",
-    prompt: "Falcon 9 (SpaceX) năm 2015 đã làm điều gì chưa từng có?",
+    prompt: "Trợ lý ảo điều khiển bằng giọng nói Siri được Apple tích hợp lần đầu tiên vào mẫu điện thoại nào vào năm 2011?",
     options: [
-      "Đưa người lên ISS giá rẻ",
-      "Phóng 100 vệ tinh cùng lúc",
-      "Tầng tên lửa hạ cánh thẳng đứng để tái sử dụng",
-      "Đi đến Mặt Trăng và quay về",
+      "iPhone 3GS",
+      "iPhone 4",
+      "iPhone 4S",
+      "iPhone 5"
     ],
     answer: 2,
     explanation:
-      "21/12/2015, tầng đầu Falcon 9 hạ cánh thẳng đứng — lần đầu tên lửa quỹ đạo « đi về », giảm chi phí phóng ×10.",
-    exhibitId: "falcon-9",
+      "Siri ra mắt công chúng lần đầu cùng với chiếc iPhone 4S vào ngày 4 tháng 10 năm 2011, đánh mốc cột mốc lịch sử đưa trí tuệ nhân tạo (AI) hội thoại đến tay người dùng phổ thông.",
+    exhibitId: "iphone-4s",
   },
   {
     id: "q4-3",
     phase: "industry-4",
-    prompt: "Kiến trúc Transformer (2017) bỏ điều gì và thay bằng gì?",
+    prompt: "Thiết bị loa thông minh Amazon Echo (2014) tích hợp trợ lý ảo điều khiển bằng giọng nói tên là gì?",
     options: [
-      "Bỏ vòng lặp, thay bằng cơ chế « chú ý »",
-      "Bỏ nơ-ron, thay bằng bảng tra cứu",
-      "Bỏ softmax, thay bằng sigmoid",
-      "Bỏ huấn luyện, thay bằng quy tắc cứng",
+      "Siri",
+      "Cortana",
+      "Alexa",
+      "Google Assistant"
     ],
-    answer: 0,
+    answer: 2,
     explanation:
-      "Transformer bỏ vòng lặp RNN, dùng « attention » để mỗi từ nhìn tất cả từ khác cùng lúc — nền móng của GPT, Claude, Gemini.",
-    exhibitId: "transformer-arch",
+      "Amazon Echo tích hợp trợ lý ảo Alexa dựa trên đám mây, giúp người dùng ra lệnh phát nhạc, quản lý lịch trình, trả lời câu hỏi và điều khiển nhà thông minh hoàn toàn bằng giọng nói.",
+    exhibitId: "amazon-echo",
   },
 ];
 

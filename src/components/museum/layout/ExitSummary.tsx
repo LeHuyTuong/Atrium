@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { ArrowRight, RotateCcw, BookOpen, Award, Share2, Sparkles } from "lucide-react";
 import { useMuseum } from "@/lib/store";
-import { EXHIBITS, PHASES } from "@/lib/museum-data";
+import { EXHIBITS, PHASES, TOTAL_EXHIBITS } from "@/lib/museum-data";
 import { BrandMark, ProgressRing } from "./brand";
 import { ThemeToggle } from "./ThemeToggle";
 
@@ -80,7 +80,7 @@ export function ExitSummary() {
             transition={{ delay: 0.4, duration: 0.7 }}
             className="mt-8 grid w-full max-w-xl grid-cols-2 gap-3 sm:grid-cols-4"
           >
-            <Stat label="Hiện vật" value={`${seenExhibits.length}/32`} accent="#e89446" />
+            <Stat label="Hiện vật" value={`${seenExhibits.length}/${TOTAL_EXHIBITS}`} accent="#e89446" />
             <Stat label="Phòng" value={`${phasesEntered.length}/4`} accent="#4ade80" />
             <Stat label="Trắc nghiệm" value={quizzesPassed} accent="#e8b53a" />
             <Stat label="Thời gian" value={`${mm}:${ss}`} accent="#00d4aa" />

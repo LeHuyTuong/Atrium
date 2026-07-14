@@ -1,41 +1,26 @@
 // Atrium — Dữ liệu bảo tàng
-// 4 kỷ nguyên × 8 hiện vật = 32 hiện vật + 9 mạch liên kết xuyên thời gian
+// 4 kỷ nguyên × (3 hoặc 4) hiện vật = 17 hiện vật + 5 mạch liên kết xuyên thời gian
 
 export type PhaseId = "industry-1" | "industry-2" | "industry-3" | "industry-4";
 
 export type Motif =
-  | "steam"
-  | "loom"
-  | "gear"
+  | "flying-shuttle"
+  | "steam-engine"
+  | "steamboat-fulton"
   | "locomotive"
-  | "cotton-gin"
-  | "puddling"
-  | "gas-lamp"
-  | "thames-shield"
-  | "bolt"
-  | "assembly"
+  | "bessemer-converter"
   | "dynamo"
-  | "otto"
-  | "marconi"
-  | "edison-meter"
-  | "light-bulb"
-  | "bulb"
-  | "network"
-  | "chip"
-  | "monitor"
-  | "upc"
-  | "www"
-  | "phone"
-  | "gps"
-  | "brain"
-  | "cloud"
-  | "printer"
-  | "car"
-  | "smartphone"
-  | "transformer"
-  | "rocket"
-  | "robot"
-  | "neural-net";
+  | "edison-phonograph"
+  | "motorwagen"
+  | "wright-flyer"
+  | "unimate-robot"
+  | "intel-4004"
+  | "modicon-plc"
+  | "altair-8800"
+  | "motorola-dynatac"
+  | "atlas-robot"
+  | "amazon-echo"
+  | "iphone-4s";
 
 export interface Exhibit {
   id: string;
@@ -78,7 +63,7 @@ export const PHASES: Phase[] = [
     accent: "#e89446",
     accentVar: "--color-phase-1",
     intro:
-      "Khi than đá và nước sôi lần đầu cùng làm việc, con người học được cách giam sức mạnh của tự nhiên trong những ống thép. Nhà máy thay thế xưởng thợ; đường sắt thu nhỏ thế giới; bóng đêm bị đèn gas chinh phục lần đầu tiên.",
+      "Khi than đá và nước sôi lần đầu cùng làm việc, con người học được cách giải phóng năng lượng của tự nhiên. Máy dệt cơ bản tăng tốc sản xuất; động cơ hơi nước và đường sắt thu nhỏ thế giới; tàu thủy hơi nước vượt mọi dòng ngược.",
     curatorQuote:
       "Không phải máy móc thay đổi thế giới — mà là niềm tin rằng sức mạnh có thể được sản xuất.",
   },
@@ -88,11 +73,11 @@ export const PHASES: Phase[] = [
     label: "2.0",
     name: "Công nghiệp 2.0",
     era: "Kỷ nguyên Điện & Sản xuất hàng loạt",
-    period: "1870–1970",
+    period: "1870–1914",
     accent: "#e8b53a",
     accentVar: "--color-phase-2",
     intro:
-      "Dòng điện chạy qua dây đồng đã viết lại mọi quy tắc. Băng chuyền Ford biến công nhân thành mắt xích của một vũ điệu cơ học; vô tuyến truyền tiếng nói qua đại dương; bóng đèn xóa nhòa ranh giới ngày và đêm.",
+      "Dòng điện chạy qua dây đồng đã viết lại mọi quy tắc. Lò Bessemer tôi luyện thép cứng dựng xây nhà chọc trời; máy phát điện Siemens thắp sáng phố phường; động cơ đốt trong và máy bay giúp nhân loại thực sự chinh phục bầu trời.",
     curatorQuote:
       "Điện không chỉ thắp sáng — nó đồng bộ hóa cả một nền văn minh.",
   },
@@ -102,11 +87,11 @@ export const PHASES: Phase[] = [
     label: "3.0",
     name: "Công nghiệp 3.0",
     era: "Kỷ nguyên Điện tử & Vi xử lý",
-    period: "1970–2010",
+    period: "1969–2010",
     accent: "#4ade80",
     accentVar: "--color-phase-3",
     intro:
-      "Silicon học cách suy nghĩ. Một con chip nhỏ bằng móng tay chứa hàng nghìn bóng bán dẫn, và đột ngột trí tuệ có thể được nhân bản thành hàng triệu bản sao. Mạng lưới kết nối các máy tính thành một hệ thần kinh toàn cầu.",
+      "Silicon học cách suy nghĩ. Một con chip nhỏ chứa hàng nghìn bóng bán dẫn mở đầu kỷ nguyên vi tính cá nhân; thiết bị PLC định hình tự động hóa dây chuyền; cánh tay robot đầu tiên giải phóng sức lao động nguy hiểm.",
     curatorQuote:
       "Chip không chỉ tính toán — nó đã dân chủ hóa sức mạnh tính toán.",
   },
@@ -116,11 +101,11 @@ export const PHASES: Phase[] = [
     label: "4.0",
     name: "Công nghiệp 4.0",
     era: "Kỷ nguyên Thông minh & Kết nối",
-    period: "2010–nay",
+    period: "2011–nay",
     accent: "#e879f9",
     accentVar: "--color-phase-4",
     intro:
-      "Khi vật lý, sinh học và kỹ thuật số hội tụ, máy móc bắt đầu tự nhận biết và tự quyết định. Trí tuệ nhân tạo học từ dữ liệu của cả nhân loại; vật liệu tự in ra chính nó; xe tự hành hiểu đường phố hơn tài xế.",
+      "Khi vật lý, kỹ thuật số và trí tuệ nhân tạo hội tụ. Trợ lý thông minh lắng nghe cuộc sống thường nhật; điện thoại trong túi kết nối cả thế giới; robot sinh học hình người tự bước đi và học hỏi từ thế giới xung quanh.",
     curatorQuote:
       "Chúng ta không còn chế tạo máy móc — chúng ta đang nuôi dưỡng chúng.",
   },
@@ -129,718 +114,388 @@ export const PHASES: Phase[] = [
 export const EXHIBITS: Exhibit[] = [
   // ===================== INDUSTRY 1.0 =====================
   {
+    id: "flying-shuttle",
+    phase: "industry-1",
+    name: "Con thoi bay John Kay",
+    year: "1733",
+    inventor: "John Kay",
+    origin: "Bury, Lancashire, Anh",
+    motif: "flying-shuttle",
+    tagline: "Tăng tốc độ dệt vải lên gấp đôi.",
+    story:
+      "Năm 1733, John Kay phát minh ra con thoi bay. Thay vì phải luồn thoi dệt bằng tay qua các sợi dọc một cách chậm chạp, thợ dệt chỉ cần kéo dây để bắn con thoi qua lại trên đường ray. Điều này giúp dệt được những khổ vải rộng hơn rất nhiều và tốc độ nhanh hơn gấp đôi.",
+    whyItMatters:
+      "Là một trong những phát minh quan trọng đầu tiên châm ngòi cho Cách mạng Công nghiệp 1.0. Nó tạo ra sự mất cân bằng lớn: tốc độ dệt quá nhanh khiến sợi không đủ cung cấp, buộc người ta phải phát minh ra các máy quay sợi hiệu suất cao sau đó.",
+    didYouKnow:
+      "Các thợ dệt thủ công lo sợ mất sinh kế đã tấn công nhà của John Kay và phá hủy các máy móc của ông. Ông phải trốn sang Pháp dệt thuê và qua đời trong nghèo khó.",
+    metrics: [
+      { label: "Năng suất dệt", value: "x2" },
+      { label: "Số thợ dệt", value: "1 người/máy" },
+      { label: "Năm cấp bằng", value: "1733" },
+    ],
+    tags: ["dệt may", "cơ giới hóa", "năng suất"],
+  },
+  {
     id: "watt-steam",
     phase: "industry-1",
     name: "Động cơ hơi nước Watt",
     year: "1769",
     inventor: "James Watt",
     origin: "Glasgow, Scotland",
-    motif: "steam",
+    motif: "steam-engine",
     hero: true,
-    tagline: "Sức mạnh bị giam cầm trong thép.",
+    tagline: "Trái tim cơ giới hóa của thế giới.",
     story:
-      "James Watt không phát minh ra động cơ hơi nước — ông cứu nó. Phiên bản Newcomen tốn than ngập ngửa mà yếu ớt. Khi sửa một mô hình năm 1765, Watt nhận ra phần lớn nhiệt bị lãng phí vì xi-lanh phải thay đổi nhiệt độ liên tục. Ông thêm buồng ngưng tách biệt, biến đổi một cú chạm khiến năng suất tăng gấp bốn.",
+      "James Watt cải tiến động cơ hơi nước của Newcomen bằng cách thêm buồng ngưng hơi nước riêng biệt. Thiết kế này giúp giữ cho xi-lanh chính luôn nóng, tiết kiệm tới 75% lượng than tiêu thụ và tăng hiệu suất động cơ lên gấp nhiều lần.",
     whyItMatters:
-      "Động cơ Watt là trái tim đầu tiên của Cách mạng Công nghiệp. Nó biến năng lượng từ việc phụ thuộc vào gió, nước và cơ bắp thành thứ có thể được sản xuất theo yêu cầu. Mọi nhà máy, mọi con tàu, mọi đường sắt sau này đều mang huyết thống của cỗ máy này.",
+      "Nguồn động lực chính thay thế sức người, sức ngựa và sức nước. Nó cho phép các nhà máy công nghiệp được xây dựng ở bất cứ đâu, không còn phụ thuộc vào sông ngòi, đặt nền móng cho đô thị hóa và đại công nghiệp.",
     didYouKnow:
-      "Watt đặt tên đơn vị « mã lực » để các chủ mỏ dễ hình dung so với ngựa kéo — và đơn vị « oát » sau này mang tên ông.",
+      "Watt phát minh ra khái niệm 'mã lực' (horsepower) để thuyết phục các chủ mỏ mua động cơ hơi nước bằng cách so sánh hiệu năng máy với sức kéo của ngựa thực tế.",
     metrics: [
-      { label: "Tăng hiệu suất", value: "×4" },
+      { label: "Tiết kiệm than", value: "75%" },
+      { label: "Tăng hiệu suất", value: "x4" },
       { label: "Năng lượng", value: "Than đá" },
-      { label: "Ứng dụng", value: "Mọi nhà máy" },
     ],
-    tags: ["động lực", "năng lượng", "cơ giới hóa"],
+    tags: ["năng lượng", "hơi nước", "động cơ"],
   },
   {
-    id: "spinning-jenny",
+    id: "steamboat-fulton",
     phase: "industry-1",
-    name: "Cái ghé quay sợi",
-    year: "1764",
-    inventor: "James Hargreaves",
-    origin: "Lancashire, Anh",
-    motif: "loom",
-    tagline: "Tám con suốt trong một bàn tay.",
+    name: "Tàu thủy hơi nước Clermont",
+    year: "1807",
+    inventor: "Robert Fulton",
+    origin: "New York, Hoa Kỳ",
+    motif: "steamboat-fulton",
+    tagline: "Chinh phục dòng nước ngược.",
     story:
-      "Câu chuyện kể rằng con gái Jenny của Hargreaves đánh rơi chiếc suốt — và ông nhìn thấy nó vẫn quay khi rơi. Cảnh tượng đó gợi ý một cỗ máy có thể quay nhiều sợi cùng lúc. Cái ghé ban đầu có 8 suốt, sau tăng lên 80, và một thợ dệt làm được việc của cả tổ.",
+      "Tàu Clermont của Robert Fulton là tàu thủy hơi nước thương mại thành công đầu tiên trên thế giới. Vào ngày 17/8/1807, Clermont đã đi 150 dặm ngược dòng sông Hudson từ New York đến Albany trong 32 giờ, mở ra kỷ nguyên mới cho vận tải đường thủy.",
     whyItMatters:
-      "Sợi vải Anh trở nên rẻ đến mức phá hủy cả ngành dệt thủ công Ấn Độ. Jenny châm ngòi cho cuộc chạy đua cơ giới hóa — và cho cuộc chiến Luddite chống lại máy móc thay người.",
+      "Giải phóng giao thương đường thủy khỏi sự phụ thuộc vào hướng gió. Nó giúp việc di chuyển ngược dòng sông lớn trở nên nhanh chóng và đáng tin cậy, thúc đẩy mạnh mẽ kinh tế nội địa và giao thương quốc tế.",
     didYouKnow:
-      "Dân dệt thủ công đập vỡ máy Hargreaves vì sợ mất việc. Ông phải chuyển nhà bí mật để bảo vệ tính mạng.",
+      "Khi đang chế tạo, người dân New York gọi Clermont là 'Fulton's Folly' (Sự điên rồ của Fulton) vì họ tin rằng con tàu gỗ chứa động cơ hơi nước nặng nề này sẽ chìm ngay khi hạ thủy.",
     metrics: [
-      { label: "Suốt / máy", value: "8 → 80" },
-      { label: "Năng suất", value: "×8" },
-      { label: "Tác động", value: "Cách mạng dệt" },
+      { label: "Vận tốc", value: "8 km/h" },
+      { label: "Quãng đường", value: "240 km" },
+      { label: "Thời gian chạy", value: "32 giờ" },
     ],
-    tags: ["dệt may", "cơ giới hóa", "lao động"],
-  },
-  {
-    id: "cotton-gin",
-    phase: "industry-1",
-    name: "Máy tách hạt bông",
-    year: "1793",
-    inventor: "Eli Whitney",
-    origin: "Georgia, Hoa Kỳ",
-    motif: "cotton-gin",
-    tagline: "Một phát minh đã kéo lùi tự do.",
-    story:
-      "Whitney thiết kế máy tách hạt bông chỉ trong mười ngày, hy vọng giảm lao động cho người trồng bông. Ngược lại, máy làm bông trở nên lợi nhuận khủng khiếp — và nền kinh tế đồn điền miền Nam Mỹ bùng nổ, kéo theo hàng triệu người bị giữ trong chế độ nô lệ.",
-    whyItMatters:
-      "Đây là một trong những phát minh có tác động ngược — làm trầm trọng thêm điều nó định giải quyết. Nó định hình cuộc Nội chiến Hoa Kỳ và để lại di chứng kéo dài thế kỷ.",
-    didYouKnow:
-      "Whitney sau này tiên phong « sản xuất linh kiện thay thế » — ý tưởng rằng mỗi bộ phận máy có thể hoán đổi, nền tảng của sản xuất hiện đại.",
-    metrics: [
-      { label: "Tốc độ tách", value: "×50" },
-      { label: "Di sản", value: "Nội chiến Mỹ" },
-      { label: "Linh kiện", value: "Hoán đổi" },
-    ],
-    tags: ["nông nghiệp", "lao động", "tiêu chuẩn hóa"],
-  },
-  {
-    id: "puddling-furnace",
-    phase: "industry-1",
-    name: "Lò luyện sắt puddling",
-    year: "1784",
-    inventor: "Henry Cort",
-    origin: "Hampshire, Anh",
-    motif: "puddling",
-    tagline: "Thép trong lành cho đường sắt.",
-    story:
-      "Trước Cort, sắt non giòn và tạp chất nhiều. Ông nghĩ ra cách khuấy (« puddle ») sắt nóng chảy trong lò có oxy, đốt cháy tạp chất cacbon. Kết quả là sắt rèn dẻo, đồng nhất — nguyên liệu của đường sắt, cầu và tàu thủy.",
-    whyItMatters:
-      "Không có puddling, không có đường sắt vắt qua các đại lục. Phương pháp này nhân 15 lần sản lượng sắt Anh trong hai thập kỷ và biến thép thành vật liệu cấu trúc của thế giới.",
-    didYouKnow:
-      "Cort bị vu oan nợ và mất bằng sáng chế — chết nghèo. Nhưng quy trình của ông đã viết lại bản đồ kỹ thuật thế giới.",
-    metrics: [
-      { label: "Sản lượng", value: "×15" },
-      { label: "Chất lượng", value: "Sắt rèn" },
-      { label: "Ứng dụng", value: "Đường sắt" },
-    ],
-    tags: ["luyện kim", "năng lượng", "cơ sở hạ tầng"],
+    tags: ["giao thông", "hàng hải", "hơi nước"],
   },
   {
     id: "rocket-locomotive",
     phase: "industry-1",
-    name: "Đầu máy Rocket",
+    name: "Đầu máy xe lửa Rocket",
     year: "1829",
-    inventor: "George Stephenson",
+    inventor: "George & Robert Stephenson",
     origin: "Newcastle, Anh",
     motif: "locomotive",
-    tagline: "Lần đầu con người nhanh hơn ngựa.",
+    tagline: "Khai sinh kỷ nguyên đường sắt hiện đại.",
     story:
-      "Cuộc thi Rainhill năm 1829 tìm đầu máy cho đường sắt Liverpool–Manchester. Rocket của Stephenson thắng áp đảo với ống lò đa ống, đạt 38 km/h — nhanh hơn mọi thứ trên đất liền thời bấy giờ. Nó không chỉ thắng cuộc thi, nó mở ra kỷ nguyên đường sắt.",
+      "Rocket chiến thắng cuộc thi Rainhill Trials năm 1829 nhờ thiết kế nồi hơi nhiều ống lò cải tiến, giúp tối ưu hóa diện tích tiếp xúc nhiệt và tạo ra lượng hơi nước lớn nhanh chóng. Thiết kế này trở thành tiêu chuẩn cho đầu máy hơi nước suốt một thế kỷ.",
     whyItMatters:
-      "Rocket chứng minh đường sắt là tương lai. Trong 20 năm, mạng lưới vắt qua Anh, rồi châu Âu, rồi thế giới. Thời gian và không gian thu nhỏ lại; đồng hồ chuẩn được phát minh vì các tuyến tàu cần giờ thống nhất.",
+      "Là đầu máy xe lửa thực tế đầu tiên kết hợp tốc độ, độ tin cậy và hiệu quả kinh tế. Rocket đã chứng minh đường sắt là phương tiện vận chuyển hành khách và hàng hóa vượt trội hơn đường bộ và kênh đào.",
     didYouKnow:
-      "Múi giờ chuẩn là di sản gián tiếp của Rocket — trước đường sắt, mỗi thành phố giữ giờ riêng theo mặt trời.",
+      "Trong cuộc thi thử nghiệm, Rocket đạt tốc độ tối đa lên tới 46 km/h — một tốc độ không tưởng vào thời điểm đó khiến nhiều hành khách lo sợ sẽ bị ngạt thở vì đi quá nhanh.",
     metrics: [
-      { label: "Tốc độ", value: "38 km/h" },
-      { label: "Công suất", value: "75 mã lực" },
-      { label: "Di sản", value: "Múi giờ" },
+      { label: "Tốc độ tối đa", value: "46 km/h" },
+      { label: "Trọng lượng", value: "4.3 tấn" },
+      { label: "Cuộc thi thắng", value: "Rainhill Trials" },
     ],
-    tags: ["giao thông", "động lực", "thu hẹp thế giới"],
-  },
-  {
-    id: "jacquard-loom",
-    phase: "industry-1",
-    name: "Khung cửi Jacquard",
-    year: "1804",
-    inventor: "Joseph Marie Jacquard",
-    origin: "Lyon, Pháp",
-    motif: "loom",
-    tagline: "Băng đục lỗ — chương trình đầu tiên.",
-    story:
-      "Jacquard gắn các thẻ đục lỗ lên khung cửi để điều khiển từng sợi dệt theo hoa văn. Một thợ dệt có thể dệt hoa văn phức tạp mà trước đây cần vài người. Hơn thế — băng đục lỗ chính là « phần mềm » đầu tiên.",
-    whyItMatters:
-      "Babbage lấy cảm hứng từ Jacquard khi thiết kế Analytical Engine; Hollerith dùng cùng ý tưởng cho máy đếm dân số. Mỗi dòng lệnh bạn viết hôm nay đều mang DNA của chiếc khung cửi này.",
-    didYouKnow:
-      "Năm 1806, Napoleon tặng Jacquard 3.000 franc và lương trọn đời. Có lúc 10.000 khung cải tiến hoạt động khắp Lyon.",
-    metrics: [
-      { label: "Lệnh / thẻ", value: "Hàng trăm" },
-      { label: "Tiền thân", value: "Phần mềm" },
-      { label: "Ứng dụng", value: "Dệt → máy tính" },
-    ],
-    tags: ["dệt may", "mã hóa", "tự động hóa"],
-  },
-  {
-    id: "gas-lamp",
-    phase: "industry-1",
-    name: "Đèn gas",
-    year: "1792",
-    inventor: "William Murdoch",
-    origin: "Cornwall, Anh",
-    motif: "gas-lamp",
-    tagline: "Chinh phục bóng đêm.",
-    story:
-      "Murdoch, nhân viên của Boulton & Watt, chưng cất than thành khí và thắp sáng ngôi nhà của mình ở Redruth năm 1792. Đến 1807, đường Pall Mall ở London là phố đầu tiên được thắp gas. Bóng đêm — kẻ thù ngàn năm của nhân loại — bị đẩy lùi.",
-    whyItMatters:
-      "Lần đầu tiên thành phố không ngủ. Nhà máy chạy 24/24, quán cà phê mở khuya, văn hóa đô thị thay đổi vĩnh viễn. Đèn gas là tiền đề vật lý cho « xã hội đêm » của thế kỷ XIX.",
-    didYouKnow:
-      "Người ta ban đầu sợ khí gas là « khí ma quỷ ». Một số nhà thờ từ chối thắp sáng vì cho rằng thắp đèn là « cản ý Chúa ».",
-    metrics: [
-      { label: "Nguồn", value: "Than chưng cất" },
-      { label: "Tuổi thọ", value: "Hàng nghìn giờ" },
-      { label: "Di sản", value: "Thành phố không ngủ" },
-    ],
-    tags: ["năng lượng", "ánh sáng", "đô thị"],
-  },
-  {
-    id: "thames-tunnel",
-    phase: "industry-1",
-    name: "Đường hầm Thames",
-    year: "1843",
-    inventor: "Marc & Isambard Brunel",
-    origin: "London, Anh",
-    motif: "thames-shield",
-    tagline: "Đi dưới con sông.",
-    story:
-      "Marc Brunel quan sát con giếng tàu (Teredo navalis) đục gỗ và nảy ra ý tưởng « khiên hầm » — một thiết bị bảo vệ công nhân trong khi đào. Con trai ông Isambard hoàn thành đường hầm dưới sông Thames sau 18 năm, ngập nước, hỏa hoạn và nợ nần.",
-    whyItMatters:
-      "Đây là đường hầm dưới nước đầu tiên trên thế giới thành công. Khiên hầm của Brunel là tổ tiên của mọi máy đào hầm (TBM) ngày nay — Metro, Channel Tunnel, thậm chí hầm đường bộ đều mang gen của nó.",
-    didYouKnow:
-      "Trong 18 năm xây dựng, đường hầm từng mở cho du khách — có cửa hàng, nhạc sống và 2 triệu lượt tham quan trước khi chạy tàu.",
-    metrics: [
-      { label: "Chiều dài", value: "396 m" },
-      { label: "Thời gian", value: "18 năm" },
-      { label: "Di sản", value: "Mọi TBM" },
-    ],
-    tags: ["cơ sở hạ tầng", "kỹ thuật", "đô thị"],
+    tags: ["giao thông", "đường sắt", "hơi nước"],
   },
 
   // ===================== INDUSTRY 2.0 =====================
   {
-    id: "light-bulb",
+    id: "bessemer-converter",
     phase: "industry-2",
-    name: "Bóng đèn sợi đốt",
-    year: "1879",
-    inventor: "Thomas Edison",
-    origin: "Menlo Park, Hoa Kỳ",
-    motif: "light-bulb",
-    hero: true,
-    tagline: "Một sợi tre thắp sáng thế giới.",
+    name: "Lò chuyển thép Bessemer",
+    year: "1856",
+    inventor: "Henry Bessemer",
+    origin: "Sheffield, Anh",
+    motif: "bessemer-converter",
+    tagline: "Luyện sắt thành thép hàng loạt.",
     story:
-      "Edison không phải người đầu tiên làm bóng đèn — nhưng là người đầu tiên làm bóng đèn « đáng mua ». Sau hàng nghìn thí nghiệm với sợi tre cácbon hóa, ông tìm ra sợi bền 40 giờ. Đêm Giao thừa 1879, phòng thí nghiệm Menlo Park của ông sáng rực, và báo chí đổ xô đến.",
+      "Henry Bessemer phát minh ra phương pháp luyện thép bằng cách thổi luồng khí oxy qua gang lỏng để đốt cháy các tạp chất cacbon dư thừa. Phương pháp này chuyển hóa gang giòn thành thép dẻo dai chỉ trong vòng 20 phút mà không cần thêm chất đốt.",
     whyItMatters:
-      "Bóng đèn là sản phẩm tiêu dùng đầu tiên của mạng lưới điện. Nó tạo ra nhu cầu đủ lớn để xây nhà máy điện, lưới phân phối và toàn bộ ngành công nghiệp điện lực. Ánh sáng nhân tạo rẻ là điều kiện cho ca đêm, cho bệnh viện hiện đại, cho mọi « thành phố không ngủ ».",
+      "Biến thép từ một vật liệu xa xỉ thành kim loại rẻ tiền được sản xuất hàng loạt. Thép Bessemer là xương sống để xây dựng đường ray xe lửa, cầu cảng, tàu chiến và các tòa nhà chọc trời đầu tiên của nhân loại.",
     didYouKnow:
-      "Edison cấp bằng sáng chế hơn 1.000 phát minh — trung bình cứ hai tuần một bằng trong suốt cuộc đời.",
+      "Mặc dù mang tên Bessemer, một nhà sáng chế người Mỹ tên là William Kelly cũng đã phát hiện ra nguyên lý tương tự trước đó nhưng không kịp đăng ký bằng sáng chế và bị phá sản.",
     metrics: [
-      { label: "Tuổi thọ", value: "40 giờ" },
-      { label: "Sợi đốt", value: "Tre cácbon" },
-      { label: "Bằng sáng chế", value: "1.000+" },
+      { label: "Thời gian luyện", value: "20 phút" },
+      { label: "Giảm chi phí", value: "80%" },
+      { label: "Sản lượng thép", value: "Tăng x10" },
     ],
-    tags: ["ánh sáng", "điện", "tiêu dùng"],
+    tags: ["vật liệu", "luyện kim", "sản xuất"],
   },
   {
     id: "dynamo",
     phase: "industry-2",
-    name: "Máy phát điện dynamo",
+    name: "Máy phát điện Dynamo Siemens",
     year: "1866",
     inventor: "Werner von Siemens",
     origin: "Berlin, Đức",
     motif: "dynamo",
-    tagline: "Cơ học hóa thành dòng điện.",
+    tagline: "Nguồn khởi đầu của dòng điện công nghiệp.",
     story:
-      "Siemens nhận ra rằng một nam châm điện quay trong cuộn dây sẽ sinh ra dòng điện — không cần pin. Dynamo của ông là máy phát điện tự kích đầu tiên, biến năng lượng cơ học thành điện một cách thực tế. Nó là trái tim của mọi nhà máy điện sau này.",
+      "Năm 1866, Werner von Siemens phát minh ra máy phát điện tự kích từ (dynamo). Bằng cách sử dụng chính dòng điện do máy tạo ra để tăng cường từ trường của nam châm điện, thiết kế này cho phép tạo ra dòng điện lớn, ổn định và liên tục.",
     whyItMatters:
-      "Dynamo khiến điện trở thành năng lượng có thể sản xuất hàng loạt. Không có nó, không có lưới điện, không có xe điện, không có mạng internet. Mọi « phích cắm » trên tường đều bắt nguồn từ nguyên lý này.",
+      "Đặt nền móng cho ngành kỹ thuật điện hiện đại. Dynamo biến năng lượng cơ học thành năng lượng điện trên quy mô lớn, thắp sáng các thành phố và cung cấp năng lượng cho động cơ điện trong nhà máy.",
     didYouKnow:
-      "Siemens ban đầu làm công ty điện báo. DynamO đã biến công ty nhỏ thành tập đoàn toàn cầu tồn tại đến nay.",
+      "Phát minh này giúp Siemens chuyển mình từ một công ty điện báo nhỏ thành một trong những tập đoàn công nghiệp kỹ thuật điện lớn nhất thế giới ngày nay.",
     metrics: [
-      { label: "Nguyên lý", value: "Tự kích" },
-      { label: "Hiệu suất", value: "Cao nhất thời" },
-      { label: "Di sản", value: "Mọi nhà máy điện" },
+      { label: "Hiệu suất điện", value: "Vượt bậc" },
+      { label: "Nguyên lý", value: "Tự kích từ" },
+      { label: "Ứng dụng", value: "Điện công nghiệp" },
     ],
-    tags: ["điện", "năng lượng", "cơ học"],
+    tags: ["năng lượng", "điện lực", "động cơ"],
   },
   {
-    id: "model-t",
+    id: "motorwagen",
     phase: "industry-2",
-    name: "Ford Model T & băng chuyền",
-    year: "1908",
-    inventor: "Henry Ford",
-    origin: "Detroit, Hoa Kỳ",
-    motif: "assembly",
-    tagline: "Một chiếc xe cho mọi người.",
+    name: "Xe hơi Benz Patent-Motorwagen",
+    year: "1886",
+    inventor: "Karl Benz",
+    origin: "Mannheim, Đức",
+    motif: "motorwagen",
+    tagline: "Chiếc xe hơi đầu tiên chạy bằng xăng.",
     story:
-      "Ford không phát minh ô tô — ông phát minh cách làm cho mọi người mua được ô tô. Năm 1913, ông áp dụng băng chuyền di động vào nhà máy Highland Park. Thời gian lắp một xe giảm từ 12 giờ xuống 90 phút, giá giảm từ 850 xuống 260 USD. Model T chiếm 50% thị trường ô tô thế giới.",
+      "Benz Patent-Motorwagen là chiếc xe hơi chạy bằng động cơ đốt trong đầu tiên trên thế giới được thiết kế đồng bộ từ đầu. Xe có 3 bánh, sử dụng động cơ xăng 1 xi-lanh bốn thì công suất 0.75 mã lực và hệ thống đánh lửa điện.",
     whyItMatters:
-      "Băng chuyền định hình lại toàn bộ lao động: công nhân lặp một động tác cả ngày, được trả lương cao để mua chính sản phẩm mình làm. Mô hình « Fordism » lan sang mọi ngành và tạo ra tầng lớp trung lưu thế kỷ XX.",
+      "Khai sinh ngành công nghiệp ô tô toàn cầu và định hình phương thức di chuyển cá nhân của nhân loại suốt thế kỷ 20 và 21, thay thế hoàn toàn xe ngựa kéo truyền thống.",
     didYouKnow:
-      "Ford trả công nhân 5 USD/ngày — gấp đôi mức thị trường — để họ đủ tiền mua Model T. Đây được xem là cú hích tạo ra « chủ nghĩa tiêu dùng có lương cao ».",
+      "Vợ của Karl Benz, bà Bertha Benz, đã thực hiện chuyến hành trình lái xe đường dài đầu tiên trong lịch sử (106 km) mà không báo cho chồng để chứng minh tính thực tế của chiếc xe với công chúng.",
     metrics: [
-      { label: "Giá", value: "850 → 260 $" },
-      { label: "Thời gian lắp", value: "90 phút" },
-      { label: "Lương", value: "5 $/ngày" },
+      { label: "Công suất", value: "0.75 hp" },
+      { label: "Vận tốc tối đa", value: "16 km/h" },
+      { label: "Nhiên liệu", value: "Ligroin" },
     ],
-    tags: ["giao thông", "sản xuất", "lao động"],
+    tags: ["giao thông", "ô tô", "động cơ"],
   },
   {
-    id: "otto-engine",
+    id: "wright-flyer",
     phase: "industry-2",
-    name: "Động cơ đốt trong Otto",
-    year: "1876",
-    inventor: "Nicolaus Otto",
-    origin: "Deutz, Đức",
-    motif: "otto",
-    tagline: "Lửa trong xi-lanh.",
+    name: "Máy bay Wright Flyer",
+    year: "1903",
+    inventor: "Orville & Wilbur Wright",
+    origin: "Kitty Hawk, North Carolina, Hoa Kỳ",
+    motif: "wright-flyer",
+    hero: true,
+    tagline: "Chinh phục bầu trời xanh.",
     story:
-      "Otto thiết kế động cơ 4 thì đầu tiên — nạp, nén, nổ, xả — đốt hỗn hợp khí và không khí trực tiếp trong xi-lanh. Nó nhỏ, nhẹ và hiệu quả hơn động cơ hơi nước nhiều. Đây là hạt giống của ô tô, xe máy, máy bay.",
+      "Ngày 17/12/1903, anh em nhà Wright thực hiện chuyến bay đầu tiên có kiểm soát, duy trì và chạy bằng động cơ của nhân loại với chiếc Wright Flyer. Chuyến bay đầu kéo dài 12 giây trên quãng đường 37 mét dưới sự điều khiển của Orville.",
     whyItMatters:
-      "Động cơ Otto giải phóng năng lượng khỏi nhà máy lớn. Nó mang sức mạnh lên xe, lên tàu, lên máy bay. Toàn bộ ngành giao thông thế kỷ XX — và nền kinh tế dầu mỏ — được xây trên bốn thì này.",
+      "Hiện thực hóa giấc mơ bay cao của loài người. Phát minh này mở ra kỷ nguyên hàng không hiện đại, thu hẹp khoảng cách địa lý giữa các quốc gia và lục địa một cách thần kỳ.",
     didYouKnow:
-      "Cùng xưởng Deutz thuê một thợ cơ khí trẻ tên Gottlieb Daimler — người sau này đồng sáng lập Mercedes-Benz.",
+      "Động cơ của Wright Flyer được làm bằng nhôm đúc nguyên khối vì các hãng sản xuất thời đó không thể chế tạo một động cơ đủ nhẹ và mạnh bằng gang hay thép như yêu cầu của họ.",
     metrics: [
-      { label: "Chu kỳ", value: "4 thì" },
-      { label: "Nhiên liệu", value: "Khí than → xăng" },
-      { label: "Di sản", value: "Ô tô, máy bay" },
+      { label: "Thời gian bay", value: "12 giây" },
+      { label: "Quãng đường", value: "37 m" },
+      { label: "Trọng lượng", value: "274 kg" },
     ],
-    tags: ["động lực", "giao thông", "năng lượng"],
+    tags: ["giao thông", "hàng không", "động cơ"],
   },
   {
-    id: "marconi-radio",
+    id: "edison-phonograph",
     phase: "industry-2",
-    name: "Vô tuyến Marconi",
-    year: "1895",
-    inventor: "Guglielmo Marconi",
-    origin: "Bologna, Ý",
-    motif: "marconi",
-    tagline: "Giọng nói vượt đại dương.",
-    story:
-      "Marconi kết hợp các phát hiện của Hertz và Branly thành một hệ thống phát–nhận sóng vô tuyến thực tế. Năm 1901, ông truyền tín hiệu « S » từ Cornwall sang Newfoundland — xuyên đại dương. Lần đầu thông tin đi nhanh hơn bất kỳ phương tiện nào có thể mang theo nó.",
-    whyItMatters:
-      "Vô tuyến là công nghệ đầu tiên « thu hẹp thế giới » mà không cần di chuyển vật lý. Nó cứu những người sống sót Titanic (đã gọi cứu nạn), thay đổi chiến tranh, báo chí, và sau này là vô tuyến–truyền hình–wifi–di động.",
-    didYouKnow:
-      "Tín hiệu cứu nạn của Titanic năm 1912 đã cứu hơn 700 người — và buộc luật quốc tế yêu cầu mọi tàu khách phải có vô tuyến 24/24.",
-    metrics: [
-      { label: "Khoảng cách", value: "3.500 km" },
-      { label: "Tần số", value: "Sóng radio" },
-      { label: "Di sản", value: "WiFi, 4G, 5G" },
-    ],
-    tags: ["thông tin", "thu hẹp thế giới", "kết nối"],
-  },
-  {
-    id: "edison-meter",
-    phase: "industry-2",
-    name: "Đồng hồ điện Edison",
-    year: "1881",
+    name: "Máy hát ống thiếc Edison",
+    year: "1877",
     inventor: "Thomas Edison",
-    origin: "New York, Hoa Kỳ",
-    motif: "edison-meter",
-    tagline: "Điện trở thành hàng hóa.",
+    origin: "Menlo Park, New Jersey, Hoa Kỳ",
+    motif: "edison-phonograph",
+    tagline: "Thiết bị đầu tiên ghi và phát lại âm thanh.",
     story:
-      "Khi Edison bán điện, ông cần đo khách hàng dùng bao nhiêu. Đồng hồ của ông dùng điện phân kẽm — kim loại tích lũy tỉ lệ với dòng điện, rồi cân được để tính tiền. Thô sơ, nhưng biến điện từ « tiện ích » thành « sản phẩm đo được ».",
+      "Tháng 12 năm 1877, Thomas Edison giới thiệu máy hát ống thiếc (Tinfoil Phonograph). Thiết bị ghi lại các chấn động âm thanh dưới dạng các vết lõm trên một lá thiếc bọc quanh một ống hình trụ có rãnh xoắn quay bằng tay. Khi quay ống trụ ngược lại dưới kim đọc thứ hai, âm thanh được phát lại thông qua loa kèn.",
     whyItMatters:
-      "Đồng hồ điện là hạt giống của toàn bộ ngành « năng lượng như một dịch vụ ». Mỗi kWh trên hóa đơn của bạn, mỗi smart meter thông minh, mỗi thị trường điện đều kế thừa nguyên lý: đo được thì bán được.",
+      "Trước Edison, âm thanh chỉ là thứ thoáng qua. Phonograph là thiết bị đầu tiên có thể ghi và phát lại giọng nói con người, đặt nền móng cho ngành công nghiệp âm nhạc, ghi âm thương mại và viễn thông hiện đại.",
     didYouKnow:
-      "Đồng hồ Edison ban đầu cần nhân viên đến tận nhà đọc và cân kẽm mỗi tháng — một công việc đã biến mất trong thế kỷ kỹ thuật số.",
+      "Từ đầu tiên được Edison ghi âm thử nghiệm thành công là bài đồng dao 'Mary Had a Little Lamb'. Ông đã vô cùng kinh ngạc khi thấy thiết bị phát lại chính xác giọng nói của mình.",
     metrics: [
-      { label: "Đo bằng", value: "Điện phân kẽm" },
-      { label: "Chu kỳ", value: "Hàng tháng" },
-      { label: "Di sản", value: "Smart meter" },
+      { label: "Năm công bố", value: "1877" },
+      { label: "Vật liệu ghi", value: "Lá thiếc (Tinfoil)" },
+      { label: "Vận hành", value: "Quay tay (Hand-crank)" },
     ],
-    tags: ["điện", "năng lượng", "tiêu dùng"],
-  },
-  {
-    id: "telstar",
-    phase: "industry-2",
-    name: "Vệ tinh Telstar",
-    year: "1962",
-    inventor: "AT&T & NASA",
-    origin: "Cape Canaveral, Hoa Kỳ",
-    motif: "marconi",
-    tagline: "Truyền hình xuyên đại dương.",
-    story:
-      "Telstar là vệ tinh truyền thông chủ động đầu tiên. Nó nhận tín hiệu từ Mỹ, khuếch đại và phát sang châu Âu. Lần đầu, người ta xem truyền hình trực tiếp xuyên đại dương. Đêm 10/7/1962, hình ảnh Mỹ–Pháp trao đổi lần đầu — và thế giới tự nhiên co lại.",
-    whyItMatters:
-      "Telstar chứng minh « ngôi làng toàn cầu » của McLuhan không còn là ẩn dụ. Cùng với cáp quang sau này, nó tạo ra hạ tầng cho internet, truyền hình 24/24 và sự kiện toàn cầu phát sóng đồng thời.",
-    didYouKnow:
-      "Telstar chỉ hoạt động mỗi ngày 20 phút — khi đi qua cả trạm Mỹ và châu Âu. Phải đợi vệ tinh địa tĩnh mới có phủ sóng liên tục.",
-    metrics: [
-      { label: "Độ cao", value: "Quỹ đạo thấp" },
-      { label: "Hoạt động", value: "20 phút/vòng" },
-      { label: "Di sản", value: "TV toàn cầu" },
-    ],
-    tags: ["thông tin", "thu hẹp thế giới", "vũ trụ"],
-  },
-  {
-    id: "ac-transformer",
-    phase: "industry-2",
-    name: "Máy biến áp AC",
-    year: "1885",
-    inventor: "Ottó Bláthy, Miksa Déri, Károly Zipernowsky",
-    origin: "Budapest, Hungary",
-    motif: "transformer",
-    tagline: "Điện đi hàng nghìn kilomet.",
-    story:
-      "Ba kỹ sư Hungary chế tạo máy biến áp kín đầu tiên — cho phép tăng điện áp để truyền đi xa, rồi hạ xuống an toàn ở đầu nhận. Đây là chìa khóa khiến dòng điện xoay chiều (AC) thắng dòng một chiều (DC) của Edison trong « cuộc chiến dòng điện ».",
-    whyItMatters:
-      "Không có biến áp, điện chỉ truyền được vài km. Với nó, nhà máy thác Niagara cấp điện cho New York cách 600 km. Biến áp biến điện thành thứ có thể chuyển đi khắp lục địa — và vẫn là xương sống của mọi lưới điện ngày nay.",
-    didYouKnow:
-      "Cuộc chiến « AC vs DC » giữa Tesla/Westinghouse và Edison là một trong những cuộc chiến kỹ thuật khốc liệt nhất lịch sử — Edison đã cho điện giật voi để bôi nhọ AC.",
-    metrics: [
-      { label: "Truyền xa", value: "Hàng trăm km" },
-      { label: "Hiệu suất", value: "> 95%" },
-      { label: "Di sản", value: "Mọi lưới điện" },
-    ],
-    tags: ["điện", "năng lượng", "cơ sở hạ tầng"],
+    tags: ["âm thanh", "truyền thông", "đại chúng"],
   },
 
   // ===================== INDUSTRY 3.0 =====================
+  {
+    id: "unimate-robot",
+    phase: "industry-3",
+    name: "Cánh tay robot Unimate",
+    year: "1961",
+    inventor: "George Devol & Joseph Engelberger",
+    origin: "New Jersey, Hoa Kỳ",
+    motif: "unimate-robot",
+    tagline: "Robot công nghiệp đầu tiên trên thế giới.",
+    story:
+      "Unimate đi vào hoạt động tại dây chuyền đúc áp lực của hãng General Motors ở New Jersey vào năm 1961. Nhiệm vụ của nó là gắp các chi tiết kim loại nóng đỏ từ máy đúc và thả vào bể nước lạnh — một công việc cực kỳ nguy hiểm đối với con người.",
+    whyItMatters:
+      "Mở ra ngành công nghiệp robot toàn cầu. Nó chứng minh robot có thể đảm nhận các công việc nguy hiểm, lặp đi lặp lại trong môi trường khắc nghiệt với độ chính xác và tốc độ vượt trội con người.",
+    didYouKnow:
+      "Năm 1966, Joseph Engelberger đã đưa Unimate lên chương trình truyền hình thực tế nổi tiếng 'The Tonight Show' và trình diễn cảnh robot rót bia đá, vung gậy đánh golf và chỉ huy dàn nhạc.",
+    metrics: [
+      { label: "Trọng lượng", value: "1.2 tấn" },
+      { label: "Ứng dụng đầu", value: "Đúc kim loại" },
+      { label: "Lưu trữ", value: "Trống từ" },
+    ],
+    tags: ["robot", "tự động hóa", "lao động"],
+  },
   {
     id: "intel-4004",
     phase: "industry-3",
     name: "Vi xử lý Intel 4004",
     year: "1971",
-    inventor: "Federico Faggin, Marcian Hoff, Stanley Mazor",
+    inventor: "Federico Faggin, Marcian Hoff, Masatoshi Shima",
     origin: "Santa Clara, Hoa Kỳ",
-    motif: "chip",
+    motif: "intel-4004",
     hero: true,
-    tagline: "Một con chip — một cỗ máy tính.",
+    tagline: "Toàn bộ máy tính trong một con chip.",
     story:
-      "Khách hàng Nhật Busicom muốn 12 chip cho máy tính bỏ túi. Hoff đề xuất: thay vì 12 chip riêng, hãy làm một con chip « tổng quát » có thể lập trình. Faggin thiết kế layout trong 9 tháng. Kết quả: Intel 4004 — 2.300 bóng bán dẫn trên một con chip 12 mm². Toàn bộ CPU trong một mảnh silicon.",
+      "Năm 1971, Intel ra mắt bộ vi xử lý đơn chip thương mại đầu tiên trên thế giới — Intel 4004. Chỉ rộng 12 mm², nó tích hợp 2.300 bóng bán dẫn, mang lại sức mạnh tính toán tương đương chiếc máy tính khổng lồ ENIAC chiếm cả căn phòng rộng.",
     whyItMatters:
-      "4004 chứng minh nguyên lý « phần mềm trên phần cứng » — cùng một con chip có thể làm máy tính, điều khiển lò vi sóng, chạy xe. Nó dân chủ hóa tính toán: từ phòng máy khổng lồ xuống chiếc bỏ túi, rồi xuống điện thoại.",
+      "Khởi đầu kỷ nguyên vi xử lý và cuộc cách mạng kỹ thuật số. Con chip này chứng minh rằng sức mạnh tính toán có thể được thu nhỏ vô hạn và tích hợp vào mọi thiết bị trong đời sống.",
     didYouKnow:
-      "Tốc độ 4004 là 740 kHz — khoảng 92.000 lệnh mỗi giây. Một con chip điện thoại hôm nay nhanh hơn 4004 khoảng 10 triệu lần.",
+      "Ban đầu Intel 4004 được thiết kế cho máy tính bỏ túi của hãng Busicom (Nhật Bản) trước khi Intel mua lại độc quyền để bán rộng rãi ra thị trường.",
     metrics: [
       { label: "Bóng bán dẫn", value: "2.300" },
-      { label: "Tốc độ", value: "740 kHz" },
-      { label: "Diện tích", value: "12 mm²" },
+      { label: "Tần số xung", value: "740 kHz" },
+      { label: "Kích thước đế", value: "12 mm²" },
     ],
-    tags: ["tính toán", "silicon", "dân chủ hóa"],
+    tags: ["điện tử", "vi xử lý", "bán dẫn"],
   },
   {
-    id: "arpanet",
+    id: "modicon-plc",
     phase: "industry-3",
-    name: "ARPANET",
+    name: "Bộ lập trình PLC Modicon 084",
     year: "1969",
-    inventor: "Bob Taylor, Larry Roberts, Vint Cerf",
-    origin: "UCLA, Hoa Kỳ",
-    motif: "network",
-    tagline: "« lo » — tin nhắn đầu tiên.",
+    inventor: "Dick Morley",
+    origin: "Bedford, Massachusetts, Hoa Kỳ",
+    motif: "modicon-plc",
+    tagline: "Bộ não lập trình của nhà máy hiện đại.",
     story:
-      "29/10/1969, sinh viên UCLA Charley Kline cố gửi từ « login » cho máy ở Stanford. Máy nhận được « lo » rồi sập. Tin nhắn đầu tiên trên ARPANET chỉ có hai chữ — và đó là lần đầu hai máy tính « nói chuyện » qua mạng chuyển gói. ARPANET là phôi thai của internet.",
+      "Modicon 084 là Bộ điều khiển logic khả trình (PLC) đầu tiên trên thế giới. Thiết bị này được thiết kế để replace các hệ thống điều khiển bằng rơ-le cơ học cồng kềnh, dễ hỏng và tốn thời gian đấu nối lại mỗi khi thay đổi quy trình sản xuất.",
     whyItMatters:
-      "ARPANET chứng minh mạng không cần trung tâm — mọi nút bình đẳng, dữ liệu tự tìm đường. Nguyên lý này sống sót qua Chiến tranh Lạnh và trở thành internet. Mọi email, trang web, tin nhắn bạn gửi đều kế thừa hai chữ « lo » đó.",
+      "Là cột mốc quan trọng nhất của tự động hóa công nghiệp. PLC cho phép điều khiển quy trình sản xuất bằng phần mềm thay vì phần cứng dây dẫn, giúp tăng tốc độ tái cấu trúc dây chuyền sản xuất từ vài tuần xuống vài giờ.",
     didYouKnow:
-      "Nguyên lý « chuyển gói » (packet switching) được nghĩ ra độc lập tại Mỹ (Paul Baran) và Anh (Donald Davies) — để mạng sống sót sau bom nguyên tử.",
+      "Cái tên 'Modicon' là viết tắt của 'MOdular DIgital CONtroller' (Bộ điều khiển kỹ thuật số dạng mô-đun). Nó được phát triển vào ngày đầu năm mới 1968 sau khi Dick Morley có một đêm giao thừa say xỉn.",
     metrics: [
-      { label: "Nút đầu tiên", value: "4" },
-      { label: "Tốc độ đường", value: "50 kbps" },
-      { label: "Di sản", value: "Internet" },
+      { label: "Thay thế", value: "Hàng trăm rơ-le" },
+      { label: "Nguyên lý", value: "Logic khả trình" },
+      { label: "Năm ra mắt", value: "1969" },
     ],
-    tags: ["kết nối", "thông tin", "thu hẹp thế giới"],
+    tags: ["tự động hóa", "điện tử", "sản xuất"],
   },
   {
-    id: "www",
+    id: "altair-8800",
     phase: "industry-3",
-    name: "World Wide Web",
-    year: "1989",
-    inventor: "Tim Berners-Lee",
-    origin: "CERN, Thụy Sĩ",
-    motif: "www",
-    tagline: "Một mạng cho mọi người.",
+    name: "Máy tính Altair 8800",
+    year: "1975",
+    inventor: "Ed Roberts",
+    origin: "Albuquerque, New Mexico, Hoa Kỳ",
+    motif: "altair-8800",
+    tagline: "Ngòi nổ của cách mạng máy tính cá nhân.",
     story:
-      "Tại CERN, Berners-Lee đề xuất một « mạng của các tài liệu » dùng siêu liên kết, để các nhà vật lý chia sẻ thông tin. Ông tự viết trình duyệt, máy chủ và giao thức HTTP/HTML đầu tiên. Ngày 6/8/1991, trang web đầu tiên đi lên mạng — và ông quyết định KHÔNG cấp bằng sáng chế.",
+      "Altair 8800 bán ra dưới dạng bộ linh kiện tự lắp ráp giá 397 USD, sử dụng chip Intel 8080. Máy không có bàn phím, màn hình hay chuột — người dùng lập trình bằng cách gạt các công tắc ở mặt trước và đọc kết quả qua hàng đèn LED đỏ nhấp nháy.",
     whyItMatters:
-      "Web biến internet — vốn chỉ dành cho kỹ sư — thành không gian công cộng toàn cầu. Quyết định miễn phí của Berners-Lee là một trong những hành động hào phóng nhất lịch sử kỹ thuật. Mọi cửa hàng, báo, mạng xã hội đều xây trên sự hào phóng đó.",
+      "Kích hoạt toàn bộ ngành công nghiệp phần mềm và phần cứng máy tính cá nhân. Chính từ Altair 8800, Bill Gates và Paul Allen đã viết trình thông dịch BASIC đầu tiên và thành lập Microsoft.",
     didYouKnow:
-      "Trang web đầu tiên (info.cern.ch) vẫn còn trực tuyến — và vẫn là một trang HTML tĩnh, không quảng cáo, không cookie.",
+      "Cái tên 'Altair' được đặt theo tên một ngôi sao trong bộ phim truyền hình khoa học viễn tưởng nổi tiếng Star Trek mà con gái của Ed Roberts đang xem vào lúc đó.",
     metrics: [
-      { label: "Trang web đầu", value: "6/8/1991" },
-      { label: "Bằng sáng chế", value: "Miễn phí" },
-      { label: "Di sản", value: "Toàn bộ web" },
+      { label: "Giá bộ kit", value: "397 USD" },
+      { label: "Vi xử lý", value: "Intel 8080" },
+      { label: "RAM", value: "256 bytes" },
     ],
-    tags: ["thông tin", "kết nối", "dân chủ hóa"],
+    tags: ["máy tính", "kỹ thuật số", "phần mềm"],
   },
   {
-    id: "bar-code",
+    id: "motorola-dynatac",
     phase: "industry-3",
-    name: "Mã vạch UPC",
-    year: "1974",
-    inventor: "IBM (George Laurer)",
-    origin: "Ohio, Hoa Kỳ",
-    motif: "upc",
-    tagline: "Vạch đen định danh mọi thứ.",
-    story:
-      "Ngày 26/6/1974, gói kẹo cao su Wrigley là sản phẩm đầu tiên được quét mã vạch UPC tại siêu thị Troy, Ohio. Mỗi sản phẩm có một dãy vạch đen độc nhất — và lần đầu máy có thể « đọc » sản phẩm nhanh hơn người. Chuỗi cung ứng toàn cầu bắt đầu từ vạch đen đó.",
-    whyItMatters:
-      "UPC biến mỗi vật phẩm thành dữ liệu. Thanh toán nhanh, kiểm kê tức thời, chuỗi cung ứng toàn cầu — tất cả đều mượn « vân tay quang học » này. QR code sau này chỉ là hậu duệ 2D của nó.",
-    didYouKnow:
-      "Sản phẩm đầu tiên quét mã vạch — gói kẹo Wrigley — hiện được trưng bày ở Viện Bảo tàng Quốc gia Mỹ như một cột mốc lịch sử.",
-    metrics: [
-      { label: "Ký tự", value: "12 số" },
-      { label: "Tốc độ quét", value: "Mili giây" },
-      { label: "Di sản", value: "QR, RFID" },
-    ],
-    tags: ["tiêu chuẩn", "mã hóa", "bán lẻ"],
-  },
-  {
-    id: "gps",
-    phase: "industry-3",
-    name: "Hệ thống GPS",
-    year: "1978",
-    inventor: "Bradford Parkinson (Quốc phòng Mỹ)",
-    origin: "Hoa Kỳ",
-    motif: "gps",
-    tagline: "Biết mình ở đâu, mọi lúc.",
-    story:
-      "GPS gồm 31 vệ tinh bay quanh Trái Đất, mỗi vệ tinh phát giờ chính xác. Máy nhận trên mặt đất tính độ trễ từ 4 vệ tinh — và suy ra vị trí trong bán kính mét. Sau tai nạn KAL 007 năm 1983, Mỹ mở GPS cho dân sự, và thế giới không bao giờ lạc đường nữa.",
-    whyItMatters:
-      "GPS là « hệ thần kinh định vị » của nhân loại. Nó điều khiển máy bay, tàu biển, drone, ứng dụng gọi xe, giao hàng, thậm chí đồng hồ tài chính (định giờ nano giây). Mọi « bản đồ » trên điện thoại đều nợ GPS.",
-    didYouKnow:
-      "GPS cần Thuyết Tương đối của Einstein: đồng hồ vệ tinh chạy nhanh hơn mặt đất (do hấp dẫn yếu hơn) ~38 micro giây/ngày — phải hiệu chỉnh nếu không GPS sai hàng km.",
-    metrics: [
-      { label: "Số vệ tinh", value: "31" },
-      { label: "Độ chính xác", value: "~5 m" },
-      { label: "Di sản", value: "Bản đồ số" },
-    ],
-    tags: ["định vị", "thu hẹp thế giới", "vũ trụ"],
-  },
-  {
-    id: "cell-phone",
-    phase: "industry-3",
-    name: "Điện thoại di động",
+    name: "Điện thoại Motorola DynaTAC 8000x",
     year: "1973",
-    inventor: "Martin Cooper (Motorola)",
-    origin: "New York, Hoa Kỳ",
-    motif: "phone",
-    tagline: "Gọi điện đi dạo phố.",
+    inventor: "Martin Cooper, Rudolph Krolopp, Donald Linder",
+    origin: "Motorola Inc., Libertyville, Illinois, Hoa Kỳ",
+    motif: "motorola-dynatac",
+    tagline: "Chiếc điện thoại di động cầm tay đầu tiên thế giới.",
     story:
-      "3/4/1973, Martin Cooper đứng giữa phố New York, cầm một « cục gạch » 1,1 kg và gọi cho đối thủ Joel Engel ở Bell Labs: « Tôi đang gọi cho bạn từ một điện thoại di động thật sự ». Cú gọi đầu tiên của một kỷ nguyên không dây.",
+      "Ngày 3/4/1973, Martin Cooper - kỹ sư trưởng của Motorola - đã thực hiện cuộc gọi di động đầu tiên lịch sử trên đường phố Manhattan, New York bằng thiết bị thử nghiệm DynaTAC. Ông gọi cho Joel Engel, đối thủ tại Bell Labs, và tuyên bố: 'Joel, tôi đang gọi cho ông từ một chiếc điện thoại di động thực sự'. Trải qua 10 năm nghiên cứu cùng khoản đầu tư 100 triệu USD, Motorola mới chính thức thương mại hóa thiết bị này vào năm 1983.",
     whyItMatters:
-      "Điện thoại di động tách thông tin khỏi địa điểm. Lần đầu bạn không cần « ở nhà » để « có mặt ». Sau này khi điện thoại kết hợp máy ảnh, GPS, internet — nó trở thành phần mở rộng của cơ thể, công cụ đầu tiên của « tính toán cá nhân hóa ».",
+      "DynaTAC 8000x giải phóng con người khỏi chiếc điện thoại cố định và dây nối vật lý. Phát minh này đặt nền móng toàn diện cho hạ tầng viễn thông di động băng thông rộng và kỷ nguyên kết nối không dây hiện đại.",
     didYouKnow:
-      "Điện thoại đầu tiên DynaTAC nặng 1,1 kg, sạc 10 giờ, đàm thoại 30 phút — giá 3.995 USD năm 1983 (khoảng 11.000 USD hôm nay).",
+      "Thiết bị nặng hơn 1,1 kg và thường được gọi là 'Cục gạch' (The Brick). Nó cần 10 tiếng để sạc đầy nhưng chỉ có thể đàm thoại trong 35 phút. Martin Cooper từng đùa rằng: 'Thời lượng pin không thành vấn đề, vì bạn không thể cầm chiếc điện thoại nặng như thế suốt 35 phút!'",
     metrics: [
-      { label: "Trọng lượng", value: "1,1 kg" },
-      { label: "Đàm thoại", value: "30 phút" },
-      { label: "Di sản", value: "Smartphone" },
+      { label: "Trọng lượng", value: "1.15 kg" },
+      { label: "Thời gian sạc", value: "10 giờ" },
+      { label: "Thời gian gọi", value: "35 phút" },
     ],
-    tags: ["kết nối", "tính toán cá nhân", "thu hẹp thế giới"],
-  },
-  {
-    id: "pc-monitor",
-    phase: "industry-3",
-    name: "Màn hình máy tính cá nhân",
-    year: "1981",
-    inventor: "IBM PC",
-    origin: "Boca Raton, Hoa Kỳ",
-    motif: "monitor",
-    tagline: "Máy tính vào văn phòng.",
-    story:
-      "IBM PC 5150 năm 1981 chuẩn hóa « máy tính để bàn » với màn hình CRT xanh–đen, bàn phím và hệ điều hành. Đó là lúc máy tính thoát khỏi phòng máy lạnh và vào văn phòng, lớp học, nhà để bàn. PC trở thành đồ gia dụng.",
-    whyItMatters:
-      "IBM PC « mở » kiến trúc — linh kiện công khai, hệ điều hành cấp phép — nên hàng chục hãng « tương thích IBM » nở ra. Cạnh tranh giảm giá, tăng tính năng. PC thắng không vì tốt nhất, mà vì mở nhất.",
-    didYouKnow:
-      "Microsoft DOS được IBM mua với giá thấp — vì Bill Gates giữ quyền bán cho hãng khác. Quyết định đó tạo ra đế chế Microsoft.",
-    metrics: [
-      { label: "RAM", value: "16–256 KB" },
-      { label: "Màn hình", value: "CRT xanh" },
-      { label: "Di sản", value: "PC tương thích" },
-    ],
-    tags: ["tính toán", "dân chủ hóa", "văn phòng"],
-  },
-  {
-    id: "ethernet",
-    phase: "industry-3",
-    name: "Mạng Ethernet",
-    year: "1973",
-    inventor: "Bob Metcalfe",
-    origin: "Xerox PARC, Hoa Kỳ",
-    motif: "network",
-    tagline: "Dây cáp kết nối văn phòng.",
-    story:
-      "Tại PARC, Metcalfe cần kết nối máy Alto cá nhân cho mọi người dùng chung máy in. Ông nghĩ ra « mạng vô tuyến hữu tuyến » — máy tính chia sẻ một dây cáp, nghe trước khi nói, chờ nếu bận. Nguyên lý đơn giản đó trở thành Ethernet.",
-    whyItMatters:
-      "Ethernet là « ngôn ngữ » của mạng cục bộ. Mọi router WiFi, mọi trung tâm dữ liệu, mọi cáp quang đều dùng giao thức kế thừa nó. Ngay cả WiFi (802.11) bản chất là Ethernet không dây.",
-    didYouKnow:
-      "Metcalfe từng dự đoán internet sẽ sụp năm 1996 vì « quá tải » — ông nuốt lời bằng cách xay bài phát biểu của mình và ăn nó trước công chúng.",
-    metrics: [
-      { label: "Tốc độ đầu", value: "2,94 Mbps" },
-      { label: "Tốc độ nay", value: "400 Gbps" },
-      { label: "Di sản", value: "Mọi LAN/WiFi" },
-    ],
-    tags: ["kết nối", "tiêu chuẩn", "mạng"],
+    tags: ["di động", "viễn thông", "kết nối"],
   },
 
   // ===================== INDUSTRY 4.0 =====================
   {
-    id: "neural-net",
+    id: "atlas-robot",
     phase: "industry-4",
-    name: "Mạng nơ-ron sâu",
-    year: "2012",
-    inventor: "Alex Krizhevsky, Ilya Sutskever, Geoffrey Hinton",
-    origin: "Toronto, Canada",
-    motif: "neural-net",
+    name: "Robot hình người Atlas",
+    year: "2013",
+    inventor: "Boston Dynamics",
+    origin: "Waltham, Massachusetts, Hoa Kỳ",
+    motif: "atlas-robot",
     hero: true,
-    tagline: "Máy học nhìn — rồi học nghĩ.",
+    tagline: "Đỉnh cao cơ điện tử và robot sinh học.",
     story:
-      "AlexNet, một mạng nơ-ron sâu 8 lớp, chạm trán cuộc thi ImageNet 2012 với 15 triệu ảnh. Nó thắng áp đảo — tỷ lệ lỗi giảm từ 26% xuống 15%. GPU gaming chạy mạng nơ-ron đủ nhanh để huấn luyện. Thế giới AI thức tỉnh sau « mùa đông » dài.",
+      "Atlas được thiết kế để thực hiện các nhiệm vụ tìm kiếm cứu nạn nguy hiểm. Trải qua nhiều năm phát triển, từ một cỗ máy cồng kềnh phải cắm dây nguồn trực tiếp, Atlas đã trở thành robot tự hành hoàn toàn bằng thủy lực (và phiên bản điện sau này), có khả năng chạy, nhảy, nhào lộn điêu luyện.",
     whyItMatters:
-      "AlexNet chứng minh « học sâu » không còn là lý thuyết. Nó mở đường cho nhận diện giọng nói, dịch tự động, xe tự hành, và cuối cùng là các mô hình ngôn ngữ lớn như GPT. Mọi lần bạn nói « Hey Siri » đều bắt đầu từ AlexNet.",
+      "Đại diện cho sự hội tụ của AI và cơ khí chính xác trong CMCN 4.0. Atlas chứng minh robot có thể di chuyển linh hoạt trong không gian gồ ghề của con người, mở đường cho lao động tự động thông minh ngoài nhà máy.",
     didYouKnow:
-      "Geoffrey Hinton, một trong ba tác giả, đoạt giải Turing 2018 và Nobel Vật lý 2024 — một trong những nhà khoa học hiếm hoi nhận cả hai vinh dự.",
+      "Mỗi cú lộn nhào ngược (backflip) của Atlas yêu cầu hệ thống máy tính trên bo mạch thực hiện hàng nghìn phép tính quỹ đạo thời gian thực để duy trì sự cân bằng động hoàn hảo.",
     metrics: [
-      { label: "Lớp", value: "8" },
-      { label: "Tham số", value: "60 triệu" },
-      { label: "GPU", value: "2 × GTX 580" },
+      { label: "Chiều cao", value: "1.5 m" },
+      { label: "Trọng lượng", value: "89 kg" },
+      { label: "Hệ dẫn động", value: "Thủy lực / Điện" },
     ],
-    tags: ["trí tuệ nhân tạo", "tự động hóa", "tính toán"],
+    tags: ["robot", "trí tuệ nhân tạo", "cơ điện tử"],
   },
   {
-    id: "3d-printer",
+    id: "amazon-echo",
     phase: "industry-4",
-    name: "Máy in 3D",
-    year: "2009",
-    inventor: "Adrian Bowyer (RepRap)",
-    origin: "Bath, Anh",
-    motif: "printer",
-    tagline: "Vật liệu tự in ra chính nó.",
-    story:
-      "Dự án RepRap của Bowyer đặt mục tiêu kỳ lạ: máy in có thể in ra phần lớn linh kiện của chính nó — « tự nhân bản ». Khi bằng sáng chế in đùn (FDM) hết hạn năm 2009, máy in 3D rẻ bùng nổ. Dưới 500 USD, bạn có thể in đồ nhựa tùy ý tại nhà.",
-    whyItMatters:
-      "In 3D đảo ngược sản xuất: thay vì đúc hàng triệu bản giống nhau, mỗi bản có thể khác. Nó in bộ phận cơ thể (prosthesis), nhà (in bê tông), linh kiện tàu vũ trụ, và thậm chí thức ăn. Sản xuất trở nên phi tập trung.",
-    didYouKnow:
-      "RepRap có thể in khoảng 50% linh kiện của chính nó. Mục tiêu cuối cùng là « máy tự nhân giống » — một thứ gần với sự sống hơn máy móc.",
-    metrics: [
-      { label: "Giá thấp", value: "< 500 $" },
-      { label: "Tự nhân bản", value: "~50%" },
-      { label: "Ứng dụng", value: "Y tế → vũ trụ" },
-    ],
-    tags: ["sản xuất", "vật liệu", "tự động hóa"],
-  },
-  {
-    id: "tesla-autopilot",
-    phase: "industry-4",
-    name: "Xe tự hành",
+    name: "Loa thông minh Amazon Echo",
     year: "2014",
-    inventor: "Tesla / Waymo",
-    origin: "Palo Alto, Hoa Kỳ",
-    motif: "car",
-    tagline: "Chiếc xe tự biết đường.",
-    story:
-      "Năm 2014, Tesla trang bị Autopilot cho Model S — xe đầu tiên hạng phổ thông có « tay lái tự động » trên cao tốc. Waymo (Google) đi xa hơn: xe không có tay lái chở khách tại Phoenix từ 2017. Lần đầu máy móc « lái » nhanh hơn người trong một số tình huống.",
-    whyItMatters:
-      "Xe tự hành đe dọa viết lại giao thông, quy hoạch đô thị, và thậm chí quyền sở hữu xe. Nếu xe tự lái an toàn hơn người, các thành phố có thể loại bỏ bãi đỗ, giảm tai nạn, và phục hồi không gian công cộng.",
-    didYouKnow:
-      "Mỗi xe Waymo tự hành thu thập khoảng 1 GB dữ liệu mỗi giây từ lidar, radar và camera — tương đương 8.000 ảnh/giây.",
-    metrics: [
-      { label: "Cảm biến", value: "Lidar + radar + cam" },
-      { label: "Dữ liệu", value: "1 GB/s" },
-      { label: "Di sản", value: "Giao thông mới" },
-    ],
-    tags: ["tự hành", "giao thông", "trí tuệ nhân tạo"],
-  },
-  {
-    id: "cloud-aws",
-    phase: "industry-4",
-    name: "Điện toán đám mây",
-    year: "2006",
-    inventor: "Amazon (AWS)",
+    inventor: "Amazon",
     origin: "Seattle, Hoa Kỳ",
-    motif: "cloud",
-    tagline: "Máy chủ theo phút.",
+    motif: "amazon-echo",
+    tagline: "Giao tiếp bằng giọng nói tự nhiên.",
     story:
-      "Năm 2006, Amazon mở dịch vụ S3 và EC2 — cho thuê máy chủ « theo phút ». Một startup với 50 USD có thể thuê sức mạnh tính toán của siêu máy tính. Khởi nghiệp không còn cần mua sắt. « Đám mây » biến tính toán thành tiện ích như nước máy.",
+      "Amazon Echo cùng trợ lý ảo Alexa được giới thiệu vào năm 2014, mang đến khả năng nhận diện giọng nói từ xa qua mạng lưới 7 micro độ nhạy cao. Người dùng có thể hỏi đáp thời tiết, phát nhạc, và điều khiển các thiết bị thông minh trong nhà bằng giọng nói tự nhiên.",
     whyItMatters:
-      "Đám mây là nền tảng của gần như mọi dịch vụ số ngày nay — Netflix, Airbnb, Uber, Slack đều chạy trên AWS/Azure/GCP. Nó cũng tập trung quyền lực kỹ thuật vào vài tập đoàn — một nghịch lý mới của thời đại phân tán.",
+      "Đưa AI và IoT (Internet vạn vật) vào sâu trong cuộc sống hàng ngày. Echo mở ra trào lưu giao diện giọng nói (Voice UI), biến trợ lý ảo trở thành trung tâm kết nối và điều hành ngôi nhà thông minh.",
     didYouKnow:
-      "AWS ban đầu là hạ tầng nội bộ Amazon để bán hàng trực tuyến. Jeff Bezos quyết định « mở » nó ra thành dịch vụ — và nay AWS mang lại phần lớn lợi nhuận của Amazon.",
+      "Cái tên 'Alexa' được lấy cảm hứng từ Thư viện Alexandria cổ đại — biểu tượng của tri thức nhân loại được lưu trữ và sẵn sàng chia sẻ.",
     metrics: [
-      { label: "Ra mắt", value: "2006" },
-      { label: "Giá", value: "Theo phút" },
-      { label: "Di sản", value: "Mọi startup" },
+      { label: "Microphone", value: "7" },
+      { label: "Trợ lý ảo", value: "Alexa" },
+      { label: "Kết nối", value: "Wi-Fi / BT" },
     ],
-    tags: ["năng lượng", "kết nối", "tính toán"],
+    tags: ["trí tuệ nhân tạo", "internet vạn vật", "giao tiếp"],
   },
   {
-    id: "smartphone",
+    id: "iphone-4s",
     phase: "industry-4",
-    name: "Smartphone cảm ứng",
-    year: "2007",
-    inventor: "Apple (Steve Jobs)",
+    name: "Điện thoại iPhone 4S",
+    year: "2011",
+    inventor: "Apple",
     origin: "Cupertino, Hoa Kỳ",
-    motif: "smartphone",
-    tagline: "Cỗ máy tính trong túi quần.",
+    motif: "iphone-4s",
+    tagline: "Sự ra mắt của Siri và kỷ nguyên di động thông minh.",
     story:
-      "9/1/2007, Jobs giới thiệu iPhone: « điện thoại + iPod + máy tính internet ». Một màn kính cảm ứng đa điểm, không bàn phím. Đánh máy bằng ngón tay. Pin cả ngày. App Store năm 2008 mở cửa cho lập trình viên — và cả một nền kinh tế di động ra đời.",
+      "iPhone 4S được giới thiệu vào năm 2011. Điểm nổi bật nhất của phiên bản này là sự xuất hiện lần đầu tiên của Siri — trợ lý ảo điều khiển bằng giọng nói tích hợp sâu vào hệ điều hành di động, mở đầu cho kỷ nguyên AI trên thiết bị cá nhân.",
     whyItMatters:
-      "Smartphone là « cái vòi » đầu tiên của tính toán cá nhân hóa. Nó kết hợp máy ảnh, GPS, cảm biến, internet — và trở thành phần mở dài cơ thể của 6 tỷ người. Nó định hình lại giao tiếp, thanh toán, giải trí, tình dục, chính trị.",
+      "Là đỉnh cao định hình lại mối quan hệ giữa con người và công nghệ trong CMCN 4.0. Điện thoại không còn là công cụ liên lạc thuần túy mà trở thành một trợ lý thông minh luôn túc trực trong túi áo.",
     didYouKnow:
-      "Trước iPhone, Nokia chiếm 50% thị trường điện thoại toàn cầu. Mười năm sau, Nokia gần như biến mất — vì đã chê cười « màn cảm ứng không có bàn phím ».",
+      "iPhone 4S là sản phẩm cuối cùng được giới thiệu ngay trước khi đồng sáng lập Apple Steve Jobs qua đời một ngày, chữ 'S' trong tên gọi được viết tắt cho 'Siri'.",
     metrics: [
-      { label: "Người dùng", value: "6,8 tỷ" },
-      { label: "App Store", value: "2 triệu app" },
-      { label: "Di sản", value: "Nền kinh tế di động" },
+      { label: "Màn hình", value: "3.5 inch Retina" },
+      { label: "Vi xử lý", value: "Apple A5 lõi kép" },
+      { label: "Trợ lý ảo", value: "Siri" },
     ],
-    tags: ["tính toán cá nhân", "kết nối", "tiêu dùng"],
-  },
-  {
-    id: "falcon-9",
-    phase: "industry-4",
-    name: "Tên lửa tái sử dụng Falcon 9",
-    year: "2015",
-    inventor: "SpaceX (Elon Musk)",
-    origin: "Hawthorne, Hoa Kỳ",
-    motif: "rocket",
-    tagline: "Tên lửa hạ cánh — lần đầu.",
-    story:
-      "21/12/2015, tầng đầu của Falcon 9 hạ cánh thẳng đứng tại mũi Cape — lần đầu một tên lửa quỹ đạo « đi về ». Trước đó, mọi tên lửa đều dùng một lần. SpaceX chứng minh « tái sử dụng » khả thi, và chi phí lên quỹ đạo giảm 90% trong một thập kỷ.",
-    whyItMatters:
-      "Khi phóng rẻ, vũ trụ mở ra. Starlink phủ internet vệ tinh toàn cầu. Hàng nghìn vệ tinh nhỏ được phóng mỗi năm. Đam mê « đa hành tinh » từ khoa học viễn tưởng thành kế hoạch kỹ thuật. Falcon 9 là cánh cửa của kỷ nguyên vũ trụ mới.",
-    didYouKnow:
-      "Falcon 9 đã phóng và hạ cánh hơn 300 lần. Mỗi tầng đầu tái sử dụng được phóng trung bình 15 lần — một con số không tưởng cách đây 20 năm.",
-    metrics: [
-      { label: "Giảm chi phí", value: "×10" },
-      { label: "Tái sử dụng", value: "~15 lần" },
-      { label: "Di sản", value: "Vũ trụ thương mại" },
-    ],
-    tags: ["vũ trụ", "tự hành", "năng lượng"],
-  },
-  {
-    id: "humanoid-robot",
-    phase: "industry-4",
-    name: "Người máy hình người",
-    year: "2024",
-    inventor: "Boston Dynamics / Tesla / Figure",
-    origin: "Hoa Kỳ",
-    motif: "robot",
-    tagline: "Bước đi hai chân — làm việc hai tay.",
-    story:
-      "Sau thập kỷ nghiên cứu, người máy hình người bắt đầu « đi làm ». Figure 01 tại nhà máy BMW, Optimus của Tesla, Atlas của Boston Dynamics — đều bước đi hai chân, cầm nắm bằng hai tay, học từ dữ liệu video con người. Lần đầu máy móc « nhập vai » vào không gian thiết kế cho người.",
-    whyItMatters:
-      "Nếu người máy hình người thành công trong lao động phổ thông, nó giải phóng con người khỏi lao động cơ thể — giống động cơ hơi nước đã giải phóng cơ bắp. Câu hỏi lớn là: ai sở hữu năng suất đó?",
-    didYouKnow:
-      "Người máy hình người học bằng « học bắt chước » — quan sát video người làm việc, rồi lặp lại. Cùng kỹ thuật mà AI dùng để học nói và học vẽ.",
-    metrics: [
-      { label: "Chiều cao", value: "~1,7 m" },
-      { label: "Học bằng", value: "Bắt chước" },
-      { label: "Di sản", value: "Lao động mới" },
-    ],
-    tags: ["tự động hóa", "lao động", "trí tuệ nhân tạo"],
-  },
-  {
-    id: "transformer-arch",
-    phase: "industry-4",
-    name: "Kiến trúc Transformer",
-    year: "2017",
-    inventor: "Google (Vaswani et al.)",
-    origin: "Mountain View, Hoa Kỳ",
-    motif: "transformer",
-    tagline: "« Attention is all you need ».",
-    story:
-      "Năm 2017, nhóm Google xuất bản bài báo 8 trang với tiêu đề táo bạo: « Chú ý là tất cả những gì bạn cần ». Họ đề xuất kiến trúc Transformer — bỏ vòng lặp, dùng « cơ chế chú ý » để mỗi từ nhìn tất cả từ khác cùng lúc. Mô hình học ngôn ngữ nhanh và song song hơn.",
-    whyItMatters:
-      "Transformer là nền móng của GPT, BERT, Claude, Gemini — mọi mô hình ngôn ngữ lớn hôm nay. Nó biến AI từ « công cụ chuyên biệt » thành « đa năng ». Văn bản bạn đang đọc có thể được một Transformer viết — và chúng đang viết cả mã, nhạc, ảnh.",
-    didYouKnow:
-      "Bài báo Transformer gốc chỉ có 8 trang — ngắn hơn nhiều bài báo học thuật. Nhưng đã trích dẫn hơn 130.000 lần, nhiều thứ ba trong lịch sử khoa học máy tính.",
-    metrics: [
-      { label: "Trang báo", value: "8" },
-      { label: "Trích dẫn", value: "130.000+" },
-      { label: "Di sản", value: "Mọi LLM" },
-    ],
-    tags: ["trí tuệ nhân tạo", "tính toán", "mã hóa"],
+    tags: ["di động", "trí tuệ nhân tạo", "kết nối"],
   },
 ];
 
@@ -857,75 +512,43 @@ export interface Connection {
 export const CONNECTIONS: Connection[] = [
   {
     id: "motive-power",
-    name: "Động lực chính",
+    name: "Động lực cách mạng",
     description:
-      "Từ hơi nước đến điện đến silicon — nhân loại luôn tìm cách biến năng lượng thành chuyển động và tính toán.",
+      "Từ hơi nước đến điện lực đến silicon và trí tuệ nhân tạo — nhân loại luôn tìm cách giải phóng năng lượng cơ bắp và trí óc.",
     color: "#e89446",
-    exhibitIds: ["watt-steam", "otto-engine", "dynamo", "intel-4004", "neural-net"],
+    exhibitIds: ["watt-steam", "dynamo", "intel-4004", "amazon-echo", "atlas-robot"],
   },
   {
     id: "shrinking-world",
-    name: "Thu hẹp thế giới",
+    name: "Thu hẹp khoảng cách",
     description:
-      "Mỗi kỷ nguyên co khoảng cách lại — đường sắt, vô tuyến, web, smartphone — cho đến khi thế giới nhỏ hơn chiếc màn hình.",
+      "Các phương tiện vận chuyển và kết nối liên tục rút ngắn khoảng cách địa lý — từ tàu thủy, đầu máy xe lửa, máy bay cho đến chiếc điện thoại thông minh.",
     color: "#e8b53a",
-    exhibitIds: ["rocket-locomotive", "marconi-radio", "telstar", "www", "smartphone"],
+    exhibitIds: ["steamboat-fulton", "rocket-locomotive", "wright-flyer", "motorola-dynatac", "iphone-4s"],
   },
   {
     id: "labor-automation",
-    name: "Lao động & Tự động hóa",
+    name: "Tự động hóa lao động",
     description:
-      "Cái ghé, băng chuyền, rô-bốt — máy móc liên tục thay thế lao động cơ bắp, rồi lao động trí óc.",
+      "Cơ chế dệt, điều khiển lập trình và robot hóa — máy móc liên tục thay thế các thao tác cơ học của con người từ thô sơ đến phức tạp.",
     color: "#4ade80",
-    exhibitIds: ["spinning-jenny", "jacquard-loom", "model-t", "humanoid-robot"],
+    exhibitIds: ["flying-shuttle", "modicon-plc", "unimate-robot", "atlas-robot"],
   },
   {
-    id: "standards-uniqueness",
-    name: "Tiêu chuẩn & Độc bản",
+    id: "computing-evolution",
+    name: "Tiến hóa của điện toán",
     description:
-      "Mã vạch chuẩn hóa mọi sản phẩm, in 3D trả lại sự độc bản. Hai cực của sản xuất hiện đại.",
+      "Từ những chiếc máy vi tính đầu tiên cho đến các vi xử lý siêu nhỏ tích hợp trợ lý thông minh trợ giúp con người.",
     color: "#e879f9",
-    exhibitIds: ["cotton-gin", "model-t", "bar-code", "3d-printer"],
+    exhibitIds: ["intel-4004", "altair-8800", "amazon-echo", "iphone-4s"],
   },
   {
-    id: "encoding-world",
-    name: "Mã hóa thế giới",
+    id: "intelligent-voice",
+    name: "Giao tiếp thông minh",
     description:
-      "Từ băng đục lỗ Jacquard đến mã vạch đến Transformer — thế giới được « viết lại » thành dữ liệu.",
+      "Dòng điện thắp sáng và kích hoạt thiết bị, làm nền móng cho các hệ thống máy tính có khả năng giao tiếp ngôn ngữ tự nhiên.",
     color: "#00d4aa",
-    exhibitIds: ["jacquard-loom", "bar-code", "ethernet", "www", "transformer-arch"],
-  },
-  {
-    id: "energy-as-service",
-    name: "Năng lượng như một dịch vụ",
-    description:
-      "Đồng hồ Edison biến điện thành hàng hóa; đám mây biến tính toán thành tiện ích. Cùng một mô hình, hai thế kỷ.",
-    color: "#ff9eb5",
-    exhibitIds: ["gas-lamp", "dynamo", "edison-meter", "ac-transformer", "cloud-aws"],
-  },
-  {
-    id: "conquering-night",
-    name: "Chinh phục bóng đêm",
-    description:
-      "Đèn gas rồi bóng đèn — mỗi bước đẩy bóng đêm lùi xa hơn, kéo theo « xã hội đêm » và ca đêm.",
-    color: "#e8b53a",
-    exhibitIds: ["gas-lamp", "light-bulb", "telstar"],
-  },
-  {
-    id: "autonomous-motion",
-    name: "Động lực tự hành",
-    description:
-      "Rocket tự hạ cánh, xe tự lái, rô-bốt tự đi — máy móc học tự quyết định trong không gian vật lý.",
-    color: "#e879f9",
-    exhibitIds: ["rocket-locomotive", "falcon-9", "tesla-autopilot", "humanoid-robot"],
-  },
-  {
-    id: "personal-computing",
-    name: "Tính toán cá nhân hóa",
-    description:
-      "Từ phòng máy lạnh xuống bàn làm việc xuống túi quần — tính toán tiến gần cơ thể từng bước.",
-    color: "#4ade80",
-    exhibitIds: ["intel-4004", "pc-monitor", "cell-phone", "smartphone"],
+    exhibitIds: ["dynamo", "edison-phonograph", "altair-8800", "amazon-echo", "iphone-4s"],
   },
 ];
 

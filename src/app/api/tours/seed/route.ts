@@ -6,44 +6,46 @@ const SEED_TOURS = [
     slug: "hanh-trinh-hoi-nuoc",
     title: "Hành trình hơi nước",
     description:
-      "Năm hiện vật đầu tiên của kỷ nguyên cơ giới hóa — từ Watt đến Jacquard.",
+      "Khám phá các phát minh cơ giới hóa quan trọng của CMCN 1.0 — từ con thoi bay đến đầu máy xe lửa.",
     author: "Người dẫn tuyến Atrium",
     exhibitIds: [
+      "flying-shuttle",
       "watt-steam",
-      "spinning-jenny",
-      "cotton-gin",
-      "puddling-furnace",
+      "steamboat-fulton",
       "rocket-locomotive",
     ],
     featured: true,
   },
   {
-    slug: "anh-sang-va-dien",
-    title: "Ánh sáng & điện",
+    slug: "cuoc-cach-mang-dien",
+    title: "Cách mạng Điện & Cơ khí",
     description:
-      "Từ bóng đèn Edison đến máy biến áp — câu chuyện về việc thắp sáng thế giới.",
+      "Khám phá các phát minh định hình thế giới ở thế kỷ 19 và đầu thế kỷ 20 qua lò Bessemer, điện lực Siemens và xe hơi Karl Benz.",
     author: "Người dẫn tuyến Atrium",
     exhibitIds: [
-      "light-bulb",
+      "bessemer-converter",
       "dynamo",
-      "edison-meter",
-      "ac-transformer",
-      "model-t",
+      "edison-phonograph",
+      "motorwagen",
+      "wright-flyer",
     ],
     featured: true,
   },
   {
-    slug: "tu-silicon-den-ai",
-    title: "Từ silicon đến AI",
+    slug: "ky-nguyen-so-va-ai",
+    title: "Kỷ nguyên Số & Trí tuệ",
     description:
-      "Khi máy tính học cách nghĩ — từ Intel 4004 đến mạng nơ-ron sâu.",
+      "Hành trình phát triển vượt bậc từ vi xử lý đầu tiên, máy tính cá nhân đến robot sinh học hình người và trợ lý ảo thông minh.",
     author: "Người dẫn tuyến Atrium",
     exhibitIds: [
       "intel-4004",
-      "arpanet",
-      "www",
-      "neural-net",
-      "transformer-arch",
+      "modicon-plc",
+      "unimate-robot",
+      "altair-8800",
+      "motorola-dynatac",
+      "atlas-robot",
+      "amazon-echo",
+      "iphone-4s",
     ],
     featured: true,
   },
@@ -52,26 +54,20 @@ const SEED_TOURS = [
 export async function POST() {
   let created = 0;
   for (const t of SEED_TOURS) {
-    const existing = await db.tour.findUnique({ where: { slug: t.slug } });
-    if (!existing) {
-      await db.tour.create({
-        data: {
-          slug: t.slug,
-          title: t.title,
-          description: t.description,
-          author: t.author,
-          exhibitIds: JSON.stringify(t.exhibitIds),
-          featured: true,
-        },
-      });
-      created++;
-    } else if (!existing.featured) {
-      await db.tour.update({
-        where: { slug: t.slug },
-        data: { featured: true },
-      });
-      created++;
-    }
+    // Delete any existing tour with the same slug to ensure it gets fully updated with new exhibitIds
+    await db.tour.deleteMany({ where: { slug: t.slug } });
+    
+    await db.tour.create({
+      data: {
+        slug: t.slug,
+        title: t.title,
+        description: t.description,
+        author: t.author,
+        exhibitIds: JSON.stringify(t.exhibitIds),
+        featured: true,
+      },
+    });
+    created++;
   }
   return NextResponse.json({ seeded: created });
 }

@@ -72,7 +72,7 @@ export function PhaseRoom() {
                   {phase.name}: {phase.era}
                 </h1>
               </div>
-              <ProgressRing value={seenCount} max={8} accent={phase.accent} size={56} />
+              <ProgressRing value={seenCount} max={exhibits.length} accent={phase.accent} size={56} />
             </div>
 
             <AnimatePresence>
@@ -131,10 +131,10 @@ export function PhaseRoom() {
           {/* collection header */}
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-[0.7rem] uppercase tracking-[0.3em] text-foreground/55">
-              Bộ sưu tập · {seenCount}/8 đã xem
+              Bộ sưu tập · {seenCount}/{exhibits.length} đã xem
             </h2>
             <span className="hidden items-center gap-2 text-[0.7rem] text-foreground/45 sm:flex">
-              <Layers3 className="h-3.5 w-3.5" /> 8 hiện vật
+              <Layers3 className="h-3.5 w-3.5" /> {exhibits.length} hiện vật
             </span>
           </div>
 

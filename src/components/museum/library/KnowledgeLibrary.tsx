@@ -84,14 +84,15 @@ export function KnowledgeLibrary() {
           <motion.button
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
+            whileHover={{ y: -4 }}
             transition={{ delay: 0.2, duration: 0.6 }}
             onClick={() => setStage("library-history")}
-            className="group relative mx-auto w-full max-w-3xl overflow-hidden rounded-3xl border p-6 text-left transition-all hover:-translate-y-1 sm:p-8"
+            className="group relative mx-auto w-full max-w-3xl overflow-hidden rounded-3xl border p-6 text-left sm:p-8"
             style={{ borderColor: "rgba(232,180,58,0.3)", background: "linear-gradient(135deg, rgba(232,180,58,0.06) 0%, oklch(0.16 0.012 60) 100%)" }}
           >
-            <div className="absolute inset-x-0 top-0 h-px" style={{ background: "linear-gradient(90deg, transparent, #e8b53a, transparent)" }} />
+            <div className="absolute inset-x-0 top-0 h-px pointer-events-none" style={{ background: "linear-gradient(90deg, transparent, #e8b53a, transparent)" }} />
             {/* Hover glow */}
-            <div className="absolute inset-0 opacity-0 transition-opacity group-hover:opacity-100" style={{ background: "radial-gradient(ellipse at top, rgba(232,180,58,0.1), transparent 70%)" }} />
+            <div className="absolute inset-0 opacity-0 transition-opacity duration-300 ease-in-out group-hover:opacity-100 pointer-events-none" style={{ background: "radial-gradient(ellipse at top, rgba(232,180,58,0.1), transparent 70%)" }} />
 
             <div className="relative flex items-start gap-5">
               <div

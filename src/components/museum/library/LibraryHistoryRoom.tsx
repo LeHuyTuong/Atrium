@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowLeft,
@@ -17,10 +17,12 @@ import {
   X,
   Award,
   Clock,
+  BookOpen,
+  Star,
+  Trophy,
 } from "lucide-react";
 import { useMuseum } from "@/lib/store";
 import { BrandMark } from "@/components/museum/layout/brand";
-import { toast } from "sonner";
 
 // ============ DATA: 4 cuộc CMCN ============
 interface Revolution {
@@ -181,33 +183,97 @@ const MINI_QUIZ: MiniQuestion[] = [
     answer: 2,
     explanation: "CMCN lần 3 đặc trưng bởi công nghệ thông tin và tự động hóa sản xuất (thập niên 1960).",
   },
+  {
+    prompt: "Đặc trưng nổi bật của Cách mạng công nghiệp lần thứ hai là gì?",
+    options: ["AI và Big Data", "Điện năng và sản xuất hàng loạt", "Internet", "Robot thông minh"],
+    answer: 1,
+    explanation: "CMCN lần 2 đặc trưng bởi điện năng và sản xuất hàng loạt (nửa cuối XIX – đầu XX).",
+  },
+  {
+    prompt: "Vai trò nào KHÔNG thuộc cách mạng công nghiệp?",
+    options: [
+      "Phát triển lực lượng sản xuất",
+      "Hoàn thiện quan hệ sản xuất",
+      "Đổi mới phương thức quản trị",
+      "Xóa bỏ hoàn toàn kinh tế thị trường",
+    ],
+    answer: 3,
+    explanation: "Xóa bỏ hoàn toàn kinh tế thị trường KHÔNG phải là vai trò của CMCN. CMCN thúc đẩy phát triển, không xóa bỏ nền kinh tế.",
+  },
 ];
 
 // ============ COMPONENT: LibraryHistoryRoom ============
 export function LibraryHistoryRoom() {
   const setStage = useMuseum((s) => s.setStage);
   const [activeRev, setActiveRev] = useState<number>(1);
-  const [quizAnswers, setQuizAnswers] = useState<(number | null)[]>([null, null, null]);
-  const [quizSubmitted, setQuizSubmitted] = useState(false);
+  const [quizAnswers, setQuizAnswers] = useState<(number | null)[]>([null, null, null, null, null]);
+  const [progressPct, setProgressPct] = useState(0);
+  const [quizAllDone, setQuizAllDone] = useState(false);
+
+  // Refs for scroll tracking
+  const card1Ref = useRef<HTMLDivElement | null>(null);
+  const card2Ref = useRef<HTMLDivElement | null>(null);
+  const card3Ref = useRef<HTMLDivElement | null>(null);
+  const card4Ref = useRef<HTMLDivElement | null>(null);
+  const summaryRef = useRef<HTMLDivElement | null>(null);
+  const timelineRef = useRef<HTMLDivElement | null>(null);
 
   const activeRevolution = REVOLUTIONS.find((r) => r.id === activeRev)!;
   const quizScore = quizAnswers.filter((a, i) => a === MINI_QUIZ[i].answer).length;
-  const progressPct = Math.round((quizAnswers.filter((a) => a !== null).length / MINI_QUIZ.length) * 100);
+  const quizAllAnswered = quizAnswers.every((a) => a !== null);
 
-  const submitQuiz = () => {
-    setQuizSubmitted(true);
-    if (quizScore === 3) {
-      toast.success("Xuất sắc! 3/3 — Bạn đã nắm vững lịch sử CMCN!");
-    } else if (quizScore >= 2) {
-      toast.success(`Khá tốt! ${quizScore}/3`);
-    } else {
-      toast.message(`Cần cố gắng hơn — ${quizScore}/3`);
-    }
+  const scrollToSection = useCallback((revId: number) => {
+    const refMap: Record<number, React.RefObject<HTMLDivElement | null>> = {
+      1: card1Ref,
+      2: card2Ref,
+      3: card3Ref,
+      4: card4Ref,
+    };
+    refMap[revId]?.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }, []);
+
+  // IntersectionObserver for progress tracking
+  useEffect(() => {
+    const targets = [card1Ref.current, card2Ref.current, card3Ref.current, card4Ref.current, summaryRef.current].filter(Boolean) as Element[];
+    if (targets.length === 0) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visibleSet = new Set<Element>();
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) visibleSet.add(entry.target);
+        });
+
+        let maxProgress = 0;
+        if (visibleSet.has(card1Ref.current!)) maxProgress = Math.max(maxProgress, 25);
+        if (visibleSet.has(card2Ref.current!)) maxProgress = Math.max(maxProgress, 50);
+        if (visibleSet.has(card3Ref.current!)) maxProgress = Math.max(maxProgress, 75);
+        if (visibleSet.has(card4Ref.current!) || visibleSet.has(summaryRef.current!)) maxProgress = Math.max(maxProgress, 100);
+
+        if (maxProgress > 0) setProgressPct(maxProgress);
+      },
+      { threshold: 0.2, rootMargin: "-10% 0px" }
+    );
+
+    targets.forEach((t) => observer.observe(t));
+    return () => observer.disconnect();
+  }, []);
+
+  // Track when all quiz questions are answered
+  useEffect(() => {
+    if (quizAllAnswered) setQuizAllDone(true);
+  }, [quizAllAnswered]);
+
+  const handleQuizAnswer = (qi: number, oi: number) => {
+    if (quizAnswers[qi] !== null) return;
+    const next = [...quizAnswers];
+    next[qi] = oi;
+    setQuizAnswers(next);
   };
 
   const resetQuiz = () => {
-    setQuizAnswers([null, null, null]);
-    setQuizSubmitted(false);
+    setQuizAnswers([null, null, null, null, null]);
+    setQuizAllDone(false);
   };
 
   return (
@@ -259,12 +325,12 @@ export function LibraryHistoryRoom() {
             {/* Progress tracker */}
             <div className="flex items-center gap-2 rounded-full border border-foreground/12 bg-foreground/[0.03] px-3 py-1.5">
               <span className="text-[0.65rem] uppercase tracking-[0.15em] text-foreground/45">Tiến độ</span>
-              <div className="h-1.5 w-16 overflow-hidden rounded-full bg-foreground/10">
+              <div className="h-1.5 w-20 overflow-hidden rounded-full bg-foreground/10">
                 <motion.div
                   className="h-full rounded-full"
                   style={{ background: "linear-gradient(90deg, #e89446, #e8b53a, #4ade80)" }}
                   animate={{ width: `${progressPct}%` }}
-                  transition={{ duration: 0.4 }}
+                  transition={{ duration: 0.6, ease: "easeOut" }}
                 />
               </div>
               <span className="font-mono text-[0.65rem] text-foreground/55">{progressPct}%</span>
@@ -298,10 +364,37 @@ export function LibraryHistoryRoom() {
             </p>
           </motion.div>
 
+          {/* ===== Knowledge Card: Khái niệm CMCN ===== */}
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.3 }}
+            className="mx-auto mt-8 max-w-3xl"
+          >
+            <div className="relative overflow-hidden rounded-2xl border bg-background/70 backdrop-blur-xl p-6 sm:p-8 shadow-sm"
+              style={{ borderColor: "oklch(0.5 0.02 60 / 0.18)" }}
+            >
+              <div className="absolute inset-x-0 top-0 h-px" style={{ background: "linear-gradient(90deg, transparent, #e8b53a44, transparent)" }} />
+              <div className="flex items-start gap-4">
+                <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border shadow-sm"
+                  style={{ borderColor: "#e8b53a44", background: "#e8b53a14", color: "#e8b53a" }}
+                >
+                  <BookOpen className="h-5 w-5" />
+                </div>
+                <div>
+                  <span className="text-[0.7rem] uppercase tracking-[0.2em] font-bold text-foreground/40">Khái niệm</span>
+                  <p className="mt-1.5 font-serif text-base sm:text-lg leading-relaxed italic text-foreground/80">
+                    Cách mạng công nghiệp là bước phát triển nhảy vọt về chất của tư liệu lao động trên cơ sở những thành tựu khoa học và công nghệ, làm thay đổi căn bản phân công lao động xã hội và nâng cao năng suất lao động.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
           {/* Curved timeline (SVG path connecting 4 milestones) */}
-          <div className="relative mt-12 mb-16">
+          <div ref={timelineRef} className="relative mt-12 mb-16">
             <svg
-              viewBox="0 0 1000 200"
+              viewBox="0 0 1000 220"
               className="w-full"
               style={{ filter: "drop-shadow(0 4px 12px rgba(232,180,58,0.15))" }}
             >
@@ -337,9 +430,11 @@ export function LibraryHistoryRoom() {
                 return (
                   <g
                     key={m.rev}
-                    onClick={() => setActiveRev(m.rev)}
+                    onClick={() => { setActiveRev(m.rev); scrollToSection(m.rev); }}
                     style={{ cursor: "pointer" }}
                   >
+                    {/* Hit area — larger invisible circle for easy clicking */}
+                    <circle cx={m.x} cy={m.y} r="30" fill="transparent" className="group" />
                     {/* Outer glow ring */}
                     {isActive && (
                       <motion.circle
@@ -374,18 +469,22 @@ export function LibraryHistoryRoom() {
                       fontWeight="700"
                       fill={rev.accent}
                       fontFamily="serif"
+                      style={{ pointerEvents: "none" }}
                     >
                       {rev.label}
                     </text>
+                    {/* Short title label */}
                     <text
                       x={m.x}
-                      y={m.y + 32}
+                      y={m.y + 34}
                       textAnchor="middle"
                       fontSize="9"
                       fill="oklch(0.65 0.02 60)"
                       fontFamily="sans-serif"
+                      fontWeight="600"
+                      style={{ pointerEvents: "none" }}
                     >
-                      {rev.period.split("–")[0].trim()}
+                      {rev.shortTitle.split("&").map((p) => p.trim()).join(" & ")}
                     </text>
                   </g>
                 );
@@ -414,18 +513,27 @@ export function LibraryHistoryRoom() {
               <h2 className="font-serif text-2xl font-bold text-foreground sm:text-3xl">Bốn cuộc cách mạng</h2>
             </div>
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-              {REVOLUTIONS.map((rev, i) => (
+              {REVOLUTIONS.map((rev, i) => {
+                const cardRefMap: Record<number, React.RefObject<HTMLDivElement | null>> = {
+                  1: card1Ref,
+                  2: card2Ref,
+                  3: card3Ref,
+                  4: card4Ref,
+                };
+                return (
                 <motion.button
                   key={rev.id}
+                  ref={(el) => { cardRefMap[rev.id].current = el as HTMLDivElement | null; }}
                   initial={{ opacity: 0, y: 16 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
+                  whileHover={{ y: -4 }}
                   transition={{ delay: i * 0.08, duration: 0.4 }}
                   onClick={() => {
                     setActiveRev(rev.id);
                     window.scrollTo({ top: 0, behavior: "smooth" });
                   }}
-                  className="group relative overflow-hidden rounded-[2rem] border p-6 text-left transition-all duration-300 hover:-translate-y-2"
+                  className="group relative overflow-hidden rounded-[2rem] border p-6 text-left"
                   style={{
                     borderColor: activeRev === rev.id ? rev.accent : "oklch(0.5 0.02 60 / 0.15)",
                     background: activeRev === rev.id ? `${rev.accent}0a` : "oklch(0.5 0.02 60 / 0.02)",
@@ -436,10 +544,10 @@ export function LibraryHistoryRoom() {
                   <div className="absolute inset-x-0 top-0 h-1" style={{ background: `linear-gradient(90deg, transparent, ${rev.accent}, transparent)` }} />
                   {/* Hover glow */}
                   <div
-                    className="absolute inset-0 opacity-0 transition-opacity group-hover:opacity-100"
+                    className="absolute inset-0 opacity-0 transition-opacity duration-300 ease-in-out group-hover:opacity-100 pointer-events-none"
                     style={{ background: `radial-gradient(ellipse at top, ${rev.accent}15, transparent 70%)` }}
                   />
-                  <div className="relative">
+                  <div className="relative pointer-events-none">
                     <div className="flex items-center justify-between mb-4">
                       <div
                         className="grid h-14 w-14 place-items-center rounded-2xl border shadow-sm"
@@ -465,7 +573,8 @@ export function LibraryHistoryRoom() {
                     </div>
                   </div>
                 </motion.button>
-              ))}
+                );
+              })}
             </div>
           </section>
 
@@ -483,19 +592,20 @@ export function LibraryHistoryRoom() {
                   key={role.id}
                   initial={{ opacity: 0, y: 16 }}
                   whileInView={{ opacity: 1, y: 0 }}
+                  whileHover={{ y: -4 }}
                   viewport={{ once: true }}
                   transition={{ delay: i * 0.1, duration: 0.5 }}
-                  className="group relative overflow-hidden rounded-[2rem] border p-8 transition-all hover:-translate-y-2 bg-background/60 backdrop-blur-xl shadow-sm"
+                  className="group relative overflow-hidden rounded-[2rem] border p-8 bg-background/60 backdrop-blur-xl shadow-sm"
                   style={{
                     borderColor: `${role.accent}40`,
                   }}
                 >
-                  <div className="absolute inset-x-0 top-0 h-1.5" style={{ background: `linear-gradient(90deg, transparent, ${role.accent}, transparent)` }} />
+                  <div className="absolute inset-x-0 top-0 h-1.5 pointer-events-none" style={{ background: `linear-gradient(90deg, transparent, ${role.accent}, transparent)` }} />
                   <div
-                    className="absolute inset-0 opacity-0 transition-opacity group-hover:opacity-100"
+                    className="absolute inset-0 opacity-0 transition-opacity duration-300 ease-in-out group-hover:opacity-100 pointer-events-none"
                     style={{ background: `radial-gradient(ellipse at top, ${role.accent}0a, transparent 70%)` }}
                   />
-                  <div className="relative">
+                  <div className="relative pointer-events-none">
                     <div className="flex items-center gap-4 mb-4">
                       <div
                         className="grid h-12 w-12 shrink-0 place-items-center rounded-xl border shadow-sm"
@@ -517,74 +627,127 @@ export function LibraryHistoryRoom() {
             </div>
           </section>
 
-          {/* ===== Section 4: Mini quiz 3 câu ===== */}
+          {/* ===== Section 4: Tổng kết chương ===== */}
+          <section ref={summaryRef} className="mb-16">
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="relative overflow-hidden rounded-[2rem] border bg-background/70 backdrop-blur-xl p-8 sm:p-12 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.08)]"
+              style={{ borderColor: "oklch(0.5 0.02 60 / 0.2)" }}
+            >
+              <div className="absolute inset-x-0 top-0 h-1.5" style={{ background: "linear-gradient(90deg, transparent, #e8b53a, #4ade80, #e879f9, transparent)" }} />
+              <div
+                className="absolute -right-8 -top-8 font-serif text-[12rem] font-bold leading-none opacity-[0.025]"
+                style={{ color: "#e8b53a" }}
+              >
+                04
+              </div>
+              <div className="relative flex flex-col items-center text-center">
+                <div className="grid h-16 w-16 place-items-center rounded-2xl border shadow-sm mb-5"
+                  style={{ borderColor: "#e8b53a44", background: "#e8b53a14", color: "#e8b53a" }}
+                >
+                  <BookOpen className="h-8 w-8" />
+                </div>
+                <span className="text-[0.7rem] uppercase tracking-[0.25em] text-foreground/50 mb-2">Tổng kết chương</span>
+                <h2 className="font-serif text-3xl font-bold text-foreground sm:text-4xl mb-5">
+                  Hành trình 260 năm công nghiệp
+                </h2>
+                <p className="max-w-3xl text-base leading-relaxed text-foreground/75 font-medium sm:text-lg">
+                  Qua bốn cuộc cách mạng công nghiệp, thế giới đã chuyển từ nền sản xuất thủ công sang nền sản xuất thông minh dựa trên công nghệ số. Mỗi cuộc cách mạng đều góp phần thúc đẩy lực lượng sản xuất, hoàn thiện quan hệ sản xuất và đổi mới phương thức quản trị, tạo nền tảng cho sự phát triển kinh tế - xã hội hiện đại.
+                </p>
+                {/* Timeline summary dots */}
+                <div className="mt-8 flex items-center gap-3 flex-wrap justify-center">
+                  {REVOLUTIONS.map((rev) => (
+                    <span
+                      key={rev.id}
+                      className="inline-flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-semibold"
+                      style={{ borderColor: `${rev.accent}44`, color: rev.accent, background: `${rev.accent}10` }}
+                    >
+                      <span className="grid h-5 w-5 place-items-center rounded-full text-[0.6rem]" style={{ background: rev.accent, color: "#fff" }}>{rev.label}</span>
+                      {rev.shortTitle.split("&")[0].trim()}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+          </section>
+
+          {/* ===== Section 5: Mini quiz 5 câu ===== */}
           <section className="mb-16">
             <div className="mb-6 flex items-center gap-2">
-              <span className="text-[0.65rem] uppercase tracking-[0.25em] text-foreground/50">04</span>
+              <span className="text-[0.65rem] uppercase tracking-[0.25em] text-foreground/50">05</span>
               <h2 className="font-serif text-2xl font-bold text-foreground sm:text-3xl">
-                Kiểm tra nhanh — 3 câu trắc nghiệm
+                Kiểm tra nhanh — 5 câu trắc nghiệm
               </h2>
             </div>
             <div className="rounded-[2rem] border shadow-sm bg-background/60 backdrop-blur-xl p-8 sm:p-10" style={{ borderColor: "oklch(0.5 0.02 60 / 0.15)" }}>
               <div className="space-y-8">
-                {MINI_QUIZ.map((q, qi) => (
+                {MINI_QUIZ.map((q, qi) => {
+                  const sel = quizAnswers[qi];
+                  const answered = sel !== null;
+                  const isCorrect = answered && sel === q.answer;
+                  const isWrong = answered && sel !== q.answer;
+                  return (
                   <div key={qi} className="pb-8 border-b border-foreground/5 last:border-0 last:pb-0">
                     <div className="mb-4 flex items-center gap-3">
-                      <span className="grid h-8 w-8 place-items-center rounded-xl bg-foreground/5 font-serif text-sm font-bold text-foreground/70 shadow-sm border border-foreground/5">
+                      <span className={`grid h-8 w-8 place-items-center rounded-xl font-serif text-sm font-bold shadow-sm border transition-colors ${answered ? (isCorrect ? "border-[#4ade80] bg-[#4ade8014]" : "border-[#f87171] bg-[#f8717114]") : "bg-foreground/5 text-foreground/70 border-foreground/5"}`}
+                        style={{ color: answered ? (isCorrect ? "#166534" : "#991b1b") : undefined }}
+                      >
                         {qi + 1}
                       </span>
                       <span className="text-lg font-bold text-foreground/90">{q.prompt}</span>
                     </div>
                     <div className="grid grid-cols-1 gap-3 pl-11 sm:grid-cols-2">
                       {q.options.map((opt, oi) => {
-                        const isSel = quizAnswers[qi] === oi;
-                        const isCorrect = quizSubmitted && oi === q.answer;
-                        const isWrong = quizSubmitted && isSel && oi !== q.answer;
+                        const isSelOption = sel === oi;
+                        const showCorrect = answered && oi === q.answer;
+                        const showWrong = answered && isSelOption && oi !== q.answer;
+                        const isDisabled = answered;
                         return (
                           <button
                             key={oi}
-                            disabled={quizSubmitted}
-                            onClick={() => {
-                              const next = [...quizAnswers];
-                              next[qi] = oi;
-                              setQuizAnswers(next);
-                            }}
-                            className="flex items-center gap-3 rounded-xl border px-4 py-3 text-left text-sm font-medium transition-all hover:bg-foreground/[0.02] shadow-sm"
+                            disabled={isDisabled}
+                            onClick={() => handleQuizAnswer(qi, oi)}
+                            className="flex items-center gap-3 rounded-xl border px-4 py-3 text-left text-sm transition-colors duration-300 ease-out shadow-sm"
                             style={{
-                              borderColor: isCorrect
-                                ? "#4ade80"
-                                : isWrong
-                                ? "#f87171"
-                                : isSel
+                              borderColor: showCorrect
+                                ? "#22c55e"
+                                : showWrong
+                                ? "#f43f5e"
+                                : isSelOption && !answered
                                 ? "#e8b53a"
-                                : "oklch(0.5 0.02 60 / 0.15)",
-                              background: isCorrect
-                                ? "#4ade8014"
-                                : isWrong
-                                ? "#f8717114"
-                                : isSel
-                                ? "#e8b53a14"
-                                : "var(--background)",
-                              color: isCorrect
-                                ? "#166534"
-                                : isWrong
-                                ? "#991b1b"
-                                : isSel
-                                ? "#854d0e"
-                                : "oklch(0.3 0.02 60)",
-                              opacity: quizSubmitted && !isCorrect && !isSel ? 0.5 : 1,
+                                : "oklch(0.5 0.02 60 / 0.18)",
+                              background: showCorrect
+                                ? "oklch(0.45 0.18 145 / 0.15)"
+                                : showWrong
+                                ? "oklch(0.45 0.22 15 / 0.15)"
+                                : isSelOption && !answered
+                                ? "#e8b53a18"
+                                : "oklch(0.18 0.01 60 / 0.35)",
+                              color: showCorrect
+                                ? "oklch(0.7 0.18 145)"
+                                : showWrong
+                                ? "oklch(0.65 0.2 15)"
+                                : isSelOption && !answered
+                                ? "#e8b53a"
+                                : "oklch(0.9 0.01 70)",
+                              fontWeight: showCorrect || showWrong ? 500 : 400,
+                              opacity: isDisabled && !showCorrect && !showWrong ? 0.4 : 1,
+                              cursor: isDisabled ? "default" : "pointer",
                             }}
                           >
-                            <span className="font-bold opacity-60">{String.fromCharCode(65 + oi)}.</span>
+                            <span style={{ opacity: showCorrect || showWrong ? 0.8 : 0.55, fontWeight: 700 }}>{String.fromCharCode(65 + oi)}.</span>
                             <span className="flex-1">{opt}</span>
-                            {isCorrect && <CheckCircle2 className="h-5 w-5" color="#166534" />}
-                            {isWrong && <X className="h-5 w-5" color="#991b1b" />}
+                            {showCorrect && <CheckCircle2 className="h-5 w-5 shrink-0" color="oklch(0.7 0.18 145)" />}
+                            {showWrong && <X className="h-5 w-5 shrink-0" color="oklch(0.65 0.2 15)" />}
                           </button>
                         );
                       })}
                     </div>
-                    {/* Explanation after submit */}
-                    {quizSubmitted && (
+                    {/* Explanation after answer */}
+                    {answered && (
                       <motion.p
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: "auto" }}
@@ -594,47 +757,51 @@ export function LibraryHistoryRoom() {
                       </motion.p>
                     )}
                   </div>
-                ))}
+                  );
+                })}
               </div>
 
-              {/* Quiz actions */}
+              {/* Quiz results */}
               <div className="mt-8 flex items-center justify-between gap-4 border-t border-foreground/10 pt-6">
-                {quizSubmitted ? (
-                  <div className="flex items-center gap-2">
-                    <Award className="h-5 w-5 text-amber-300" />
-                    <span className="font-serif text-lg font-bold" style={{ color: quizScore === 3 ? "#4ade80" : "#e8b53a" }}>
-                      {quizScore}/3
-                    </span>
-                    <span className="text-xs text-foreground/55">
-                      {quizScore === 3 ? "Hoàn hảo!" : quizScore >= 2 ? "Khá tốt!" : "Cần cố gắng"}
-                    </span>
-                  </div>
-                ) : (
-                  <span className="text-xs text-foreground/45">
-                    Đã trả lời {quizAnswers.filter((a) => a !== null).length}/3
+                <div className="flex items-center gap-2">
+                  <Award className="h-5 w-5 text-amber-300" />
+                  <span className="font-serif text-lg font-bold" style={{ color: quizScore >= 4 ? "#4ade80" : "#e8b53a" }}>
+                    {quizScore}/5
                   </span>
-                )}
-                <div className="flex gap-2">
-                  {quizSubmitted && (
-                    <button
-                      onClick={resetQuiz}
-                      className="inline-flex items-center gap-1.5 rounded-full border border-foreground/15 px-3 py-2 text-xs text-foreground/65 transition hover:border-foreground/30"
-                    >
-                      Làm lại
-                    </button>
-                  )}
-                  {!quizSubmitted && (
-                    <button
-                      onClick={submitQuiz}
-                      disabled={quizAnswers.some((a) => a === null)}
-                      className="inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-xs font-semibold text-background transition disabled:opacity-40"
-                      style={{ background: "#e8b53a" }}
-                    >
-                      Nộp bài
-                    </button>
-                  )}
+                  <span className="text-xs text-foreground/55">
+                    {!quizAllAnswered ? `Đã trả lời ${quizAnswers.filter((a) => a !== null).length}/5` :
+                     quizScore === 5 ? "Hoàn hảo!" : quizScore >= 3 ? "Khá tốt!" : "Cần cố gắng"}
+                  </span>
                 </div>
+                <button
+                  onClick={resetQuiz}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-foreground/15 px-3 py-2 text-xs text-foreground/65 transition hover:border-foreground/30"
+                >
+                  Làm lại
+                </button>
               </div>
+
+              {/* Badge for perfect score */}
+              {quizAllDone && quizScore === 5 && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.8, y: 20 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.2 }}
+                  className="mt-6"
+                >
+                  <div className="relative overflow-hidden rounded-2xl border p-6 text-center"
+                    style={{
+                      borderColor: "#e8b53a55",
+                      background: "linear-gradient(135deg, #e8b53a10 0%, #4ade8010 50%, #e879f910 100%)",
+                    }}
+                  >
+                    <div className="absolute inset-x-0 top-0 h-px" style={{ background: "linear-gradient(90deg, transparent, #e8b53a88, transparent)" }} />
+                    <Trophy className="mx-auto h-10 w-10 text-amber-300 drop-shadow-lg" />
+                    <p className="mt-3 font-serif text-xl font-bold text-foreground">🏆 Đã hoàn thành xuất sắc Chương 1</p>
+                    <p className="mt-1 text-sm text-foreground/60">Bạn đã trả lời chính xác toàn bộ 5/5 câu hỏi trắc nghiệm.</p>
+                  </div>
+                </motion.div>
+              )}
             </div>
           </section>
 
@@ -666,6 +833,20 @@ export function LibraryHistoryRoom() {
 }
 
 // ============ RevolutionCard — detail view =====
+const REV_SIGNIFICANCE: Record<number, string> = {
+  1: "Đặt nền móng cho nền công nghiệp hiện đại.",
+  2: "Thúc đẩy sản xuất hàng loạt và sự phát triển mạnh của các ngành công nghiệp.",
+  3: "Mở đầu kỷ nguyên tự động hóa và công nghệ thông tin.",
+  4: "Thúc đẩy chuyển đổi số, kinh tế số và sản xuất thông minh.",
+};
+
+const REV_EMOJI: Record<number, string> = {
+  1: "🚂",
+  2: "🏭",
+  3: "💻",
+  4: "🤖",
+};
+
 function RevolutionCard({ rev }: { rev: Revolution }) {
   return (
     <div
@@ -682,7 +863,7 @@ function RevolutionCard({ rev }: { rev: Revolution }) {
         {rev.label}
       </div>
 
-      <div className="relative grid grid-cols-1 gap-10 md:grid-cols-[auto_1fr]">
+      <div className="relative grid grid-cols-1 gap-10 md:grid-cols-[auto_1fr_auto]">
         {/* Left: icon + period */}
         <div className="flex flex-row items-center gap-6 md:flex-col md:items-start">
           <div
@@ -700,7 +881,7 @@ function RevolutionCard({ rev }: { rev: Revolution }) {
           </div>
         </div>
 
-        {/* Right: content */}
+        {/* Center: content */}
         <div className="pt-2 md:pl-6 md:border-l border-foreground/5">
           <h3 className="font-serif text-3xl font-bold leading-tight text-foreground sm:text-4xl">{rev.title}</h3>
           <ul className="mt-6 space-y-4">
@@ -731,6 +912,46 @@ function RevolutionCard({ rev }: { rev: Revolution }) {
                 {t}
               </span>
             ))}
+          </div>
+          {/* Ý nghĩa nổi bật */}
+          <div className="mt-6">
+            <div
+              className="flex items-start gap-3 rounded-2xl border p-4 sm:p-5"
+              style={{ borderColor: `${rev.accent}33`, background: `${rev.accent}0d` }}
+            >
+              <Star className="h-5 w-5 mt-0.5 shrink-0" style={{ color: rev.accent }} />
+              <div>
+                <span className="text-[0.65rem] uppercase tracking-[0.15em] font-bold" style={{ color: rev.accent }}>Ý nghĩa nổi bật</span>
+                <p className="mt-1 text-sm leading-relaxed font-medium text-foreground/80">{REV_SIGNIFICANCE[rev.id]}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Right: Museum frame */}
+        <div className="flex items-start justify-center md:pt-0 order-first md:order-none md:border-l md:border-foreground/5 md:pl-6">
+          <div
+            className="group relative overflow-hidden rounded-[1.25rem] border-2 shadow-lg"
+            style={{
+              borderColor: `${rev.accent}33`,
+              background: `${rev.accent}0a`,
+              width: "120px",
+              height: "140px",
+            }}
+          >
+            {/* Inner mat */}
+            <div className="absolute inset-2 rounded-lg border" style={{ borderColor: `${rev.accent}22` }} />
+            {/* Emoji */}
+            <div className="absolute inset-0 flex items-center justify-center text-5xl transition-transform duration-300 group-hover:scale-110">
+              {REV_EMOJI[rev.id]}
+            </div>
+            {/* Plaque */}
+            <div
+              className="absolute bottom-1 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full border px-2.5 py-0.5 text-[0.5rem] uppercase tracking-[0.1em] font-bold"
+              style={{ borderColor: `${rev.accent}44`, color: rev.accent, background: `${rev.accent}14` }}
+            >
+              CMCN {rev.label}
+            </div>
           </div>
         </div>
       </div>

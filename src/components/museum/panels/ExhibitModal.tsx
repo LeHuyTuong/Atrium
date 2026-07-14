@@ -13,9 +13,13 @@ import {
   Network,
   ArrowRight,
   Quote,
+  Volume2,
+  Square,
+  Loader2,
   FlaskConical,
 } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import {
   Dialog,
   DialogContent,
@@ -29,6 +33,7 @@ import {
   connectionsForExhibit,
 } from "@/lib/museum-data";
 import { useMuseum } from "@/lib/store";
+import { audio as audioEngine } from "@/lib/audio";
 import { MotifIcon } from "@/components/museum/cards/MotifIcon";
 import { imageForExhibit, gradientForExhibit } from "@/lib/historical-images";
 import { PhasePill } from "@/components/museum/layout/brand";
@@ -36,78 +41,6 @@ import SceneLoader from "@/components/pc-monitor/SceneLoader";
 
 const Artifact3DStage = dynamic(
   () => import("@/components/museum/3d/Artifact3DStage").then((m) => m.Artifact3DStage),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="grid h-80 place-items-center">
-        <div className="h-10 w-10 animate-spin rounded-full border-2 border-foreground/15 border-t-foreground/60" />
-      </div>
-    ),
-  }
-);
-
-const LoomStageDemo = dynamic(
-  () => import("@/components/museum/3d/loom/LoomStageDemo").then((m) => m.LoomStageDemo),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="grid h-80 place-items-center">
-        <div className="h-10 w-10 animate-spin rounded-full border-2 border-foreground/15 border-t-foreground/60" />
-      </div>
-    ),
-  }
-);
-
-const NeuralStageDemo = dynamic(
-  () => import("@/components/museum/3d/neural/NeuralStageDemo").then((m) => m.NeuralStageDemo),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="grid h-80 place-items-center">
-        <div className="h-10 w-10 animate-spin rounded-full border-2 border-foreground/15 border-t-foreground/60" />
-      </div>
-    ),
-  }
-);
-
-const BulbStageDemo = dynamic(
-  () => import("@/components/museum/3d/bulb/BulbStageDemo").then((m) => m.BulbStageDemo),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="grid h-80 place-items-center">
-        <div className="h-10 w-10 animate-spin rounded-full border-2 border-foreground/15 border-t-foreground/60" />
-      </div>
-    ),
-  }
-);
-
-const ChipStageDemo = dynamic(
-  () => import("@/components/museum/3d/chip/ChipStageDemo").then((m) => m.ChipStageDemo),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="grid h-80 place-items-center">
-        <div className="h-10 w-10 animate-spin rounded-full border-2 border-foreground/15 border-t-foreground/60" />
-      </div>
-    ),
-  }
-);
-
-const SteamEngine3D = dynamic(
-  () => import("@/components/steam-engine/SteamCanvas"),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="grid h-80 place-items-center">
-        <div className="h-10 w-10 animate-spin rounded-full border-2 border-foreground/15 border-t-foreground/60" />
-      </div>
-    ),
-  }
-);
-
-const OttoEngine3D = dynamic(
-  () => import("@/components/otto-engine/OttoCanvas"),
   {
     ssr: false,
     loading: () => (
@@ -132,6 +65,7 @@ export function ExhibitModal() {
   const open = !!exhibit;
 
   const handleClose = () => {
+    if (!audioEngine.muted) audioEngine.playClose();
     closeExhibit();
   };
 
@@ -174,7 +108,10 @@ export function ExhibitModal() {
                 if (n) openExhibit(n.id);
               }}
               bookmarked={bookmarks.includes(exhibit.id)}
-              onBookmark={() => toggleBookmark(exhibit.id)}
+              onBookmark={() => {
+                if (!audioEngine.muted) audioEngine.playBookmark();
+                toggleBookmark(exhibit.id);
+              }}
               inCompare={compareIds.includes(exhibit.id)}
               onCompare={() => addCompare(exhibit.id)}
               onExploreConnections={() => {
@@ -221,40 +158,98 @@ function ExhibitModalBody({
     setSceneLabOpen(true, exhibitId);
   };
 
+  const [narrating, setNarrating] = useState(false);
+  const [narrLoading, setNarrLoading] = useState(false);
+  const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
+
+  // Soft chime when this exhibit body mounts (i.e. when an exhibit opens or
+  // the visitor navigates to a different one via prev/next).
+  useEffect(() => {
+    if (!audioEngine.muted) audioEngine.playOpen();
+  }, []);
+
+  // Stop narration when exhibit changes
+  useEffect(() => {
+    if (audio) {
+      audio.pause();
+      audio.currentTime = 0;
+    }
+    setAudio(null);
+    setNarrating(false);
+  }, [exhibitId]);
+
+  const toggleNarrate = async () => {
+    if (narrating && audio) {
+      audio.pause();
+      setNarrating(false);
+      return;
+    }
+    if (audio) {
+      audio.play();
+      setNarrating(true);
+      return;
+    }
+    setNarrLoading(true);
+    try {
+      const text = `${exhibit.name}. ${exhibit.tagline}. ${exhibit.story} ${exhibit.whyItMatters} Bạn có biết: ${exhibit.didYouKnow}`;
+      const res = await fetch("/api/narrate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text, phase: exhibit.phase }),
+      });
+      if (!res.ok) throw new Error("narrate failed");
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const el = new Audio(url);
+      el.onended = () => {
+        setNarrating(false);
+        URL.revokeObjectURL(url);
+      };
+      el.onerror = () => {
+        setNarrating(false);
+        URL.revokeObjectURL(url);
+        toast.error("Không thể phát âm thanh.");
+      };
+      setAudio(el);
+      await el.play();
+      setNarrating(true);
+    } catch {
+      toast.error("Giọng đọc tạm thời không sẵn sàng.");
+    } finally {
+      setNarrLoading(false);
+    }
+  };
+
   return (
     <div className="grid max-h-[92vh] grid-cols-1 overflow-y-auto elegant-scroll md:grid-cols-2 md:overflow-hidden">
       {/* LEFT: visual */}
       <div className="relative flex flex-col border-b border-foreground/10 md:border-b-0 md:border-r">
         {/* 3D stage */}
         <div className="relative p-3 sm:p-4">
-          {exhibitId === "watt-steam" ? (
-            <div className="h-[320px] w-full overflow-hidden rounded-xl">
-              <SteamEngine3D />
-            </div>
-          ) : exhibitId === "otto-engine" ? (
-            <div className="h-[320px] w-full overflow-hidden rounded-xl">
-              <OttoEngine3D />
-            </div>
-          ) : exhibit.motif === "loom" ? (
-            <LoomStageDemo height={320} />
-          ) : exhibit.motif === "chip" ? (
-            <ChipStageDemo height={320} />
-          ) : exhibit.motif === "light-bulb" ? (
-            <BulbStageDemo height={320} />
-          ) : exhibit.motif === "neural-net" ? (
-            <NeuralStageDemo height={320} />
-          ) : exhibitId === "pc-monitor" ? (
-            <div className="h-[320px] w-full overflow-hidden rounded-xl">
-              <SceneLoader />
-            </div>
-          ) : (
-            <Artifact3DStage
-              motif={exhibit.motif}
-              accent={phase.accent}
-              hero={exhibit.hero}
-              height={320}
-            />
-          )}
+          <Artifact3DStage
+            motif={exhibit.motif}
+            accent={phase.accent}
+            hero={exhibit.hero}
+            height={320}
+          />
+          {/* narrator pill */}
+          <button
+            onClick={toggleNarrate}
+            className="absolute right-5 top-5 z-10 inline-flex items-center gap-2 rounded-full border bg-card/85 px-3 py-1.5 text-[0.7rem] font-medium backdrop-blur-md transition hover:bg-card"
+            style={{
+              borderColor: narrating ? phase.accent : "rgba(255,255,255,0.15)",
+              color: narrating ? phase.accent : "rgba(255,255,255,0.8)",
+            }}
+          >
+            {narrLoading ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            ) : narrating ? (
+              <Square className="h-3.5 w-3.5" style={{ fill: phase.accent }} />
+            ) : (
+              <Volume2 className="h-3.5 w-3.5" />
+            )}
+            {narrating ? "Đang đọc" : narrLoading ? "Đang tải" : "Người dẫn tuyến"}
+          </button>
         </div>
 
         {/* metrics */}
@@ -401,7 +396,6 @@ function ExhibitModalBody({
             {exhibit.didYouKnow}
           </p>
         </div>
-
 
         {/* nav footer */}
         <div className="mt-auto flex items-center justify-between gap-2 pt-6">
