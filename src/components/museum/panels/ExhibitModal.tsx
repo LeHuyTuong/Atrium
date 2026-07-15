@@ -1,6 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   X,
@@ -17,6 +18,7 @@ import {
   Square,
   Loader2,
   FlaskConical,
+  Maximize2,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -158,6 +160,8 @@ function ExhibitModalBody({
     setSceneLabOpen(true, exhibitId);
   };
 
+  const [imgLightboxOpen, setImgLightboxOpen] = useState(false);
+
   const [narrating, setNarrating] = useState(false);
   const [narrLoading, setNarrLoading] = useState(false);
   const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
@@ -273,12 +277,31 @@ function ExhibitModalBody({
         {img && (
           <div className="px-4 pb-4 sm:px-5 sm:pb-5">
             <div
-              className="relative flex h-28 items-end overflow-hidden rounded-lg border border-foreground/10 sm:h-32"
+              className={`group relative flex h-28 items-end overflow-hidden rounded-lg border border-foreground/10 sm:h-32 ${img.imageUrl ? "cursor-zoom-in" : ""}`}
               style={img.imageUrl ? { backgroundImage: `url(${img.imageUrl})`, backgroundSize: 'cover', backgroundPosition: 'center' } : { background: img.gradient }}
+              onClick={img.imageUrl ? () => setImgLightboxOpen(true) : undefined}
+              role={img.imageUrl ? "button" : undefined}
+              tabIndex={img.imageUrl ? 0 : undefined}
+              onKeyDown={
+                img.imageUrl
+                  ? (e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        setImgLightboxOpen(true);
+                      }
+                    }
+                  : undefined
+              }
+              aria-label={img.imageUrl ? "Phóng to ảnh lịch sử" : undefined}
             >
               {!img.imageUrl && <div className="absolute inset-0 grain opacity-[0.08] mix-blend-overlay" />}
               {img.imageUrl && <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />}
               {!img.imageUrl && <MotifIcon motif={exhibit.motif} className="absolute right-3 top-3 h-8 w-8 text-foreground/20" strokeWidth={1} />}
+              {img.imageUrl && (
+                <span className="absolute right-2 top-2 inline-flex h-7 w-7 items-center justify-center rounded-full border border-white/15 bg-black/55 text-white/85 opacity-0 backdrop-blur-md transition group-hover:opacity-100">
+                  <Maximize2 className="h-3.5 w-3.5" />
+                </span>
+              )}
               <div className="relative p-3">
                 <div className="text-[0.55rem] uppercase tracking-[0.18em] text-white/60">
                   Ảnh lịch sử · {img.year}
@@ -293,6 +316,40 @@ function ExhibitModalBody({
             </div>
           </div>
         )}
+
+        {imgLightboxOpen && img?.imageUrl && typeof document !== "undefined" &&
+          createPortal(
+            <div
+              className="pointer-events-auto fixed inset-0 z-[200] flex flex-col items-center justify-center bg-black/92 p-6 backdrop-blur-sm"
+              role="dialog"
+              aria-modal="true"
+              aria-label="Ảnh lịch sử phóng to"
+              onClick={() => setImgLightboxOpen(false)}
+            >
+              <img
+                src={img.imageUrl}
+                alt={img.caption}
+                className="max-h-[80vh] max-w-full rounded-lg object-contain shadow-2xl"
+                onClick={(e) => e.stopPropagation()}
+              />
+              <div className="mt-4 max-w-2xl text-center">
+                <div className="text-[0.65rem] uppercase tracking-[0.18em] text-white/50">
+                  Ảnh lịch sử · {img.year}
+                </div>
+                <div className="mt-1 text-sm font-medium text-white/85">{img.caption}</div>
+                <div className="mt-1 text-xs italic text-white/50">Nguồn: {img.source}</div>
+              </div>
+              <button
+                onClick={() => setImgLightboxOpen(false)}
+                className="absolute right-4 top-4 inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-black/55 text-white/85 backdrop-blur-md transition hover:bg-black/75 hover:text-white"
+                aria-label="Đóng"
+                title="Đóng"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>,
+            document.body
+          )}
 
         <div className="px-4 pb-4 sm:px-5 sm:pb-5 pt-0">
           {/* connections */}

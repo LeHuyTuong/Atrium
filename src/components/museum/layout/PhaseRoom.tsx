@@ -102,7 +102,7 @@ export function PhaseRoom() {
                       {currentPhase === "industry-1" && (
                         <button
                           onClick={() => {
-                            setSceneLabOpen(true);
+                            setSceneLabOpen(true, "watt-steam");
                           }}
                           className="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[0.65rem] font-medium transition"
                           style={{
